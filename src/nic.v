@@ -109,6 +109,7 @@ module nic #(parameter PACKET_WIDTH = 64)(
         if (reset) begin
             net_so <= 0;
             net_do <= 0;
+            net_ri <= 1;
         end else begin
             // Write to output buffer
             if (nicEnWR && nicEn && addr == 2'b10) begin
