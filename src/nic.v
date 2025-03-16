@@ -79,7 +79,6 @@ module nic #(parameter PACKET_WIDTH = 64)(
             d_out <= 0;
         end else begin
             // Handle data reception from router to NIC input buffer
-            // 
             // nic_ri = 1, input buffer empty
             // net_si = 1
             if (net_ri && net_si) begin
@@ -87,42 +86,42 @@ module nic #(parameter PACKET_WIDTH = 64)(
                 channel_input_buffer_status <= 1;
             end
             
+            // - for load/store 
             // send data from router to processor
-            // nicEn == 1
-            // nicEnWR == 0
-            // addr == 2'b00 for channel input reg
-            if (nicEn && !nicEnWR && addr == 2'b00) begin
-                d_out <= channel_input_buffer;
-            end else if (addr == 2'b01) begin // read input channel status register
-                d_out <= {62'b0, channel_input_buffer_status};
-            end else if (addr == 2'b11) begin // read output channel status register
-                d_out <= {62'b0, channel_output_buffer_status};
+            if (nicEn && !nicEnWR) begin
+                case (addr)
+                    2'b00: d_out <= channel_input_buffer;                   // Read channel buffer data
+                    2'b01: d_out <= {62'b0, channel_input_buffer_status};   // Read input channel status register
+                    2'b10: d_out <= channel_output_buffer;                  // Read channel buffer data
+                    2'b11: d_out <= {62'b0, channel_output_buffer_status};  // Read output channel status register
+                    default: d_out <= 0;
+                endcase
             end
         end
     end
     
     // Network Output Channel Logic
-    
-    // 1. if nicEnWR && nicEn, place data into output buffer
+    // 1. If nicEn and nicWrEN are both high
+    // and addr[0:1] specifies the network output channel buffer, the packet on the d_in port is written to the output
+    // channel buffer
     // 2. check if buffer is full && net_ro && net_polarity , yes then send
     always @(posedge clk or posedge reset) begin
         if (reset) begin
             net_so <= 0;
             net_do <= 0;
         end else begin
-            if (nicEnWR && nicEn) begin
+            // Write to output buffer
+            if (nicEnWR && nicEn && addr == 2'b10) begin
                 channel_output_buffer <= d_in;
             end
+    
             // Check if there is a packet in the output buffer and router is ready
             if (channel_output_buffer_status && net_ro && net_polarity) begin
-                // Assert net_so to signal that data is ready to be sent
                 net_do <= channel_output_buffer; // Place packet on output channel
-                net_so <= 1;
+                net_so <= 1;                     // Signal that data is ready to be sent
             end else begin
-                // If router is not ready, keep net_so low and retain data
-                net_so <= 0;
+                net_so <= 0;                     // Keep signal low if router isn't ready
             end
         end
     end
-
 endmodule
