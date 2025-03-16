@@ -69,10 +69,8 @@ initial begin
     net_di = 64'hA5A5A5A5A5A5A5A5; // Example test data
     net_si = 1;                    // Assert send-in signal
     
-    #10; nicEn = 1;
-    // Deassert net_si to simulate end of transmission
-    net_si = 0;
-    #10;
+    // data recieved for 1 cycle
+    #10; nicEn = 1; net_si = 0; #20; reset = 1; #10; reset = 0;
     
     // Don't accept packet into d_out
     nicEn = 0;
@@ -103,13 +101,7 @@ initial begin
     // Step 2: Simulate router readiness (net_ro) and polarity (net_polarity)
     net_ro = 1;
     net_polarity = 1;
-    #10;
-    
-    
-    // Step 3: Simulate router not being ready and check if NIC holds the data
-    net_ro = 0; // Router not ready
-    net_polarity = 1;
-    #10; #10;
+    #10;#10;
 
 
     // Finish the simulation

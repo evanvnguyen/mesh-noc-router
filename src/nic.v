@@ -1,7 +1,7 @@
 module nic #(parameter PACKET_WIDTH = 64)(
     input clk, reset, 
     
-    // **** Between CPU ****
+        // **** Between CPU ****
     
      // Addressing for status reg and channel buffer reg
     input [0:1] addr,
@@ -42,91 +42,60 @@ module nic #(parameter PACKET_WIDTH = 64)(
     input net_polarity 
 );
 
-// router handshake
-
-    // GET DATA FROM ROUTER --> NIC
-    //1. check to see if buffer is empty
-    //1. set ready signal
-    //  - assert net_ri = 1
-    //  - if input buffer is empty
-    //2. assert net_si = 1 once router asserts pe_so = 1
-    //3. check to see if in buff is empty
+    // Internal Buffers and Status Registers
     reg [PACKET_WIDTH-1:0] channel_input_buffer;
     reg [PACKET_WIDTH-1:0] channel_output_buffer;
     reg channel_input_buffer_status;   
     reg channel_output_buffer_status;
     
+    // router handhsake
     always @(posedge clk or posedge reset) begin
         if (reset) begin
-            channel_input_buffer_status <= 1'b0;
-            channel_output_buffer_status <= 1'b0;
-        end else begin
-            channel_input_buffer_status <= (channel_input_buffer == 0) ? 1'b0 : 1'b1;
-            channel_output_buffer_status <= (channel_output_buffer == 0) ? 1'b0 : 1'b1;
-        end
-    end
-    
-    always @(posedge clk or posedge reset) begin
-        if (reset) begin
-            // Reset all buffers and statuses
             channel_input_buffer <= 0;
-            channel_input_buffer_status <= 0;
             channel_output_buffer <= 0;
+            channel_input_buffer_status <= 0;
             channel_output_buffer_status <= 0;
             d_out <= 0;
+            net_ri <= 1;    // Ready to accept data after reset
+            net_so <= 0;
+            net_do <= 0;
         end else begin
-            // Handle data reception from router to NIC input buffer
-            // nic_ri = 1, input buffer empty
-            // net_si = 1
+            // Write to Output Buffer (if nicEnWR, nicEn, addr to output buffer, output buffer is empty)
+            if (nicEnWR && nicEn && addr == 2'b10 && !channel_output_buffer_status) begin
+                channel_output_buffer <= d_in;
+            end
+    
+            // Receive Data from Router into Input Buffer (only if ready and valid)
             if (net_ri && net_si) begin
                 channel_input_buffer <= net_di;
             end
             
-            // - for load/store 
-            // send data from router to processor
+            // Update Status Registers (0-empty, 1-full)
+            channel_input_buffer_status <= (channel_input_buffer == 0) ? 1'b0 : 1'b1;
+            channel_output_buffer_status <= (channel_output_buffer == 0) ? 1'b0 : 1'b1;
+            
+            // Update net_ri based on input buffer status
+            net_ri <= (channel_input_buffer_status == 0) ? 1'b1 : 1'b0;
+    
+            // Send data to router (if router ready, polarity ok, buffer is full)
+            if (channel_output_buffer_status && net_ro && net_polarity) begin
+                net_do <= channel_output_buffer;
+                net_so <= 1;
+            end else begin
+                net_so <= 0;
+            end
+    
+            // Processor Read Logic
             if (nicEn && !nicEnWR) begin
                 case (addr)
-                    2'b00: d_out <= channel_input_buffer;                   // Read channel buffer data
-                    2'b01: d_out <= {62'b0, channel_input_buffer_status};   // Read input channel status register
-                    2'b10: d_out <= channel_output_buffer;                  // Read channel buffer data
-                    2'b11: d_out <= {62'b0, channel_output_buffer_status};  // Read output channel status register
-                    default: d_out <= 0;
+                    2'b00: d_out <= channel_input_buffer;                             // Read input buffer
+                    2'b01: d_out <= {62'b0, channel_input_buffer_status};             // Read input status
+                    2'b10: d_out <= 64'b0;                                            // Invalid read from output buffer
+                    2'b11: d_out <= {62'b0, channel_output_buffer_status};            // Read output status
+                    default: d_out <= 64'b0;
                 endcase
             end
         end
     end
-    
-    // Network Output Channel Logic
-    // 1. If nicEn and nicWrEN are both high
-    // and addr[0:1] specifies the network output channel buffer, the packet on the d_in port is written to the output
-    // channel buffer
-    // 2. check if buffer is full && net_ro && net_polarity , yes then send
-    always @(posedge clk or posedge reset) begin
-        if (reset) begin
-            net_so <= 0;
-            net_do <= 0;
-            net_ri <= 1;
-        end else begin
-            // Write to output buffer
-            if (nicEnWR && nicEn && addr == 2'b10) begin
-                channel_output_buffer <= d_in;
-            end
-    
-            // Check if there is a packet in the output buffer and router is ready
-            if (channel_output_buffer_status && net_ro && net_polarity) begin
-                net_do <= channel_output_buffer; // Place packet on output channel
-                net_so <= 1;                     // Signal that data is ready to be sent
-            end else begin
-                net_so <= 0;                     // Keep signal low if router isn't ready
-            end
-            
-            // if input buf status = 1(full), don't accept data
-            if (channel_input_buffer_status) begin
-                net_ri <= 0;
-            end else begin // if = 0(empty), so accept data
-                net_ri <= 1;        
-            end
-            
-        end
-    end
+
 endmodule
