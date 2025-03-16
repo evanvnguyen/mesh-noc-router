@@ -56,19 +56,16 @@ module nic #(parameter PACKET_WIDTH = 64)(
     reg channel_input_buffer_status;   
     reg channel_output_buffer_status;
     
-    always @(*) begin
-        // assert buffer status if full or empty
-        channel_input_buffer_status = (channel_input_buffer == 64'b0) ? 1'b0 : 1'b1;
-        channel_output_buffer_status = (channel_output_buffer == 64'b0) ? 1'b0 : 1'b1;
-
-        // if input buf status = 1(full), don't accept data
-        if (channel_input_buffer_status) begin
-            net_ri = 0;
-        end else begin // if = 0(empty), so accept data
-            net_ri = 1;        
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            channel_input_buffer_status <= 1'b0;
+            channel_output_buffer_status <= 1'b0;
+        end else begin
+            channel_input_buffer_status <= (channel_input_buffer == 0) ? 1'b0 : 1'b1;
+            channel_output_buffer_status <= (channel_output_buffer == 0) ? 1'b0 : 1'b1;
         end
-        
     end
+    
     always @(posedge clk or posedge reset) begin
         if (reset) begin
             // Reset all buffers and statuses
@@ -83,7 +80,6 @@ module nic #(parameter PACKET_WIDTH = 64)(
             // net_si = 1
             if (net_ri && net_si) begin
                 channel_input_buffer <= net_di;
-                channel_input_buffer_status <= 1;
             end
             
             // - for load/store 
@@ -123,6 +119,14 @@ module nic #(parameter PACKET_WIDTH = 64)(
             end else begin
                 net_so <= 0;                     // Keep signal low if router isn't ready
             end
+            
+            // if input buf status = 1(full), don't accept data
+            if (channel_input_buffer_status) begin
+                net_ri <= 0;
+            end else begin // if = 0(empty), so accept data
+                net_ri <= 1;        
+            end
+            
         end
     end
 endmodule

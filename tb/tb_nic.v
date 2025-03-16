@@ -69,14 +69,10 @@ initial begin
     net_di = 64'hA5A5A5A5A5A5A5A5; // Example test data
     net_si = 1;                    // Assert send-in signal
     
-    #10;
+    #10; nicEn = 1;
     // Deassert net_si to simulate end of transmission
     net_si = 0;
     #10;
-
-    // Accept packet into CPU
-    nicEnWR = 0;
-    nicEn = 0;
     
     // Don't accept packet into d_out
     nicEn = 0;
