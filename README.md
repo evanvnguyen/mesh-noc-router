@@ -1,3 +1,3 @@
 # mesh-noc-router
 
-577B
+Multi-core Cardinal NIC System on a Bidirectional 4x4 Mesh NoC
