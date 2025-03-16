@@ -1,3 +1,319 @@
-module router ();
+/*
+* This module is the router that routes the input channels to the output channels.
+* The router is responsible for abritrating the input channels to the output channels.
+* The router has 4 input channels and 4 output channels, 
+*  - cw: clockwise
+*  - ccw: counter clockwise
+*  - pe: processing element
+*  - ns: north-south
+*  - sn: south-north
+*/
+
+module router (
+  input clk,
+  input reset,
+  input [3:0] router_position,
+  output reg polarity_out,
+
+  // cw input channel signals
+  input cwsi,
+  input [63:0] cwdi,
+  output cwri,
+
+  // ccw input channel signals
+  input ccwsi,
+  input [63:0] ccwdi,
+  output ccwri,
+
+  // pe input channel signals
+  input pesi,
+  input [63:0] pedi,
+  output peri,
+
+  // cw output channel signals
+  input cwro,
+  output cwso,
+  output [63:0] cwdo,
+
+  // ccw output channel signals
+  input ccwro,
+  output ccwso,
+  output [63:0] ccwdo,
+
+  // pe output channel signals
+  input pero,
+  output peso,
+  output [63:0] pedo,
+
+  // ns input channel signals
+  input nssi,
+  input [63:0] nsdi,
+  output nsri,
+
+  // sn input channel signals
+  input snsi,
+  input [63:0] sndi,
+  output snri,
+
+  // ns output channel signals
+  input nsro,
+  output nsso,
+  output [63:0] nsdo,
+
+  // sn output channel signals
+  input snro,
+  output snso,
+  output [63:0] sndo
+);
+
+  localparam NORTH_TO_SOUTH = 1'b0; 
+  localparam SOUTH_TO_NORTH = 1'b1;
+  localparam EAST_TO_WEST = 1'b0;
+  localparam WEST_TO_EAST = 1'b1;
+
+  // 1-bit for the VC
+  localparam VC_BIT = 63;          // The bit that determines which virtual channel we are using
+  // 2-bits for the direction
+  localparam NORTH_SOUTH_BIT = 62; // The bit that determines if the data is going north to south or south to north
+  localparam EAST_WEST_BIT = 61;   // The bit that determines if the data is going east to west or west to east
+  // There are 5 reserved bits 60-56
+  localparam Y_HOP_BIT = 55;       // The MSB that points to how many hops we have left in the Y direction
+  localparam X_HOP_BIT = 51;       // The MSB that points to how many hops we have left in the X direction
+  localparam HOP_BIT_WIDTH = 3;    // The width of the hop bits. 1-bit is excluded to make it simplier to use
+  // 8 bits for the hop values
+  localparam Y_SOURCE_BITS = 47;   // The bits that point to the source of the data in the Y direction
+  localparam X_SOURCE_BITS = 39;   // The bits that point to the source of the data in the X direction
+  localparam SOURCE_BIT_WIDTH = 7; // The width of the source bits. 1-bit is excluded to make it simplier to use
+  // 16 bits for the source and the remain 32-bits are for the data
+
+  reg polarity;
+
+  // This will be used to see who has requested to send data to a given output channel.
+  reg [1:0] cw_requests;  // Index 0 is for cw and index 1 is for pe
+  reg [1:0] ccw_requests; // Index 0 is for ccw and index 1 is for pe
+  reg [3:0] pe_requests;  // Index 0 is for cw, index 1 is for ccw, index 2 is for ns, and index 3 is for sn
+  reg [3:0] ns_requests;  // Index 0 is for cw, index 1 is for ccw, index 2 is for pe, and index 3 is for ns
+  reg [3:0] sn_requests;  // Index 0 is for cw, index 1 is for ccw, index 2 is for pe, and index 3 is for sn
+
+  wire cw_out_blocked;
+  wire ccw_out_blocked;
+  wire pe_out_blocked;
+  wire ns_out_blocked;
+  wire sn_out_blocked;
+
+  reg cw_in_blocked;
+  reg ccw_in_blocked;
+  reg pe_in_blocked;
+  reg ns_in_blocked;
+  reg sn_in_blocked;
+
+  // These will be used to connect the output of the input channels
+  // to the input of the output channels. This connection will be determined
+  // by the arbiter.
+  wire [63:0] cw_data_out;
+  wire [63:0] ccw_data_out;
+  wire [63:0] pe_data_out;
+  wire [63:0] ns_data_out;
+  wire [63:0] sn_data_out;
+
+  // These will be used to connect the output of the input channels
+  // to the input of the output channels. This connection will be determined
+  // by the arbiter.
+  reg [63:0] cw_data_in;
+  reg [63:0] ccw_data_in;
+  reg [63:0] pe_data_in;
+  reg [63:0] ns_data_in;
+  reg [63:0] sn_data_in;
+
+  // Instantiate the input and output channels of the router
+  router_input_channel cw_input_channel (
+    .clk(clk),
+    .reset(reset),
+    .polarity(polarity),
+    .send(cwsi),
+    .blocked(cw_in_blocked),
+    .data_in(cwdi),
+    .ready(cwri),
+    .data_out(cw_data_out)
+  );
+
+  router_input_channel ccw_input_channel (
+    .clk(clk),
+    .reset(reset),
+    .polarity(polarity),
+    .send(ccwsi),
+    .blocked(ccw_in_blocked),
+    .data_in(ccwdi),
+    .ready(ccwri),
+    .data_out(ccw_data_out)
+  );
+
+  router_input_channel pe_input_channel (
+    .clk(clk),
+    .reset(reset),
+    .polarity(polarity),
+    .send(pesi),
+    .blocked(pe_in_blocked),
+    .data_in(pedi),
+    .ready(peri),
+    .data_out(pe_data_out)
+  );
+
+  router_input_channel ns_input_channel (
+    .clk(clk),
+    .reset(reset),
+    .polarity(polarity),
+    .send(nssi),
+    .blocked(ns_in_blocked),
+    .data_in(nsdi),
+    .ready(nsri),
+    .data_out(ns_data_out)
+  );
+
+  router_input_channel sn_input_channel (
+    .clk(clk),
+    .reset(reset),
+    .polarity(polarity),
+    .send(snsi),
+    .blocked(sn_in_blocked),
+    .data_in(sndi),
+    .ready(snri),
+    .data_out(sn_data_out)
+  );
+
+  router_output_channel cw_output_channel (
+    .clk(clk),
+    .reset(reset),
+    .polarity(polarity),
+    .ready(cwro),
+    .data_in(cw_data_in),
+    .blocked(cw_out_blocked),
+    .send(cwso),
+    .data_out(cwdo)
+  );
+
+  router_output_channel ccw_output_channel (
+    .clk(clk),
+    .reset(reset),
+    .polarity(polarity),
+    .ready(ccwro),
+    .data_in(ccw_data_in),
+    .blocked(ccw_out_blocked),
+    .send(ccwso),
+    .data_out(ccwdo)
+  );
+
+  router_output_channel pe_output_channel (
+    .clk(clk),
+    .reset(reset),
+    .polarity(polarity),
+    .ready(pero),
+    .data_in(pe_data_in),
+    .blocked(pe_out_blocked),
+    .send(peso),
+    .data_out(pedo)
+  );
+
+  router_output_channel ns_output_channel (
+    .clk(clk),
+    .reset(reset),
+    .polarity(polarity),
+    .ready(nsro),
+    .data_in(ns_data_in),
+    .blocked(ns_out_blocked),
+    .send(nsso),
+    .data_out(nsdo)
+  );
+
+  router_output_channel sn_output_channel (
+    .clk(clk),
+    .reset(reset),
+    .polarity(polarity),
+    .ready(snro),
+    .data_in(sn_data_in),
+    .blocked(sn_out_blocked),
+    .send(snso),
+    .data_out(sndo)
+  );
+
+  always @(posedge clk) begin
+    if (reset) begin
+      polarity <= 1'b0;
+    end else begin
+      polarity <= ~polarity;
+    end
+  end
+
+  always @(*) begin
+    if (reset) begin
+      cw_data_in = 64'b0;
+      ccw_data_in = 64'b0;
+      pe_data_in = 64'b0;
+      ns_data_in = 64'b0;
+      sn_data_in = 64'b0;
+
+      cw_in_blocked = 1'b0;
+      ccw_in_blocked = 1'b0;
+      pe_in_blocked = 1'b0;
+      ns_in_blocked = 1'b0;
+      sn_in_blocked = 1'b0;
+    end else begin
+      cw_in_blocked = 1'b0;
+      ccw_in_blocked = 1'b0;
+      pe_in_blocked = 1'b0;
+      ns_in_blocked = 1'b0;
+      sn_in_blocked = 1'b0;
+
+      // We need to look at the direction of the data and figure out where to 
+      // send it. We will use an arbiter to determine who has priority if
+      // multiple channels are trying to send data to the same output channel.
+
+      // If traveling cw, we will conitnue to travel cw until it runs out of hops.
+      // After that, we will travel ns or sn until it runs out of hops.
+      // Once we are out of y hops and x hops we have reached our destination and
+      // we will send the data to the processing element.
+      if (cw_data_out != 64'b0) begin
+        // Is the packet traveling from west to east and are there any hops left?
+        if (cw_data_out[EAST_WEST_BIT] == WEST_TO_EAST && 
+            cw_data_out[X_HOP_BIT: X_HOP_BIT-HOP_BIT_WIDTH] > 0) begin
+
+          cw_requests[0] = 1'b1;
+        end else if (cw_data_out[NORTH_SOUTH_BIT] == NORTH_TO_SOUTH &&
+                     cw_data_out[Y_HOP_BIT: Y_HOP_BIT-HOP_BIT_WIDTH] > 0) begin
+        
+          ns_requests[0] = 1'b1;
+        end else begin
+          if (cw_data_out[Y_HOP_BIT: Y_HOP_BIT-HOP_BIT_WIDTH] > 0) begin
+            sn_requests[0] = 1'b1;
+          end else begin
+            // There are no more hops left, so we've reached our destination.
+            pe_requests[0] = 1'b1;
+          end
+        end
+      end
+
+      // If traveling ccw, we use the same logic as traveling cw.
+      if (ccw_data_out != 64'b0) begin
+        // Is the packet traveling from west to east and are there any hops left?
+        if (ccw_data_out[EAST_WEST_BIT] == EAST_TO_WEST && 
+            ccw_data_out[X_HOP_BIT: X_HOP_BIT-HOP_BIT_WIDTH] > 0) begin
+
+          ccw_requests[0] = 1'b1;
+        end else if (ccw_data_out[NORTH_SOUTH_BIT] == NORTH_TO_SOUTH &&
+                     ccw_data_out[Y_HOP_BIT: Y_HOP_BIT-HOP_BIT_WIDTH] > 0) begin
+        
+          ns_requests[1] = 1'b1;
+        end else begin
+          if (ccw_data_out[Y_HOP_BIT: Y_HOP_BIT-HOP_BIT_WIDTH] > 0) begin
+            sn_requests[1] = 1'b1;
+          end else begin
+            // There are no more hops left, so we've reached our destination.
+            pe_requests[1] = 1'b1;
+          end
+        end
+      end
+
+    end
+  end
 
 endmodule
