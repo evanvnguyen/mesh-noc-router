@@ -18,9 +18,9 @@
 // synthesis will optimize out nets not being driven by input or driven by output
 module mesh_top #(
         parameter PACKET_WIDTH = 64,
-        parameter MESH_X = 4,
-        parameter MESH_Y = 4,
-        parameter NUM_ROUTERS = MESH_X * MESH_Y
+        parameter SIZE_X = 4,
+        parameter SIZE_Y = 4,
+        parameter NUM_ROUTERS = SIZE_X * SIZE_Y
     ) (
         input clk,
         input reset,
