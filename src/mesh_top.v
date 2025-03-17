@@ -16,30 +16,35 @@
 
 // not entirely sure how to wrap this properly.
 // synthesis will optimize out nets not being driven by input or driven by output
-module mesh_top #(parameter PACKET_WIDTH = 64) (
-    input clk,
-    input reset,
-
-    output [15:0] polarity_out
-);
+module mesh_top #(
+        parameter PACKET_WIDTH = 64,
+        parameter MESH_X = 4,
+        parameter MESH_Y = 4,
+        parameter NUM_ROUTERS = MESH_X * MESH_Y
+    ) (
+        input clk,
+        input reset,
+    
+        output [NUM_ROUTERS-1:0] polarity_out
+    );
     
     // Flatten the width of the router inputs/outputs and splice it for each router
-    wire [15:0] cwsi, cwri, cwro, cwso;
-    wire [15:0] ccwsi, ccwri, ccwro, ccwso;
-    
-   // Dont really need cwdi/ccwdi_flat since we just connect outputs to output
-    wire [(16 * PACKET_WIDTH) - 1:0] cwdi_flat, cwdo_flat;
-    wire [(16 * PACKET_WIDTH) - 1:0] ccwdi_flat, ccwdo_flat;
+    wire [NUM_ROUTERS-1:0] cwsi, cwri, cwro, cwso;
+    wire [NUM_ROUTERS-1:0] ccwsi, ccwri, ccwro, ccwso;
 
-    wire [15:0] pesi, peri, pero, peso;
-    wire [(16 * PACKET_WIDTH) - 1:0] pedi_flat, pedo_flat;
+    // Don't really need cwdi/ccwdi_flat since we just connect outputs to output
+    wire [(NUM_ROUTERS * PACKET_WIDTH) - 1:0] cwdi_flat, cwdo_flat;
+    wire [(NUM_ROUTERS * PACKET_WIDTH) - 1:0] ccwdi_flat, ccwdo_flat;
 
-    wire [15:0] nssi, nsri, nsro, nsso;
-    wire [15:0] snsi, snri, snro, snso;
-    
-    // Dont really need nsdi/sndi_flat since we just connect outputs to output
-    wire [(16 * PACKET_WIDTH) - 1:0] nsdi_flat, nsdo_flat;
-    wire [(16 * PACKET_WIDTH) - 1:0] sndi_flat, sndo_flat;
+    wire [NUM_ROUTERS-1:0] pesi, peri, pero, peso;
+    wire [(NUM_ROUTERS * PACKET_WIDTH) - 1:0] pedi_flat, pedo_flat;
+
+    wire [NUM_ROUTERS-1:0] nssi, nsri, nsro, nsso;
+    wire [NUM_ROUTERS-1:0] snsi, snri, snro, snso;
+
+    // Don't really need nsdi/sndi_flat since we just connect outputs to output
+    wire [(NUM_ROUTERS * PACKET_WIDTH) - 1:0] nsdi_flat, nsdo_flat;
+    wire [(NUM_ROUTERS * PACKET_WIDTH) - 1:0] sndi_flat, sndo_flat;
 
     /* Edge grounding
     1. Top Row (i == 0):
@@ -59,10 +64,10 @@ module mesh_top #(parameter PACKET_WIDTH = 64) (
        - .cwsi and .cwdi are set to GND
 
     5. Corner Routers:
-         - router_genblk(0,0) ? Ground NS and CCW
-         - router_genblk(0,3) ? Ground NS and CW
-         - router_genblk(3,0) ? Ground SN and CCW
-         - router_genblk(3,3) ? Ground SN and CW
+         - router_genblk(0,0) → Ground NS and CCW
+         - router_genblk(0,3) → Ground NS and CW
+         - router_genblk(3,0) → Ground SN and CCW
+         - router_genblk(3,3) → Ground SN and CW
     */
 
     // Flattened NIC signals for each router
@@ -80,14 +85,23 @@ module mesh_top #(parameter PACKET_WIDTH = 64) (
                 localparam index = i * 4 + j;
                 
                 /*
-                1. Hooks up 1 dummy CPU to 1 NIC.
-                2. Hooks up 1 NIC to 1 router.
-                These signals need to connect to the  actual CPU in future:
-                 - addr
-                 - d_in/d_out
-                 - nicEn
-                 - nicEnWr
-                 Currently driven by a dummy cpu that always rigths to the output buffer
+                    1. Hooks up 1 dummy CPU to 1 NIC.
+                    2. Hooks up 1 NIC to 1 router.
+                    These signals need to connect to the  actual CPU in future:
+                     - addr
+                     - d_in/d_out
+                     - nicEn
+                     - nicEnWr
+                     Currently driven by a dummy cpu that always rigths to the output buffer
+                */
+
+                /* Splice handling
+                    -   if index = 3 and PACKET_WIDTH = 64,
+                        (index + 1) × PACKET_WIDTH = 4 × 64 = 256.
+                        So cwdi comes from cwdo_flat[256 +: 64], i.e. bits [256 : 319].
+                    
+                        Similarly, index × PACKET_WIDTH = 3 × 64 = 192.
+                        So the local cwdo slice is cwdo_flat[192 +: 64], i.e. bits [192 : 255].
                 */
                 
                 dummy_cpu #(PACKET_WIDTH) cpu_inst (
@@ -121,6 +135,14 @@ module mesh_top #(parameter PACKET_WIDTH = 64) (
                     .reset(reset),
                     .router_position({i[1:0], j[1:0]}),
                     .polarity_out(polarity_out[index]),
+                    
+                    /* 
+                        If on right column (j = 3), cwdi is grounded to 1'b0.
+                        If not, assign cwdi to cwdo_flat[((index + 1) × PACKET_WIDTH) +: PACKET_WIDTH].
+                        For example, if index = 3 and PACKET_WIDTH = 64:
+                        (index + 1) × PACKET_WIDTH = 4 × 64 = 256,
+                        so cwdi comes from bits [256 : 319] of cwdo_flat.
+                    */
 
                     // CW input/output or grounded for right edge
                     .cwsi((j == 3) ? 1'b0 : ccwso[index + 1]),
