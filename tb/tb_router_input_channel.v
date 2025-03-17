@@ -52,7 +52,7 @@ module tb_router_input_channel;
 				data_in <= 0;
 			end
 			
-			blocked <= (cycle_count == 2 || cycle_count == 3);
+			blocked <= (cycle_count == 3 || cycle_count == 4);
 
 			polarity <= ~polarity;
 			cycle_count <= cycle_count + 1;

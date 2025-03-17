@@ -1,16 +1,10 @@
 module tb_router();
-  reg clk, reset, polarity, send, in_blocked;
-  reg [63:0] data_in;
-  reg out_ready;
-  
-  wire ready;
-  wire send_ou, out_blockedt;
-  wire [63:0] input_channel_output;
-  wire [63:0] data_out;
-  
-  router_input_channel in_channel(clk, reset, polarity, send, in_blocked, data_in, ready, input_channel_output);
-
-  router_output_channel out_channel(clk, reset, polarity, out_ready, input_channel_output, out_blocked, send_out, data_out);
+  reg clk, reset;
+  reg cwsi, ccwsi, pesi, cwro, ccwro, pero, nssi, snsi, nsro, snro;
+  reg [63:0] cwdi, ccwdi, pedi, nsdi, sndi;
+  reg [3:0] router_position;
+  wire cwri, ccwri, peri, nsri, snri, cwso, ccwso, peso, nsso, snso, polarity_out;
+  wire [63:0] cwdo, ccwdo, pedo, nsdo, sndo;
   
   reg [63:0] data_array [10:0];
   integer cycle_count, data_index;
@@ -18,11 +12,48 @@ module tb_router();
   initial clk = 0;
   always #2 clk = ~clk; // 250 Mhz
 
+  router uut(
+    .clk(clk),
+    .reset(reset),
+    .router_position(router_position),
+    .polarity_out(polarity_out),
+    .cwsi(cwsi),
+    .cwdi(cwdi),
+    .cwri(cwri),
+    .ccwsi(ccwsi),
+    .ccwdi(ccwdi),
+    .ccwri(ccwri),
+    .pesi(pesi),
+    .pedi(pedi),
+    .peri(peri),
+    .cwro(cwro),
+    .cwso(cwso),
+    .cwdo(cwdo),
+    .ccwro(ccwro),
+    .ccwso(ccwso),
+    .ccwdo(ccwdo),
+    .pero(pero),
+    .peso(peso),
+    .pedo(pedo),
+    .nssi(nssi),
+    .nsdi(nsdi),
+    .nsri(nsri),
+    .snsi(snsi),
+    .sndi(sndi),
+    .snri(snri),
+    .nsro(nsro),
+    .nsso(nsso),
+    .nsdo(nsdo),
+    .snro(snro),
+    .snso(snso),
+    .sndo(sndo)
+  );
+
   initial begin
     $dumpfile("iverilog-out/dump.vcd");
     $dumpvars(0, tb_router);
-    data_array[0] = 'hfA50;
-    data_array[1] = 'h6840;
+    data_array[0] = 'h200200000000FA50;
+    data_array[1] = 'h4002000000006840;
     data_array[2] = 'hffff;
     data_array[3] = 'hc7d4;
     data_array[4] = 'hffffffff;
@@ -32,42 +63,47 @@ module tb_router();
     data_array[8] = 'h12345678;
     data_array[9] = 'hdef123;
     data_array[10] = 'h11a11;
-    
-    data_in = 0;
+
+    cwsi = 0;
+    ccwsi = 0;
+    pesi = 0;
+    cwro = 1;
+    ccwro = 0;
+    pero = 0;
+    nssi = 0;
+    snsi = 0;
+    nsro = 0;
+    snro = 0;
+    cwdi = 64'b0;
+    ccwdi = 64'b0;
+    pedi = 64'b0;
+    nsdi = 64'b0;
+    sndi = 64'b0;
+    router_position = 4'b0;
     cycle_count = 0;
     data_index = 0;
-    polarity = 0;
-    in_blocked = 0;
-    send = 0;
-    out_ready = 1;
 
     reset = 1;
     #8
     reset = 0;
-    #100
+    #40
 
     $finish;
   end
     
 	always @(posedge clk) begin
 		if (!reset) begin
-		    if (ready && data_index < 10 && !in_blocked) begin
-				send <= 1;
-				data_in <= data_array[data_index];
-				
-				data_index <= data_index + 1;
-			end else begin
-				send <= 0;
-				data_in <= 0;
-			end
-			
-			// blocked <= (cycle_count == 2 || cycle_count == 3);
+      if (peri && cycle_count == 2) begin
+        pedi <= data_array[0];
+        pesi <= 1;
+      end
 
-			polarity <= ~polarity;
-			cycle_count <= cycle_count + 1;
+      if (nsri && cycle_count == 2) begin
+        nsdi <= data_array[1];
+        nssi <= 1;
+      end
 		end
-		
-		$display("TB: Time=%0t, clk=%b, reset=%b, polarity=%b, send=%b, blocked=%b, data=%h, ready=%b, data_out=%h",
-						$time, clk, reset, polarity, send, in_blocked, data_in, ready, data_out);
+
+    cycle_count <= cycle_count + 1;
 	end
 endmodule

@@ -14,33 +14,33 @@ module four_way_arbiter (
 
   always @(*) begin
     if (reset) begin
-      granted <= 2'b00;
-      last_granted <= 2'b00;
+      granted = 2'b00;
+      last_granted = 2'b00;
     end else begin
       case (last_granted)
         2'b00: begin
-          if (req[1]) begin granted <= 2'b01; last_granted <= 2'b01; end
-          else if (req[2]) begin granted <= 2'b10; last_granted <= 2'b10; end
-          else if (req[3]) begin granted <= 2'b11; last_granted <= 2'b11; end
-          else if (req[0]) begin granted <= 2'b00; last_granted <= 2'b00; end
+          if (requests[1]) begin granted = 2'b01; last_granted = 2'b01; end
+          else if (requests[2]) begin granted = 2'b10; last_granted = 2'b10; end
+          else if (requests[3]) begin granted = 2'b11; last_granted = 2'b11; end
+          else if (requests[0]) begin granted = 2'b00; last_granted = 2'b00; end
         end
         2'b01: begin
-          if (req[2]) begin granted <= 2'b10; last_granted <= 2'b10; end
-          else if (req[3]) begin granted <= 2'b11; last_granted <= 2'b11; end
-          else if (req[0]) begin granted <= 2'b00; last_granted <= 2'b00; end
-          else if (req[1]) begin granted <= 2'b01; last_granted <= 2'b01; end
+          if (requests[2]) begin granted = 2'b10; last_granted = 2'b10; end
+          else if (requests[3]) begin granted = 2'b11; last_granted = 2'b11; end
+          else if (requests[0]) begin granted = 2'b00; last_granted = 2'b00; end
+          else if (requests[1]) begin granted = 2'b01; last_granted = 2'b01; end
         end
         2'b10: begin
-          if (req[3]) begin granted <= 2'b11; last_granted <= 2'b11; end
-          else if (req[0]) begin granted <= 2'b00; last_granted <= 2'b00; end
-          else if (req[1]) begin granted <= 2'b01; last_granted <= 2'b01; end
-          else if (req[2]) begin granted <= 2'b10; last_granted <= 2'b10; end
+          if (requests[3]) begin granted = 2'b11; last_granted = 2'b11; end
+          else if (requests[0]) begin granted = 2'b00; last_granted = 2'b00; end
+          else if (requests[1]) begin granted = 2'b01; last_granted = 2'b01; end
+          else if (requests[2]) begin granted = 2'b10; last_granted = 2'b10; end
         end
         2'b11: begin
-          if (req[0]) begin granted <= 2'b00; last_granted <= 2'b00; end
-          else if (req[1]) begin granted <= 2'b01; last_granted <= 2'b01; end
-          else if (req[2]) begin granted <= 2'b10; last_granted <= 2'b10; end
-          else if (req[3]) begin granted <= 2'b11; last_granted <= 2'b11; end
+          if (requests[0]) begin granted = 2'b00; last_granted = 2'b00; end
+          else if (requests[1]) begin granted = 2'b01; last_granted = 2'b01; end
+          else if (requests[2]) begin granted = 2'b10; last_granted = 2'b10; end
+          else if (requests[3]) begin granted = 2'b11; last_granted = 2'b11; end
         end
       endcase
     end

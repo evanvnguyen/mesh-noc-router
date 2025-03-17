@@ -95,6 +95,12 @@ module router (
   reg [3:0] ns_requests;  // Index 0 is for cw, index 1 is for ccw, index 2 is for pe, and index 3 is for ns
   reg [3:0] sn_requests;  // Index 0 is for cw, index 1 is for ccw, index 2 is for pe, and index 3 is for sn
 
+  wire cw_granted;
+  wire ccw_granted;
+  wire [1:0] pe_granted;
+  wire [1:0] ns_granted;
+  wire [1:0] sn_granted;
+
   wire cw_out_blocked;
   wire ccw_out_blocked;
   wire pe_out_blocked;
@@ -236,6 +242,37 @@ module router (
     .data_out(sndo)
   );
 
+  // Arbiters
+  two_way_arbiter cw_arbiter (
+    .reset(reset),
+    .requests(cw_requests),
+    .granted(cw_granted)
+  );
+
+  two_way_arbiter ccw_arbiter (
+    .reset(reset),
+    .requests(ccw_requests),
+    .granted(ccw_granted)
+  );
+
+  four_way_arbiter pe_arbiter (
+    .reset(reset),
+    .requests(pe_requests),
+    .granted(pe_granted)
+  );
+
+  four_way_arbiter ns_arbiter (
+    .reset(reset),
+    .requests(ns_requests),
+    .granted(ns_granted)
+  );
+
+  four_way_arbiter sn_arbiter (
+    .reset(reset),
+    .requests(sn_requests),
+    .granted(sn_granted)
+  );
+
   always @(posedge clk) begin
     if (reset) begin
       polarity <= 1'b0;
@@ -246,28 +283,115 @@ module router (
 
   always @(*) begin
     if (reset) begin
-      cw_data_in = 64'b0;
-      ccw_data_in = 64'b0;
-      pe_data_in = 64'b0;
-      ns_data_in = 64'b0;
-      sn_data_in = 64'b0;
-
-      cw_in_blocked = 1'b0;
-      ccw_in_blocked = 1'b0;
-      pe_in_blocked = 1'b0;
-      ns_in_blocked = 1'b0;
-      sn_in_blocked = 1'b0;
+      reset_values;
     end else begin
-      cw_in_blocked = 1'b0;
-      ccw_in_blocked = 1'b0;
-      pe_in_blocked = 1'b0;
-      ns_in_blocked = 1'b0;
-      sn_in_blocked = 1'b0;
+      reset_values;
 
       // We need to look at the direction of the data and figure out where to 
       // send it. We will use an arbiter to determine who has priority if
       // multiple channels are trying to send data to the same output channel.
 
+      check_cw_data;
+      check_ccw_data;
+      check_ns_data;
+      check_sn_data;
+      check_pe_data;
+
+      // more the data from the input channels to the output channels
+      if (cw_requests > 0) begin
+        if (cw_granted) begin
+          cw_data_in = pe_data_out;
+
+          // If cw also requested to send data to cw out, we need to block it.
+          cw_in_blocked = cw_requests[0];
+        end else begin
+          cw_data_in = cw_data_out;
+
+          pe_in_blocked = cw_requests[1];
+        end
+      end
+
+      if (ccw_requests > 0) begin
+        if (ccw_granted) begin
+          ccw_data_in = pe_data_out;
+        end else begin
+          ccw_data_in = ccw_data_out;
+        end
+      end
+
+      if (pe_requests > 0) begin
+        case (pe_granted)
+          2'b00: pe_data_in = cw_data_out;
+          2'b01: pe_data_in = ccw_data_out;
+          2'b10: pe_data_in = ns_data_out;
+          2'b11: pe_data_in = sn_data_out;
+        endcase
+      end
+
+      if (ns_requests > 0) begin
+        case (ns_granted)
+          2'b00: ns_data_in = cw_data_out;
+          2'b01: ns_data_in = ccw_data_out;
+          2'b10: ns_data_in = pe_data_out;
+          2'b11: ns_data_in = ns_data_out;
+        endcase
+      end
+
+      if (sn_requests > 0) begin
+        case (sn_granted)
+          2'b00: sn_data_in = cw_data_out;
+          2'b01: sn_data_in = ccw_data_out;
+          2'b10: sn_data_in = pe_data_out;
+          2'b11: sn_data_in = sn_data_out;
+        endcase
+      end
+
+    end
+  end
+
+  task reset_values();
+    begin
+      cw_in_blocked = 1'b0;
+      ccw_in_blocked = 1'b0;
+      pe_in_blocked = 1'b0;
+      ns_in_blocked = 1'b0;
+      sn_in_blocked = 1'b0;
+
+      cw_requests = 1'b0; 
+      ccw_requests = 1'b0;
+      pe_requests = 4'b0; 
+      ns_requests = 4'b0; 
+      sn_requests = 4'b0;
+
+      cw_data_in = 64'b0;
+      ccw_data_in = 64'b0;
+      pe_data_in = 64'b0;
+      ns_data_in = 64'b0;
+      sn_data_in = 64'b0;
+    end
+  endtask
+
+  task check_pe_data();
+    begin
+      if (pe_data_out != 64'b0) begin
+        // Is the packet traveling from west to east and are there any hops left?
+        if (pe_data_out[X_HOP_BIT: X_HOP_BIT-HOP_BIT_WIDTH] > 0) begin
+          if (pe_data_out[EAST_WEST_BIT] == WEST_TO_EAST)
+            cw_requests[1] = 1'b1;
+          else
+            ccw_requests[1] = 1'b1;
+        end else if (pe_data_out[Y_HOP_BIT: Y_HOP_BIT-HOP_BIT_WIDTH] > 0) begin
+          if (pe_data_out[NORTH_SOUTH_BIT] == NORTH_TO_SOUTH)
+            ns_requests[2] = 1'b1;
+          else
+            sn_requests[2] = 1'b1;
+        end
+      end
+    end
+  endtask
+
+  task check_cw_data();
+    begin
       // If traveling cw, we will conitnue to travel cw until it runs out of hops.
       // After that, we will travel ns or sn until it runs out of hops.
       // Once we are out of y hops and x hops we have reached our destination and
@@ -291,7 +415,11 @@ module router (
           end
         end
       end
+    end
+  endtask
 
+  task check_ccw_data();
+    begin
       // If traveling ccw, we use the same logic as traveling cw.
       if (ccw_data_out != 64'b0) begin
         // Is the packet traveling from west to east and are there any hops left?
@@ -312,8 +440,41 @@ module router (
           end
         end
       end
-
     end
-  end
+  endtask
+
+  task check_ns_data();
+    begin
+      // If traveling ns, we will conitnue to travel ns until it runs out of hops.
+      if (ns_data_out != 64'b0) begin
+        // Is the packet traveling from north to south and are there any hops left?
+        if (ns_data_out[NORTH_SOUTH_BIT] == NORTH_TO_SOUTH && 
+            ns_data_out[Y_HOP_BIT: Y_HOP_BIT-HOP_BIT_WIDTH] > 0) begin
+
+          ns_requests[2] = 1'b1;
+        end else begin
+          // There are no more hops left, so we've reached our destination.
+          pe_requests[2] = 1'b1;
+        end
+      end
+    end
+  endtask
+
+  task check_sn_data();
+    begin
+      // If traveling sn, we will conitnue to travel sn until it runs out of hops.
+      if (sn_data_out != 64'b0) begin
+        // Is the packet traveling from north to south and are there any hops left?
+        if (sn_data_out[NORTH_SOUTH_BIT] == SOUTH_TO_NORTH && 
+            sn_data_out[Y_HOP_BIT: Y_HOP_BIT-HOP_BIT_WIDTH] > 0) begin
+
+          sn_requests[3] = 1'b1;
+        end else begin
+          // There are no more hops left, so we've reached our destination.
+          pe_requests[3] = 1'b1;
+        end
+      end
+    end
+  endtask
 
 endmodule

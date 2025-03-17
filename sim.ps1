@@ -17,17 +17,24 @@
 #       This will create a VCD file named 'dump.vcd' with the signals from the 'testbench' module.
 param (
     [switch]$compileOnly = $false,
-    [switch]$waveform = $false
+    [switch]$waveform = $false,
+    [String]$tbModule = ""
 )
 
 # Set directories
-$designDir = "design"
+$designDir = "src"
 $tbDir = "tb"
 $outputFile = ".\iverilog-out\sim.out"
 $vcdFile = ".\iverilog-out\dump.vcd"
 
 # Find all Verilog files
-$verilogFiles = Get-ChildItem -Path $designDir, $tbDir -Filter "*.v" -Recurse | ForEach-Object { $_.FullName }
+if ($tbModule -eq "") {
+    $verilogFiles = Get-ChildItem -Path $designDir, $tbDir -Filter "*.v" -Recurse | ForEach-Object { $_.FullName }
+}
+else {
+    $verilogFiles = Get-ChildItem -Path $designDir -Filter "*.v" -Recurse | ForEach-Object { $_.FullName }
+    $verilogFiles += Get-Item -Path "$tbDir\$tbModule" | ForEach-Object { $_.FullName }
+}
 
 # Compile the Verilog files
 Write-Host "Compiling Verilog files..."
