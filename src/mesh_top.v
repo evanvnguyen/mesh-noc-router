@@ -121,12 +121,12 @@ module mesh_top #(
                     .d_out(nic_net_do_flat[(index * PACKET_WIDTH) +: PACKET_WIDTH]),
                     .nicEn(nic_en[index]),
                     .nicEnWR(nic_en_wr[index]),
-                    .net_si(pesi[index]),
+                    .net_si(peso[index]),
                     .net_ri(peri[index]),
-                    .net_di(pedi_flat[(index * PACKET_WIDTH) +: PACKET_WIDTH]),
-                    .net_so(peso[index]),
-                    .net_ro(pero[index]),
-                    .net_do(pedo_flat[(index * PACKET_WIDTH) +: PACKET_WIDTH]),
+                    .net_di(pedo_flat[(index * PACKET_WIDTH) +: PACKET_WIDTH]),
+                    .net_so(pesi[index]),
+                    .net_ro(peri[index]),
+                    .net_do(pedi_flat[(index * PACKET_WIDTH) +: PACKET_WIDTH]),
                     .net_polarity(polarity_out[index])
                 );
                 
