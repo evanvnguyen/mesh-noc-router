@@ -479,14 +479,14 @@ wire pedo_0, pedo_1, pedo_2, pedo_3, pedo_4, pedo_5, pedo_6, pedo_7,
                     .nssi(nssi_7),
                     .nsdi(nsdi_7),
                     .nsri(nsri_7),
-                    .nsro(nsro_7),
-                    .nsso(nsso_7),
-                    .nsdo(nsdo_7),
+                    .nsro(nsri_8),
+                    .nsso(nssi_8),
+                    .nsdo(nsdi_8),
                 
                     // SN input/output or grounded for bottom row
-                    .snsi(snsi_7),
-                    .sndi(sndi_7),
-                    .snri(snri_7),
+                    .snsi(snso_8),
+                    .sndi(sndo_8),
+                    .snri(snro_8),
                     .snro(snro_7),
                     .snso(snso_7),
                     .sndo(sndo_7),
@@ -502,50 +502,50 @@ wire pedo_0, pedo_1, pedo_2, pedo_3, pedo_4, pedo_5, pedo_6, pedo_7,
 
                 router router_1_2 (
                     .clk(clk),
-    .reset(reset),
-    .router_position(),
-    .polarity_out(),
-
-    // CW input/output or grounded for right edge
-    .cwsi(cwsi_8),
-    .cwdi(cwdi_8),
-    .cwri(cwri_8),
-    .cwro(cwro_8),
-    .cwso(cwso_8),
-    .cwdo(cwdo_8),
-
-    // CCW input/output or grounded for left edge
-    .ccwsi(ccwsi_8),
-    .ccwdi(ccwdi_8),
-    .ccwri(ccwri_8),
-    .ccwro(ccwro_8),
-    .ccwso(ccwso_8),
-    .ccwdo(ccwdo_8),
-
-    // NS input/output or grounded for top row
-    .nssi(nssi_8),
-    .nsdi(nsdi_8),
-    .nsri(nsri_8),
-    .nsro(nsro_8),
-    .nsso(nsso_8),
-    .nsdo(nsdo_8),
-
-    // SN input/output or grounded for bottom row
-    .snsi(snsi_8),
-    .sndi(sndi_8),
-    .snri(snri_8),
-    .snro(snro_8),
-    .snso(snso_8),
-    .sndo(sndo_8),
-
-    // PE input/output
-    .pesi(pesi_8),
-    .pedi(pedi_8),
-    .peri(peri_8),
-    .pero(pero_8),
-    .peso(peso_8),
-    .pedo(pedo_8)
-);
+                    .reset(reset),
+                    .router_position(),
+                    .polarity_out(),
+                
+                    // CW input/output or grounded for right edge
+                    .cwsi(cwsi_8),
+                    .cwdi(cwdi_8),
+                    .cwri(cwri_8),
+                    .cwro(cwro_8),
+                    .cwso(cwso_8),
+                    .cwdo(cwdo_8),
+                
+                    // CCW input/output or grounded for left edge
+                    .ccwsi(ccwsi_8),
+                    .ccwdi(ccwdi_8),
+                    .ccwri(ccwri_8),
+                    .ccwro(ccwro_8),
+                    .ccwso(ccwso_8),
+                    .ccwdo(ccwdo_8),
+                
+                    // NS input/output or grounded for top row
+                    .nssi(nssi_8),
+                    .nsdi(nsdi_8),
+                    .nsri(nsri_8),
+                    .nsro(nsro_8),
+                    .nsso(nsso_8),
+                    .nsdo(nsdo_8),
+                
+                    // SN input/output or grounded for bottom row
+                    .snsi(snsi_8),
+                    .sndi(sndi_8),
+                    .snri(snri_8),
+                    .snro(snro_8),
+                    .snso(snso_8),
+                    .sndo(sndo_8),
+                
+                    // PE input/output
+                    .pesi(pesi_8),
+                    .pedi(pedi_8),
+                    .peri(peri_8),
+                    .pero(pero_8),
+                    .peso(peso_8),
+                    .pedo(pedo_8)
+                );
 
                 router router_1_3 (
                     .clk(clk),
