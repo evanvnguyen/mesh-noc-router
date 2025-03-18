@@ -17,8 +17,8 @@
 // synthesis will optimize out nets not being driven by input or driven by output
 module mesh_top #(
         parameter PACKET_WIDTH = 64,
-        parameter SIZE_X = 4,
-        parameter SIZE_Y = 4,
+        parameter SIZE_X = 2,
+        parameter SIZE_Y = 2,
         parameter NUM_ROUTERS = SIZE_X * SIZE_Y
     ) (
         input clk,
@@ -140,37 +140,46 @@ module mesh_top #(
                     .polarity_out(polarity_out[index]),
                 
                     // **CW input/output (Right)**
-                    .cwsi(cwsi[index]), // input
-                    .cwdi(cwdi_flat[(index * PACKET_WIDTH) +: PACKET_WIDTH]), // input
-                    .cwri(cwri[index]), // output
-                    .cwro(cwro[index]), // input
-                    .cwso(cwso[index]), // output
-                    .cwdo(cwdo_flat[(index * PACKET_WIDTH) +: PACKET_WIDTH]), // output
+                    // if on right edge and i < size_x , leave it disconnected for clock wise inupt
+                    // **CW input/output (Right)**
+                    // **CW input/output (Right)**
+                    .cwsi(), // to right router's CW output
+                    .cwdi(), // output
+                    .cwri(cwri[index]), //  input
+                    .cwro(cwro[index]), // output
+                    .cwso(cwso[index]), //  output
+                    .cwdo(), //  output
+
+
                 
                     // **CCW input/output (Left)**
-                    .ccwsi(ccwsi[index]), // input
+                    // if on left edge i == 0, leave it disconnected for counter clock wise input
+                    .ccwsi(), // input
                     .ccwdi(ccwdi_flat[(index * PACKET_WIDTH) +: PACKET_WIDTH]), // input
                     .ccwri(ccwri[index]), // output
                     .ccwro(ccwro[index]), // input
-                    .ccwso(ccwso[index]), // output
+                    .ccwso(), // output
                     .ccwdo(ccwdo_flat[(index * PACKET_WIDTH) +: PACKET_WIDTH]), // output
                 
                     // **NS input/output (Up)**
-                    .nssi(ccwsi[index]), // input
+                    // get above router only if its not the top row
+                    .nssi((j == 0) ? 1'b0 : ((j < SIZE_Y) ? nsso[index-1] : 1'b0)), // input
                     .nsdi(nsdi_flat[(index * PACKET_WIDTH) +: PACKET_WIDTH]), // input
                     .nsri(nsri[index]), // output
-                    .nsro(nsro[index]), // input
+                    .nsro((j == 0) ? 1'b0 : ((j < SIZE_Y) ? nsri[index-1] : 1'b0)), // input
                     .nsso(nsso[index]), // output
                     .nsdo(nsdo_flat[(index * PACKET_WIDTH) +: PACKET_WIDTH]), // output
                 
                     // **SN input/output (Down)**
-                    .snsi(snsi[index]), // input
-                    .sndi(sndi_flat[(index * PACKET_WIDTH) +: PACKET_WIDTH]), // input
+                    // get below router only if its not the bottom row
+                    .snsi((j < SIZE_Y - 1) ? ((j + 1 < SIZE_Y) ? snso[index + 1] : 1'b0) : 1'b0), // input
+                    .sndi(), // input
                     .snri(snri[index]), // output
-                    .snro(snro[index]), // input
+                    .snro((j < SIZE_Y - 1) ? ((j + 1 < SIZE_Y) ? snri[index + 1] : 1'b0) : 1'b0), // input
                     .snso(snso[index]), // output
-                    .sndo(sndo_flat[(index * PACKET_WIDTH) +: PACKET_WIDTH]), // output
-                
+                    .sndo(), // output
+                    
+
                     // **PE input/output**
                     .pesi(pesi[index]), // input
                     .pedi(pedi_flat[(index * PACKET_WIDTH) +: PACKET_WIDTH]), // input
