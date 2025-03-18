@@ -1,4 +1,3 @@
-`timescale 1ns / 1ps
 
 /* Mesh connection
               GND           GND         GND          GND
@@ -64,10 +63,10 @@ module mesh_top #(
        - .cwsi and .cwdi are set to GND
 
     5. Corner Routers:
-         - router_genblk(0,0) → Ground NS and CCW
-         - router_genblk(0,3) → Ground NS and CW
-         - router_genblk(3,0) → Ground SN and CCW
-         - router_genblk(3,3) → Ground SN and CW
+         - router_genblk(0,0) ? Ground NS and CCW
+         - router_genblk(0,3) ? Ground NS and CW
+         - router_genblk(3,0) ? Ground SN and CCW
+         - router_genblk(3,3) ? Ground SN and CW
     */
 
     // Flattened NIC signals for each router
@@ -82,7 +81,7 @@ module mesh_top #(
     generate
         for (i=0; i<SIZE_X; i=i+1) begin : ROW
             for (j=0; j<SIZE_Y; j=j+1) begin : COLUMN
-                localparam index = i * 4 + j;
+                localparam index = i * SIZE_X + j;
                 
                 /*
                     1. Hooks up 1 dummy CPU to 1 NIC.
@@ -108,7 +107,8 @@ module mesh_top #(
                     .clk(clk),
                     .reset(reset),
                     .addr(nic_addr_flat[(index * 2) +: 2]),
-                    .d_in(nic_din_flat[(index * PACKET_WIDTH) +: PACKET_WIDTH]),
+                    .d_out(nic_din_flat[(index * PACKET_WIDTH) +: PACKET_WIDTH]),
+                    .d_in(nic_net_do_flat[(index * PACKET_WIDTH) +: PACKET_WIDTH]),
                     .nicEn(nic_en[index]),
                     .nicEnWR(nic_en_wr[index])
                 );
@@ -122,67 +122,62 @@ module mesh_top #(
                     .nicEn(nic_en[index]),
                     .nicEnWR(nic_en_wr[index]),
                     .net_si(peso[index]),
-                    .net_ri(peri[index]),
+                    .net_ri(pero[index]),
                     .net_di(pedo_flat[(index * PACKET_WIDTH) +: PACKET_WIDTH]),
                     .net_so(pesi[index]),
                     .net_ro(peri[index]),
                     .net_do(pedi_flat[(index * PACKET_WIDTH) +: PACKET_WIDTH]),
                     .net_polarity(polarity_out[index])
                 );
-                
+
+                // x = 3 -- far right row                
+                // y = 3 -- far bottom row
+                // indexing fixed
                 router router_genblk (
                     .clk(clk),
                     .reset(reset),
-                    .router_position({i[1:0], j[1:0]}),
+                    .router_position({i[SIZE_X-1:0], j[SIZE_Y-1:0]}),
                     .polarity_out(polarity_out[index]),
-                    
-                    /* 
-                        If on right column (j = 3), cwdi is grounded to 1'b0.
-                        If not, assign cwdi to cwdo_flat[((index + 1) × PACKET_WIDTH) +: PACKET_WIDTH].
-                        For example, if index = 3 and PACKET_WIDTH = 64:
-                        (index + 1) × PACKET_WIDTH = 4 × 64 = 256,
-                        so cwdi comes from bits [256 : 319] of cwdo_flat.
-                    */
-
-                    // CW input/output or grounded for right edge
-                    .cwsi((j == 3) ? 1'b0 : ccwso[index + 1]),
-                    .cwdi((j == 3) ? {PACKET_WIDTH{1'b0}} : cwdo_flat[((index + 1) * PACKET_WIDTH) +: PACKET_WIDTH]),
-                    .cwri(cwri[index]),
-                    .cwro((j == 3) ? 1'b0 : cwro[index]),
-                    .cwso((j == 3) ? 1'b0 : cwso[index]),
-                    .cwdo((j == 3) ? {PACKET_WIDTH{1'b0}} : cwdo_flat[(index * PACKET_WIDTH) +: PACKET_WIDTH]),
-
-                    // CCW input/output or grounded for left edge
-                    .ccwsi((j == 0) ? 1'b0 : cwso[index - 1]),
-                    .ccwdi((j == 0) ? {PACKET_WIDTH{1'b0}} : cwdo_flat[((index - 1) * PACKET_WIDTH) +: PACKET_WIDTH]),
-                    .ccwri(ccwri[index]),
-                    .ccwro((j == 0) ? 1'b0 : ccwro[index]),
-                    .ccwso((j == 0) ? 1'b0 : ccwso[index]),
-                    .ccwdo((j == 0) ? {PACKET_WIDTH{1'b0}} : ccwdo_flat[(index * PACKET_WIDTH) +: PACKET_WIDTH]),
-
-                    // NS input/output or grounded for top row
-                    .nssi((i == 0) ? 1'b0 : snso[(i - 1) * 4 + j]),
-                    .nsdi((i == 0) ? {PACKET_WIDTH{1'b0}} : nsdo_flat[((i - 1) * 4 + j) * PACKET_WIDTH +: PACKET_WIDTH]),
-                    .nsri(nsri[index]),
-                    .nsro((i == 0) ? 1'b0 : nsro[index]),
-                    .nsso((i == 0) ? 1'b0 : nsso[index]),
-                    .nsdo((i == 0) ? {PACKET_WIDTH{1'b0}} : nsdo_flat[(index * PACKET_WIDTH) +: PACKET_WIDTH]),
-
-                    // SN input/output or grounded for bottom row
-                    .snsi((i == 3) ? 1'b0 : nsso[(i + 1) * 4 + j]),
-                    .sndi((i == 3) ? {PACKET_WIDTH{1'b0}} : nsdo_flat[((i + 1) * 4 + j) * PACKET_WIDTH +: PACKET_WIDTH]),
-                    .snri(snri[index]),
-                    .snro((i == 3) ? 1'b0 : snro[index]),
-                    .snso((i == 3) ? 1'b0 : snso[index]),
-                    .sndo((i == 3) ? {PACKET_WIDTH{1'b0}} : sndo_flat[(index * PACKET_WIDTH) +: PACKET_WIDTH]),
-
-                    // PE input/output
-                    .pesi(pesi[index]),
-                    .pedi(pedi_flat[(index * PACKET_WIDTH) +: PACKET_WIDTH]),
-                    .peri(peri[index]),
-                    .pero(pero[index]),
-                    .peso(peso[index]),
-                    .pedo(pedo_flat[(index * PACKET_WIDTH) +: PACKET_WIDTH])
+                
+                    // **CW input/output (Right)**
+                    .cwsi(cwsi[index]), // input
+                    .cwdi(cwdi_flat[(index * PACKET_WIDTH) +: PACKET_WIDTH]), // input
+                    .cwri(cwri[index]), // output
+                    .cwro(cwro[index]), // input
+                    .cwso(cwso[index]), // output
+                    .cwdo(cwdo_flat[(index * PACKET_WIDTH) +: PACKET_WIDTH]), // output
+                
+                    // **CCW input/output (Left)**
+                    .ccwsi(ccwsi[index]), // input
+                    .ccwdi(ccwdi_flat[(index * PACKET_WIDTH) +: PACKET_WIDTH]), // input
+                    .ccwri(ccwri[index]), // output
+                    .ccwro(ccwro[index]), // input
+                    .ccwso(ccwso[index]), // output
+                    .ccwdo(ccwdo_flat[(index * PACKET_WIDTH) +: PACKET_WIDTH]), // output
+                
+                    // **NS input/output (Up)**
+                    .nssi(ccwsi[index]), // input
+                    .nsdi(nsdi_flat[(index * PACKET_WIDTH) +: PACKET_WIDTH]), // input
+                    .nsri(nsri[index]), // output
+                    .nsro(nsro[index]), // input
+                    .nsso(nsso[index]), // output
+                    .nsdo(nsdo_flat[(index * PACKET_WIDTH) +: PACKET_WIDTH]), // output
+                
+                    // **SN input/output (Down)**
+                    .snsi(snsi[index]), // input
+                    .sndi(sndi_flat[(index * PACKET_WIDTH) +: PACKET_WIDTH]), // input
+                    .snri(snri[index]), // output
+                    .snro(snro[index]), // input
+                    .snso(snso[index]), // output
+                    .sndo(sndo_flat[(index * PACKET_WIDTH) +: PACKET_WIDTH]), // output
+                
+                    // **PE input/output**
+                    .pesi(pesi[index]), // input
+                    .pedi(pedi_flat[(index * PACKET_WIDTH) +: PACKET_WIDTH]), // input
+                    .peri(peri[index]), // output
+                    .pero(pero[index]), // input
+                    .peso(peso[index]), // output
+                    .pedo(pedo_flat[(index * PACKET_WIDTH) +: PACKET_WIDTH]) // output
                 );
             end
         end
