@@ -80,8 +80,8 @@ module mesh_top #(
     // Generates a 4x4 router mesh, each router with 1 NIC. Each NIC has 1 dummy CPU to drive PE
     genvar i, j;
     generate
-        for (i=0; i<4; i=i+1) begin : ROW
-            for (j=0; j<4; j=j+1) begin : COLUMN
+        for (i=0; i<SIZE_X; i=i+1) begin : ROW
+            for (j=0; j<SIZE_Y; j=j+1) begin : COLUMN
                 localparam index = i * 4 + j;
                 
                 /*
