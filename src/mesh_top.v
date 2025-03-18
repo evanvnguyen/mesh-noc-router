@@ -163,19 +163,20 @@ module mesh_top #(
                 
                     // **NS input/output (Up)**
                     // get above router only if its not the top row
-                    .nssi((j == 0) ? 1'b0 : ((j < SIZE_Y) ? nsso[index-1] : 1'b0)), // input
+                    
+                    .nssi((j < SIZE_Y - 1) ? ((j + 1 < SIZE_Y) ? nsso[index + 1] : 1'b0) : 1'b0), // input
                     .nsdi(nsdi_flat[(index * PACKET_WIDTH) +: PACKET_WIDTH]), // input
-                    .nsri(nsri[index]), // output
-                    .nsro((j == 0) ? 1'b0 : ((j < SIZE_Y) ? nsri[index-1] : 1'b0)), // input
-                    .nsso(nsso[index]), // output
+                    .nsri(), // output
+                    .nsro((j < SIZE_Y - 1) ? ((j + 1 < SIZE_Y) ? nsri[index + 1] : 1'b0) : 1'b0), // input
+                    .nsso(), // output
                     .nsdo(nsdo_flat[(index * PACKET_WIDTH) +: PACKET_WIDTH]), // output
                 
                     // **SN input/output (Down)**
                     // get below router only if its not the bottom row
-                    .snsi((j < SIZE_Y - 1) ? ((j + 1 < SIZE_Y) ? snso[index + 1] : 1'b0) : 1'b0), // input
+                    .snsi((j == 0) ? 1'b0 : ((j < SIZE_Y) ? snso[index-1] : 1'b0)), // input
                     .sndi(), // input
                     .snri(snri[index]), // output
-                    .snro((j < SIZE_Y - 1) ? ((j + 1 < SIZE_Y) ? snri[index + 1] : 1'b0) : 1'b0), // input
+                    .snro((j == 0) ? 1'b0 : ((j < SIZE_Y) ? snri[index-1] : 1'b0)), // input
                     .snso(snso[index]), // output
                     .sndo(), // output
                     
