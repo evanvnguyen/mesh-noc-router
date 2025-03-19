@@ -48,6 +48,13 @@ module nic #(parameter PACKET_WIDTH = 64)(
     reg channel_input_buffer_status;   
     reg channel_output_buffer_status;
     
+    // debug
+    always @(posedge clk) begin
+        if (net_ro && net_polarity) $display("NIC: net_ro=1 & polarity OK. Router input buffer is empty & ready. Placing data onto network output channel.");
+        if (net_ri) $display("NIC: net_ri=1, we have space for incoming data.");
+    end
+
+    
     // router handhsake
     always @(posedge clk or posedge reset) begin
         if (reset) begin

@@ -14,7 +14,7 @@ module tb_nic_router();
     wire [63:0] cwdi, ccwdi, nsdi, sndi;
     
     // PE signals as **wires**
-    wire pesi, pero, peso;
+    wire pesi, pero, peso, peri;
     wire [63:0] pedi, pedo;
     
     // Output signals
@@ -66,15 +66,10 @@ module tb_nic_router();
     reg [0:PACKET_WIDTH-1] d_in;
     reg nicEn;
     reg nicEnWR;
-    reg net_si;
     reg [0:PACKET_WIDTH-1] net_di;
-    reg net_ro;
-    reg net_polarity;
     
     wire [0:PACKET_WIDTH-1] d_out;
-    wire net_ri;
-    wire net_so;
-    wire [0:PACKET_WIDTH-1] net_do;
+    //wire [0:PACKET_WIDTH-1] net_do;
 
     nic #(PACKET_WIDTH) nic_0 (
         .clk(clk),
@@ -111,7 +106,21 @@ module tb_nic_router();
             nicEnWR = 0;
         end
     endtask
-
+    
+    task disable_write_to_nic;
+        output reg [0:1] addr;
+        output reg nicEn;
+        output reg nicEnWR;
+    
+        begin
+            // Step 1: Write a packet to the NIC output buffer
+            addr = 2'b00;
+            nicEn = 0;
+            nicEnWR = 0; // Enable writing to output buffer
+            #10;
+        end
+    endtask
+    
     task send_packet_from_cpu_to_router;
         output reg [0:1] addr;
         output reg [0:PACKET_WIDTH-1] d_in;
@@ -124,7 +133,7 @@ module tb_nic_router();
             addr = 2'b10;
             nicEn = 1;
             nicEnWR = 1; // Enable writing to output buffer
-            
+            #10;
         end
     endtask
 
@@ -139,7 +148,10 @@ module tb_nic_router();
         
         // send a packet CPU->NIC->ROUTER 
         #10; send_packet_from_cpu_to_router(addr, d_in, nicEn, nicEnWR); 
+        #10; disable_write_to_nic(addr, nicEn, nicEnWR);
         
-        #10;
+        #100;
+        
+        $finish;
     end
 endmodule
