@@ -19,8 +19,9 @@ module router_input_channel (
 
   reg [63:0] virtual_channel_1;
   reg [63:0] virtual_channel_2;
+  reg vc_1_read, vc_2_read;
 
-  always @(posedge clk) begin
+  always @(*) begin
     if (reset) begin
       virtual_channel_1 <= 64'b0;
       virtual_channel_2 <= 64'b0;
@@ -28,41 +29,47 @@ module router_input_channel (
         // 0 (even) input goes to vc1. 1 (odd) input goes to vc2
         if (polarity) begin
           // If send is high and we have space in vc2, store data in vc2
-          if (send && virtual_channel_2 == 64'b0)
-            virtual_channel_2 <= data_in;
+          if (send && virtual_channel_2 == 64'b0 && vc_2_read)
+            virtual_channel_2 = data_in;
         end else begin
           // If send is high and we have space in vc1, store data in vc1
-          if (send && virtual_channel_1 == 64'b0)
-            virtual_channel_1 <= data_in;
+          if (send && virtual_channel_1 == 64'b0 && vc_1_read)
+            virtual_channel_1 = data_in;
         end
+
+        // We are ready to receive data if we have space in the virtual channel and we are not blocked.
+        // We also check our polarity depending on the virtual channel we are going to be using in the
+        // next clock cycle.
+        ready = ((vc_1_read && !polarity) || (vc_2_read && polarity)) && !blocked;
     end
   end
 
-  always @(*) begin
+  always @(posedge clk) begin
     if (reset) begin
-      ready = 1'b1;
-      data_out = 64'b0;
+      ready <= 1'b1;
+      data_out <= 64'b0;
+      vc_1_read <= 1'b1;
+      vc_2_read <= 1'b1;
     end else begin
-      data_out = 64'b0;
+      data_out <= 64'b0;
+      vc_1_read <= 1'b1;
+      vc_2_read <= 1'b1;
 
-      if (polarity) begin
+      if (!polarity) begin
         // Check if we have data in vc1 and we are not blocked
         if (virtual_channel_1 != 0 && !blocked) begin
-          data_out = virtual_channel_1;
-          virtual_channel_1 = 64'b0;
+          data_out <= virtual_channel_1;
+          vc_1_read <= 1'b0;
+          virtual_channel_1 <= 64'b0;
         end
       end else begin      
         // Check if we have data in vc2 and we are not blocked
         if (virtual_channel_2 != 0 && !blocked) begin
-          data_out = virtual_channel_2;
-          virtual_channel_2 = 64'b0;
+          data_out <= virtual_channel_2;
+          vc_2_read <= 1'b0;
+          virtual_channel_2 <= 64'b0;
         end
       end
-
-      // We are ready to receive data if we have space in the virtual channel and we are not blocked.
-      // We also check our polarity depending on the virtual channel we are going to be using in the
-      // next clock cycle.
-      ready = ((virtual_channel_1 == 0 && !polarity) || (virtual_channel_2 == 0 && polarity)) && !blocked;
     end
   end
 

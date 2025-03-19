@@ -53,7 +53,7 @@ module tb_router();
     $dumpfile("iverilog-out/dump.vcd");
     $dumpvars(0, tb_router);
     data_array[0] = 'h200200000000FA50;
-    data_array[1] = 'h4002000000006840;
+    data_array[1] = 'h2002000000006840;
     data_array[2] = 'hffff;
     data_array[3] = 'hc7d4;
     data_array[4] = 'hffffffff;
@@ -96,11 +96,17 @@ module tb_router();
       if (peri && cycle_count == 2) begin
         pedi <= data_array[0];
         pesi <= 1;
+      end else begin
+        pedi <= 64'b0;
+        pesi <= 0;
       end
 
-      if (nsri && cycle_count == 2) begin
-        nsdi <= data_array[1];
-        nssi <= 1;
+      if (cwri && cycle_count == 2) begin
+        cwdi <= data_array[1];
+        cwsi <= 1;
+      end else begin
+        cwdi <= 64'b0;
+        cwsi <= 0;
       end
 		end
 

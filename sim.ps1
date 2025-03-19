@@ -26,6 +26,7 @@ $designDir = "src"
 $tbDir = "tb"
 $outputFile = ".\iverilog-out\sim.out"
 $vcdFile = ".\iverilog-out\dump.vcd"
+$ignoreFiles = @("dummy_cpu.v", "mesh_top.v")
 
 # Find all Verilog files
 if ($tbModule -eq "") {
@@ -35,6 +36,9 @@ else {
     $verilogFiles = Get-ChildItem -Path $designDir -Filter "*.v" -Recurse | ForEach-Object { $_.FullName }
     $verilogFiles += Get-Item -Path "$tbDir\$tbModule" | ForEach-Object { $_.FullName }
 }
+
+# Exclude ignored files
+$verilogFiles = $verilogFiles | Where-Object { $ignoreFiles -notcontains [System.IO.Path]::GetFileName($_) }
 
 # Compile the Verilog files
 Write-Host "Compiling Verilog files..."

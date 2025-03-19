@@ -274,42 +274,60 @@ module router (
   );
 
   always @(posedge clk) begin
-    if (reset) begin
+    if (reset)
       polarity <= 1'b0;
-    end else begin
+    else
       polarity <= ~polarity;
+  end
+
+  always @(posedge clk) begin
+    if (reset) begin
+      $display("Router: Resetting...");
+      reset_values(1'b1);
+    end else begin
+      $display("Router: Looking at the granted requests");
+      // more the data from the input channels to the output channels
+      if (cw_requests > 0) begin
+        $display("Router: CW requests are %b", cw_requests);
+        if (cw_granted) begin
+          $display("Router: CW granted PE data to go to CW output channel");
+          cw_data_in <= pe_data_out;
+
+          // If cw also requested to send data to cw out, we need to block it.
+          cw_in_blocked <= cw_requests[0];
+        end else begin
+          $display("Router: CW granted CW data to go to CW output channel");
+          cw_data_in <= cw_data_out;
+
+          pe_in_blocked <= cw_requests[1];
+        end
+      end
     end
   end
 
   always @(*) begin
-    if (reset) begin
-      reset_values;
-    end else begin
-      reset_values;
+    if (!reset) begin
+      $display("Router: Running router");
+      reset_values(1'b0);
+      $display("cw_data_in: %h, pe_data_out=%h", cw_data_in, pe_data_out);
 
       // We need to look at the direction of the data and figure out where to 
       // send it. We will use an arbiter to determine who has priority if
       // multiple channels are trying to send data to the same output channel.
-
+      $display("Router: Checking CW data");
       check_cw_data;
+
+      $display("Router: Checking CCW data");
       check_ccw_data;
+
+      $display("Router: Checking NS data");
       check_ns_data;
+
+      $display("Router: Checking SN data");
       check_sn_data;
+
+      $display("Router: Checking PE data");
       check_pe_data;
-
-      // more the data from the input channels to the output channels
-      if (cw_requests > 0) begin
-        if (cw_granted) begin
-          cw_data_in = pe_data_out;
-
-          // If cw also requested to send data to cw out, we need to block it.
-          cw_in_blocked = cw_requests[0];
-        end else begin
-          cw_data_in = cw_data_out;
-
-          pe_in_blocked = cw_requests[1];
-        end
-      end
 
       if (ccw_requests > 0) begin
         if (ccw_granted) begin
@@ -347,9 +365,11 @@ module router (
       end
 
     end
+
+    polarity_out = polarity;
   end
 
-  task reset_values();
+  task reset_values(input includeData);
     begin
       cw_in_blocked = 1'b0;
       ccw_in_blocked = 1'b0;
@@ -363,28 +383,37 @@ module router (
       ns_requests = 4'b0; 
       sn_requests = 4'b0;
 
-      cw_data_in = 64'b0;
-      ccw_data_in = 64'b0;
-      pe_data_in = 64'b0;
-      ns_data_in = 64'b0;
-      sn_data_in = 64'b0;
+      if (includeData) begin
+        cw_data_in = 64'b0;
+        ccw_data_in = 64'b0;
+        pe_data_in = 64'b0;
+        ns_data_in = 64'b0;
+        sn_data_in = 64'b0;
+      end
     end
   endtask
 
   task check_pe_data();
     begin
       if (pe_data_out != 64'b0) begin
+        $display("Router: PE data is not 0");
         // Is the packet traveling from west to east and are there any hops left?
         if (pe_data_out[X_HOP_BIT: X_HOP_BIT-HOP_BIT_WIDTH] > 0) begin
-          if (pe_data_out[EAST_WEST_BIT] == WEST_TO_EAST)
+          if (pe_data_out[EAST_WEST_BIT] == WEST_TO_EAST) begin
+            $display("Router: PE data is traveling west to east with %b hops left", pe_data_out[X_HOP_BIT: X_HOP_BIT-HOP_BIT_WIDTH]);
             cw_requests[1] = 1'b1;
-          else
+          end else begin
+            $display("Router: PE data is traveling east to west with %b hops left", pe_data_out[X_HOP_BIT: X_HOP_BIT-HOP_BIT_WIDTH]);
             ccw_requests[1] = 1'b1;
+          end
         end else if (pe_data_out[Y_HOP_BIT: Y_HOP_BIT-HOP_BIT_WIDTH] > 0) begin
-          if (pe_data_out[NORTH_SOUTH_BIT] == NORTH_TO_SOUTH)
+          if (pe_data_out[NORTH_SOUTH_BIT] == NORTH_TO_SOUTH) begin
+            $display("Router: PE data is traveling north to south with %b hops left", pe_data_out[Y_HOP_BIT: Y_HOP_BIT-HOP_BIT_WIDTH]);
             ns_requests[2] = 1'b1;
-          else
+          end else begin
+            $display("Router: PE data is traveling south to north with %b hops left", pe_data_out[Y_HOP_BIT: Y_HOP_BIT-HOP_BIT_WIDTH]);
             sn_requests[2] = 1'b1;
+          end
         end
       end
     end
@@ -397,20 +426,24 @@ module router (
       // Once we are out of y hops and x hops we have reached our destination and
       // we will send the data to the processing element.
       if (cw_data_out != 64'b0) begin
+        $display("Router: CW data is not 0");
         // Is the packet traveling from west to east and are there any hops left?
         if (cw_data_out[EAST_WEST_BIT] == WEST_TO_EAST && 
             cw_data_out[X_HOP_BIT: X_HOP_BIT-HOP_BIT_WIDTH] > 0) begin
-
+          $display("Router: CW data is traveling west to east with %b hops left", cw_data_out[X_HOP_BIT: X_HOP_BIT-HOP_BIT_WIDTH]);
           cw_requests[0] = 1'b1;
         end else if (cw_data_out[NORTH_SOUTH_BIT] == NORTH_TO_SOUTH &&
                      cw_data_out[Y_HOP_BIT: Y_HOP_BIT-HOP_BIT_WIDTH] > 0) begin
-        
+                    
+          $display("Router: CW data is traveling north to south with %b hops left", cw_data_out[Y_HOP_BIT: Y_HOP_BIT-HOP_BIT_WIDTH]);
           ns_requests[0] = 1'b1;
         end else begin
           if (cw_data_out[Y_HOP_BIT: Y_HOP_BIT-HOP_BIT_WIDTH] > 0) begin
+            $display("Router: CW data is traveling south to north with %b hops left", cw_data_out[Y_HOP_BIT: Y_HOP_BIT-HOP_BIT_WIDTH]);
             sn_requests[0] = 1'b1;
           end else begin
             // There are no more hops left, so we've reached our destination.
+            $display("Router: CW data is at its destination.");
             pe_requests[0] = 1'b1;
           end
         end
@@ -422,20 +455,25 @@ module router (
     begin
       // If traveling ccw, we use the same logic as traveling cw.
       if (ccw_data_out != 64'b0) begin
+        $display("Router: CCW data is not 0");
         // Is the packet traveling from west to east and are there any hops left?
         if (ccw_data_out[EAST_WEST_BIT] == EAST_TO_WEST && 
             ccw_data_out[X_HOP_BIT: X_HOP_BIT-HOP_BIT_WIDTH] > 0) begin
 
+          $display("Router: CCW data is traveling east to west with %b hops left", ccw_data_out[X_HOP_BIT: X_HOP_BIT-HOP_BIT_WIDTH]);
           ccw_requests[0] = 1'b1;
         end else if (ccw_data_out[NORTH_SOUTH_BIT] == NORTH_TO_SOUTH &&
                      ccw_data_out[Y_HOP_BIT: Y_HOP_BIT-HOP_BIT_WIDTH] > 0) begin
         
+          $display("Router: CCW data is traveling north to south with %b hops left", ccw_data_out[Y_HOP_BIT: Y_HOP_BIT-HOP_BIT_WIDTH]);
           ns_requests[1] = 1'b1;
         end else begin
           if (ccw_data_out[Y_HOP_BIT: Y_HOP_BIT-HOP_BIT_WIDTH] > 0) begin
+            $display("Router: CCW data is traveling south to north with %b hops left", ccw_data_out[Y_HOP_BIT: Y_HOP_BIT-HOP_BIT_WIDTH]);
             sn_requests[1] = 1'b1;
           end else begin
             // There are no more hops left, so we've reached our destination.
+            $display("Router: CCW data is at its destination.");
             pe_requests[1] = 1'b1;
           end
         end
