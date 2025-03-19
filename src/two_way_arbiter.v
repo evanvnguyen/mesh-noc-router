@@ -10,6 +10,7 @@
 module two_way_arbiter (
   input reset,
   input [1:0] requests,
+  input [1:0] blockedRequests,
   output reg granted
 );
   
@@ -22,15 +23,25 @@ module two_way_arbiter (
     end else begin
       case (requests) 
         2'b10: begin
-          granted = 1;
-          last_granted = 1;
+          if (blockedRequests[1]) begin
+            granted = 0;
+            last_granted = 0;
+          end else begin
+            granted = 1;
+            last_granted = 1;
+          end
         end
         2'b01: begin
-          granted = 0;
-          last_granted = 0;
+          if (blockedRequests[0]) begin
+            granted = 1;
+            last_granted = 1;
+          end else begin
+            granted = 0;
+            last_granted = 0;
+          end
         end
         2'b11: begin  // Both requests active
-          if (last_granted == 0) begin
+          if (last_granted == 0 || blockedRequests[0]) begin
             granted = 1;
             last_granted = 1;
           end else begin

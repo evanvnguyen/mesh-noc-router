@@ -54,15 +54,15 @@ module tb_router();
     $dumpvars(0, tb_router);
     data_array[0] = 'h200200000000FA50;
     data_array[1] = 'h2002000000006840;
-    data_array[2] = 'hffff;
-    data_array[3] = 'hc7d4;
-    data_array[4] = 'hffffffff;
-    data_array[5] = 'hfba34;
-    data_array[6] = 'h53fda;
-    data_array[7] = 'habcdef;
-    data_array[8] = 'h12345678;
-    data_array[9] = 'hdef123;
-    data_array[10] = 'h11a11;
+    data_array[2] = 'h400200000000ffff;
+    data_array[3] = 'h400200000000c7d4;
+    data_array[4] = 'h60020000ffffffff;
+    data_array[5] = 'h00020000000fba34;
+    data_array[6] = 'h2002000000053fda;
+    data_array[7] = 'h2002000000abcdef;
+    data_array[8] = 'h2002000012345678;
+    data_array[9] = 'h2002000000def123;
+    data_array[10] = 'h2002000000011a11;
 
     cwsi = 0;
     ccwsi = 0;
@@ -96,14 +96,20 @@ module tb_router();
       if (peri && cycle_count == 2) begin
         pedi <= data_array[0];
         pesi <= 1;
+      end else if (peri && cycle_count == 4) begin
+        pedi <= data_array[3];
+        pesi <= 1;
       end else begin
         pedi <= 64'b0;
         pesi <= 0;
       end
 
       if (cwri && cycle_count == 2) begin
-        cwdi <= data_array[1];
         cwsi <= 1;
+        cwdi <= data_array[1];
+      end else if (cwri && cycle_count == 3) begin
+        cwsi <= 1;
+        cwdi <= data_array[2];
       end else begin
         cwdi <= 64'b0;
         cwsi <= 0;

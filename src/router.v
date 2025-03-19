@@ -246,44 +246,55 @@ module router (
   two_way_arbiter cw_arbiter (
     .reset(reset),
     .requests(cw_requests),
+    .blockedRequests({pe_in_blocked | pe_out_blocked,
+                      cw_in_blocked | cw_out_blocked}),
     .granted(cw_granted)
   );
 
   two_way_arbiter ccw_arbiter (
     .reset(reset),
     .requests(ccw_requests),
+    .blockedRequests({pe_in_blocked | pe_out_blocked,
+                      cw_in_blocked | cw_out_blocked}),
     .granted(ccw_granted)
   );
 
   four_way_arbiter pe_arbiter (
     .reset(reset),
     .requests(pe_requests),
+    .blockedRequests({sn_in_blocked | sn_out_blocked,
+                      ns_in_blocked | ns_out_blocked,
+                      ccw_in_blocked | ccw_out_blocked,
+                      cw_in_blocked | cw_out_blocked}),
     .granted(pe_granted)
   );
 
   four_way_arbiter ns_arbiter (
     .reset(reset),
     .requests(ns_requests),
+    .blockedRequests({ns_in_blocked | ns_out_blocked,
+                      pe_in_blocked | pe_out_blocked,
+                      ccw_in_blocked | ccw_out_blocked,
+                      cw_in_blocked | cw_out_blocked}),
     .granted(ns_granted)
   );
 
   four_way_arbiter sn_arbiter (
     .reset(reset),
     .requests(sn_requests),
+    .blockedRequests({sn_in_blocked | sn_out_blocked,
+                      pe_in_blocked | pe_out_blocked,
+                      ccw_in_blocked | ccw_out_blocked,
+                      cw_in_blocked | cw_out_blocked}),
     .granted(sn_granted)
   );
 
   always @(posedge clk) begin
-    if (reset)
-      polarity <= 1'b0;
-    else
-      polarity <= ~polarity;
-  end
-
-  always @(posedge clk) begin
     if (reset) begin
       $display("Router: Resetting...");
-      reset_values(1'b1);
+      reset_values;
+      reset_clocked_values;
+      polarity <= 1'b0;
     end else begin
       $display("Router: Looking at the granted requests");
       // more the data from the input channels to the output channels
@@ -302,13 +313,132 @@ module router (
           pe_in_blocked <= cw_requests[1];
         end
       end
+
+      if (ccw_requests > 0) begin
+        $display("Router: CCW requests are %b", ccw_requests);
+        if (ccw_granted) begin
+          $display("Router: CCW granted PE data to go to CCW output channel");
+          ccw_data_in <= pe_data_out;
+
+          ccw_in_blocked <= ccw_requests[0];
+        end else begin
+          $display("Router: CCW granted CW data to go to CCW output channel");
+          ccw_data_in <= ccw_data_out;
+
+          pe_in_blocked <= ccw_requests[1];
+        end
+      end
+
+      // Index 0 is for cw, index 1 is for ccw, index 2 is for ns, and index 3 is for sn
+      if (pe_requests > 0) begin
+        case (pe_granted)
+          2'b00: begin
+            $display("Router: PE granted CW data to go to PE output channel");
+            pe_data_in <= cw_data_out;
+            ccw_in_blocked <= pe_requests[1];
+            ns_in_blocked <= pe_requests[2];
+            sn_in_blocked <= pe_requests[3];
+          end
+          2'b01: begin
+            $display("Router: PE granted CCW data to go to PE output channel");
+            pe_data_in <= ccw_data_out;
+            cw_in_blocked <= pe_requests[0];
+            ns_in_blocked <= pe_requests[2];
+            sn_in_blocked <= pe_requests[3];
+          end
+          2'b10: begin 
+            $display("Router: PE granted NS data to go to PE output channel");
+            pe_data_in <= ns_data_out;
+            cw_in_blocked <= pe_requests[0];
+            ccw_in_blocked <= pe_requests[1];
+            sn_in_blocked <= pe_requests[3];
+          end
+          2'b11: begin
+            $display("Router: PE granted SN data to go to PE output channel");
+            pe_data_in <= sn_data_out;
+            cw_in_blocked <= pe_requests[0];
+            ccw_in_blocked <= pe_requests[1];
+            ns_in_blocked <= pe_requests[2];
+          end
+        endcase
+      end
+
+      // Index 0 is for cw, index 1 is for ccw, index 2 is for pe, and index 3 is for ns
+      if (ns_requests > 0) begin
+        case (ns_granted)
+          2'b00: begin 
+            $display("Router: NS granted CW data to go to NS output channel");
+            ns_data_in = cw_data_out; 
+            ccw_in_blocked <= pe_requests[1];
+            pe_in_blocked <= pe_requests[2];
+            sn_in_blocked <= pe_requests[3];
+          end
+          2'b01: begin 
+            $display("Router: NS granted CCW data to go to NS output channel");
+            ns_data_in = ccw_data_out; 
+            cw_in_blocked <= pe_requests[0];
+            pe_in_blocked <= pe_requests[2];
+            sn_in_blocked <= pe_requests[3];
+          end
+          2'b10: begin 
+            $display("Router: NS granted PE data to go to NS output channel");
+            ns_data_in = pe_data_out; 
+            cw_in_blocked <= pe_requests[0];
+            ccw_in_blocked <= pe_requests[1];
+            sn_in_blocked <= pe_requests[3];
+          end
+          2'b11: begin 
+            $display("Router: NS granted SN data to go to NS output channel");
+            ns_data_in = ns_data_out; 
+            cw_in_blocked <= pe_requests[0];
+            ccw_in_blocked <= pe_requests[1];
+            pe_in_blocked <= pe_requests[2];
+          end
+        endcase
+      end
+
+      // Index 0 is for cw, index 1 is for ccw, index 2 is for pe, and index 3 is for sn
+      if (sn_requests > 0) begin
+        case (sn_granted)
+          2'b00: begin 
+            $display("Router: SN granted CW data to go to SN output channel");
+            sn_data_in = cw_data_out; 
+            ccw_in_blocked <= pe_requests[1];
+            pe_in_blocked <= pe_requests[2];
+            sn_in_blocked <= pe_requests[3];
+          end
+          2'b01: begin
+            $display("Router: SN granted CCW data to go to SN output channel");
+            sn_data_in = ccw_data_out; 
+            cw_in_blocked <= pe_requests[0];
+            pe_in_blocked <= pe_requests[2];
+            sn_in_blocked <= pe_requests[3];
+          end
+          2'b10: begin
+            $display("Router: SN granted PE data to go to SN output channel");
+            sn_data_in = pe_data_out; 
+            cw_in_blocked <= pe_requests[0];
+            ccw_in_blocked <= pe_requests[1];
+            sn_in_blocked <= pe_requests[3];
+          end
+          2'b11: begin
+            $display("Router: SN granted SN data to go to SN output channel");
+            sn_data_in = sn_data_out; 
+            cw_in_blocked <= pe_requests[0];
+            ccw_in_blocked <= pe_requests[1];
+            pe_in_blocked <= pe_requests[2];
+          end
+        endcase
+      end
+
+      polarity <= ~polarity;
     end
   end
 
   always @(*) begin
     if (!reset) begin
       $display("Router: Running router");
-      reset_values(1'b0);
+      reset_values;
       $display("cw_data_in: %h, pe_data_out=%h", cw_data_in, pe_data_out);
 
       // We need to look at the direction of the data and figure out where to 
@@ -328,68 +458,34 @@ module router (
 
       $display("Router: Checking PE data");
       check_pe_data;
-
-      if (ccw_requests > 0) begin
-        if (ccw_granted) begin
-          ccw_data_in = pe_data_out;
-        end else begin
-          ccw_data_in = ccw_data_out;
-        end
-      end
-
-      if (pe_requests > 0) begin
-        case (pe_granted)
-          2'b00: pe_data_in = cw_data_out;
-          2'b01: pe_data_in = ccw_data_out;
-          2'b10: pe_data_in = ns_data_out;
-          2'b11: pe_data_in = sn_data_out;
-        endcase
-      end
-
-      if (ns_requests > 0) begin
-        case (ns_granted)
-          2'b00: ns_data_in = cw_data_out;
-          2'b01: ns_data_in = ccw_data_out;
-          2'b10: ns_data_in = pe_data_out;
-          2'b11: ns_data_in = ns_data_out;
-        endcase
-      end
-
-      if (sn_requests > 0) begin
-        case (sn_granted)
-          2'b00: sn_data_in = cw_data_out;
-          2'b01: sn_data_in = ccw_data_out;
-          2'b10: sn_data_in = pe_data_out;
-          2'b11: sn_data_in = sn_data_out;
-        endcase
-      end
-
-    end
+    end            
 
     polarity_out = polarity;
   end
 
-  task reset_values(input includeData);
+  task reset_clocked_values();
     begin
-      cw_in_blocked = 1'b0;
-      ccw_in_blocked = 1'b0;
-      pe_in_blocked = 1'b0;
-      ns_in_blocked = 1'b0;
-      sn_in_blocked = 1'b0;
+        cw_data_in <= 64'b0;
+        ccw_data_in <= 64'b0;
+        pe_data_in <= 64'b0;
+        ns_data_in <= 64'b0;
+        sn_data_in <= 64'b0;
 
+        cw_in_blocked <= 1'b0;
+        ccw_in_blocked <= 1'b0;
+        pe_in_blocked <= 1'b0;
+        ns_in_blocked <= 1'b0;
+        sn_in_blocked <= 1'b0;
+    end
+  endtask
+
+  task reset_values();
+    begin
       cw_requests = 1'b0; 
       ccw_requests = 1'b0;
       pe_requests = 4'b0; 
       ns_requests = 4'b0; 
       sn_requests = 4'b0;
-
-      if (includeData) begin
-        cw_data_in = 64'b0;
-        ccw_data_in = 64'b0;
-        pe_data_in = 64'b0;
-        ns_data_in = 64'b0;
-        sn_data_in = 64'b0;
-      end
     end
   endtask
 
