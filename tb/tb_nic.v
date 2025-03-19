@@ -86,7 +86,6 @@ initial begin
     #10; addr=2'b10; #10; addr=2'b11;
     
     
-    // write your code here
     // Test sending data from NIC to Router (network output channel)
     
     // Step 1: Write a packet to the NIC output buffer
