@@ -33,7 +33,7 @@ module tb_nic_router();
         .ccwsi(ccwsi),
         .ccwdi(ccwdi),
         .ccwri(ccwri),
-        .cwro(cwro),
+        .cwro(1'b1),
         .cwso(cwso),
         .cwdo(cwdo),
         .ccwro(ccwro),
@@ -129,7 +129,7 @@ module tb_nic_router();
     
         begin
             // Step 1: Write a packet to the NIC output buffer
-            d_in = 64'hDEADBEEFDEADBEEF; // Example packet data
+            d_in = 64'h200200000000FA50; // Example packet data
             addr = 2'b10;
             nicEn = 1;
             nicEnWR = 1; // Enable writing to output buffer
