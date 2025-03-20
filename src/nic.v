@@ -35,8 +35,8 @@ module nic #(parameter PACKET_WIDTH = 64)(
     // Update Status Registers (0-empty, 1-full)
     // reduced by 1 cycle
     always @(*) begin
-        assign channel_input_buffer_status = (channel_input_buffer == 0) ? 1'b0 : 1'b1;
-        assign channel_output_buffer_status = (channel_output_buffer == 0) ? 1'b0 : 1'b1;
+        channel_input_buffer_status = (channel_input_buffer == 0) ? 1'b0 : 1'b1;
+        channel_output_buffer_status = (channel_output_buffer == 0) ? 1'b0 : 1'b1;
     end
     
     // router handhsake
