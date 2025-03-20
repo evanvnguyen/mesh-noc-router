@@ -33,7 +33,7 @@ module tb_nic_router();
         .ccwsi(ccwsi),
         .ccwdi(ccwdi),
         .ccwri(ccwri),
-        .cwro(1'b1),
+        .cwro(cwro),
         .cwso(cwso),
         .cwdo(cwdo),
         .ccwro(ccwro),
@@ -83,9 +83,9 @@ module tb_nic_router();
         .nicEnWR(nicEnWR),
         
          // To Router
-        .net_si(peso),
-        .net_ri(pero),
-        .net_di(pedo), // 64-bit input data
+        .net_si(cwso), // for input channel of nic
+        .net_ri(cwro), // for input channel of nic
+        .net_di(cwdo), // 64-bit input data --> get from router
         .net_so(pesi),
         .net_ro(peri),
         .net_do(pedi), // 64-bit output data
@@ -136,7 +136,20 @@ module tb_nic_router();
             #10;
         end
     endtask
-
+    
+    task read_data_from_nic_to_cpu;
+        output reg [1:0] addr;
+        output reg nicEn;
+        output reg nicEnWR;
+        
+        begin
+            addr = 2'b00;
+            nicEn = 1; // read data from input buffer and latch to d_out
+            nicEnWR = 0;
+            #10;
+        end
+    
+    endtask
     
     // Test stimulus
     initial begin
@@ -149,6 +162,7 @@ module tb_nic_router();
         // send a packet CPU->NIC->ROUTER 
         #10; send_packet_from_cpu_to_router(addr, d_in, nicEn, nicEnWR); 
         #10; disable_write_to_nic(addr, nicEn, nicEnWR);
+        #10; read_data_from_nic_to_cpu(addr, nicEn, nicEnWR);
         
         #100;
         

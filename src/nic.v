@@ -1,46 +1,24 @@
 module nic #(parameter PACKET_WIDTH = 64)(
-    input clk, reset, 
-    
-        // **** Between CPU ****
-    
-     // Addressing for status reg and channel buffer reg
-    input [0:1] addr,
-    
-    // Packet from CPU --> (NIC) network OUTPUT buffer 
-    input [0:PACKET_WIDTH-1] d_in, 
-    
-    // Packet from Router --> (NIC)  stored in network INPUT buffer 
-    output reg [0:PACKET_WIDTH-1] d_out, 
-    
-    // Enable signal to NIC. if !nicEn, d_out port = 0
-    input nicEn, 
-    
-    // Write enable signal to the NIC. if nicEnWR + nicEn , d_in data assigned to network OUTPUT buffer
-    input nicEnWR, 
+    input clk,
+    input reset,
 
-    // **** Between Router ****
-    
-    // NIC <-- Send handshake signal-in for network input channel
-    input net_si, 
-    
-    // Ready shandhsake signal-in for network input channel --> Router
-    output reg net_ri, 
-    
-    // Packet data from router --> (NIC) stored innetwork INPUT buffer
-    input [0:PACKET_WIDTH-1] net_di, 
+    // **** Between CPU and NIC ****
+    input  [1:0] addr,                // Addressing for status reg and channel buffer reg
+    input  [PACKET_WIDTH-1:0] d_in,   // Packet from CPU to NIC (network OUTPUT buffer)
+    output reg [PACKET_WIDTH-1:0] d_out, // Packet from Router to CPU (stored in network INPUT buffer)
+    input nicEn,                      // Enable signal to NIC (if !nicEn, d_out = 0)
+    input nicEnWR,                    // Write enable signal to NIC (if nicEnWR + nicEn, d_in -> network OUTPUT buffer)
 
-    // Send handshaking signal-out for the network output channel --> Router
-    output reg net_so, 
-    
-    //Ready handshaking signal for the network output channel
-    input net_ro, 
-    
-     //Packet data for the network output channel
-    output reg [0:PACKET_WIDTH-1] net_do,
-    
-    //Polarity input from the router connected to the NIC
-    input net_polarity 
+    // **** Between Router and NIC ****
+    input  net_si,                     // Handshake signal from Router for network input channel
+    output reg net_ri,                 // Ready handshake signal from NIC to Router for input channel
+    input  [PACKET_WIDTH-1:0] net_di,   // Packet data from Router to NIC (stored in network INPUT buffer)
+    output reg net_so,                 // Handshake signal from NIC to Router for output channel
+    input  net_ro,                     // Ready handshake signal from Router for network output channel
+    output reg [PACKET_WIDTH-1:0] net_do, // Packet data for network output channel
+    input net_polarity                 // Polarity input from Router connected to NIC
 );
+
 
     // Internal Buffers and Status Registers
     reg [PACKET_WIDTH-1:0] channel_input_buffer;
@@ -54,6 +32,12 @@ module nic #(parameter PACKET_WIDTH = 64)(
         if (net_ri) $display("NIC: net_ri=1, we have space for incoming data.");
     end
 
+    // Update Status Registers (0-empty, 1-full)
+    // reduced by 1 cycle
+    always @(*) begin
+        assign channel_input_buffer_status = (channel_input_buffer == 0) ? 1'b0 : 1'b1;
+        assign channel_output_buffer_status = (channel_output_buffer == 0) ? 1'b0 : 1'b1;
+    end
     
     // router handhsake
     always @(posedge clk or posedge reset) begin
@@ -76,11 +60,7 @@ module nic #(parameter PACKET_WIDTH = 64)(
             if (net_ri && net_si) begin
                 channel_input_buffer <= net_di;
             end
-            
-            // Update Status Registers (0-empty, 1-full)
-            channel_input_buffer_status <= (channel_input_buffer == 0) ? 1'b0 : 1'b1;
-            channel_output_buffer_status <= (channel_output_buffer == 0) ? 1'b0 : 1'b1;
-            
+
             // Update net_ri based on input buffer status
             net_ri <= (channel_input_buffer_status == 0) ? 1'b1 : 1'b0;
     
