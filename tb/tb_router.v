@@ -7,7 +7,9 @@ module tb_router();
   wire [63:0] cwdo, ccwdo, pedo, nsdo, sndo;
   
   reg [63:0] data_array [10:0];
-  integer cycle_count, data_index;
+  reg [10:0] passedTests;
+  reg [63:0] returnedData [10:0];
+  integer cycle_count, data_index, i;
 
   initial clk = 0;
   always #2 clk = ~clk; // 250 Mhz
@@ -53,21 +55,26 @@ module tb_router();
     $dumpfile("iverilog-out/dump.vcd");
     $dumpvars(0, tb_router);
     data_array[0] = 64'h200200000000FA50;
-    data_array[1] = 64'h2002000000006840;
-    data_array[2] = 64'h400200000000ffff;
-    data_array[3] = 64'h400200000000c7d4;
-    data_array[4] = 64'h60020000ffffffff;
-    data_array[5] = 64'h00020000000fba34;
+    data_array[1] = 64'h0002000000006840;
+    data_array[2] = 64'h401200000000ffff;
+    data_array[3] = 64'h401000000000c7d4;
+    data_array[4] = 64'h00100000ffffffff;
+    data_array[5] = 64'h00120000000fba34;
     data_array[6] = 64'h2002000000053fda;
     data_array[7] = 64'h2002000000abcdef;
     data_array[8] = 64'h2002000012345678;
     data_array[9] = 64'h2002000000def123;
     data_array[10] = 64'h2002000000011a11;
 
+    for (i = 0; i < 10; i = i + 1) begin
+      returnedData[i] = 64'h0;
+      passedTests[i] = 11'b0;
+    end
+
     cwsi = 0;
     ccwsi = 0;
     pesi = 0;
-    cwro = 1;
+    cwro = 0;
     ccwro = 0;
     pero = 0;
     nssi = 0;
@@ -153,6 +160,61 @@ module tb_router();
           snsi <= 0;
         end
       endcase
+
+      // Check if our first test case passed
+      if (cycle_count == 5) begin
+        cwro <= 1;
+      end else if (cycle_count == 6) begin
+        cwro <= 0;
+        if (cwdo == {data_array[0][63:52], data_array[0][51:48] >> 1, data_array[0][47:0]}) begin
+          passedTests[0] <= 1;
+          $display("cwdo: %h", cwdo);
+        end
+      end
+
+      // Check if our second test case passed
+      if (cycle_count == 6) begin
+        ccwro <= 1;
+      end else if (cycle_count == 7) begin
+        ccwro <= 0;
+        if (ccwdo == {data_array[1][63:52], data_array[1][51:48] >> 1, data_array[1][47:0]}) begin
+          passedTests[1] <= 1;
+          $display("ccwdo: %h", ccwdo);
+        end
+      end
+
+      // Check if our third test case passed
+      if (cycle_count == 7) begin
+        pero <= 1;
+      end else if (cycle_count == 8) begin
+        pero <= 0;
+        if (pedo == {data_array[2][63:56], data_array[2][55:52] >> 1, data_array[2][51:0]}) begin
+          passedTests[2] <= 1;
+          $display("pedo: %h", ccwdo);
+        end
+      end
+
+      // Check if our fourth test case passed
+      if (cycle_count == 8) begin
+        nsro <= 1;
+      end else if (cycle_count == 9) begin
+        nsro <= 0;
+        if (nsdo == {data_array[3][63:56], data_array[3][55:52] >> 1, data_array[3][51:0]}) begin
+          passedTests[3] <= 1;
+          $display("nsdo: %h", ccwdo);
+        end
+      end
+
+      // Check if our fifth test case passed
+      if (cycle_count == 9) begin
+        snro <= 1;
+      end else if (cycle_count == 10) begin
+        snro <= 0;
+        if (sndo == {data_array[4][63:56], data_array[4][55:52] >> 1, data_array[4][51:0]}) begin
+          passedTests[4] <= 1;
+          $display("sndo: %h", ccwdo);
+        end
+      end
 
       data_index <= data_index + 1;
 		end

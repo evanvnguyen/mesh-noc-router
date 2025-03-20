@@ -301,13 +301,13 @@ module router (
         $display("Router: CW requests are %b", cw_requests);
         if (cw_granted) begin
           $display("Router: CW granted PE data to go to CW output channel");
-          cw_data_in <= pe_data_out;
+          cw_data_in <= {pe_data_out[63:52], pe_data_out[51:48] >> 1, pe_data_out[47:0]};
 
           // If cw also requested to send data to cw out, we need to block it.
           cw_in_blocked <= cw_requests[0];
         end else begin
           $display("Router: CW granted CW data to go to CW output channel");
-          cw_data_in <= cw_data_out;
+          cw_data_in <= {cw_data_out[63:52], cw_data_out[51:48] >> 1, cw_data_out[47:0]};
 
           pe_in_blocked <= cw_requests[1];
         end
@@ -317,12 +317,12 @@ module router (
         $display("Router: CCW requests are %b", ccw_requests);
         if (ccw_granted) begin
           $display("Router: CCW granted PE data to go to CCW output channel");
-          ccw_data_in <= pe_data_out;
+          ccw_data_in <= {pe_data_out[63:52], pe_data_out[51:48] >> 1, pe_data_out[47:0]};
 
           ccw_in_blocked <= ccw_requests[0];
         end else begin
           $display("Router: CCW granted CW data to go to CCW output channel");
-          ccw_data_in <= ccw_data_out;
+          ccw_data_in <= {ccw_data_out[63:52], ccw_data_out[51:48] >> 1, ccw_data_out[47:0]};
 
           pe_in_blocked <= ccw_requests[1];
         end
@@ -333,28 +333,28 @@ module router (
         case (pe_granted)
           2'b00: begin
             $display("Router: PE granted CW data to go to PE output channel");
-            pe_data_in <= cw_data_out;
+            pe_data_in <= {cw_data_out[63:52], cw_data_out[51:48] >> 1, cw_data_out[47:0]};
             ccw_in_blocked <= pe_requests[1];
             ns_in_blocked <= pe_requests[2];
             sn_in_blocked <= pe_requests[3];
           end
           2'b01: begin
             $display("Router: PE granted CCW data to go to PE output channel");
-            pe_data_in <= ccw_data_out;
+            pe_data_in <= {ccw_data_out[63:52], ccw_data_out[51:48] >> 1, ccw_data_out[47:0]};
             cw_in_blocked <= pe_requests[0];
             ns_in_blocked <= pe_requests[2];
             sn_in_blocked <= pe_requests[3];
           end
           2'b10: begin 
             $display("Router: PE granted NS data to go to PE output channel");
-            pe_data_in <= ns_data_out;
+            pe_data_in <= {ns_data_out[63:56], ns_data_out[55:52] >> 1, ns_data_out[51:0]};
             cw_in_blocked <= pe_requests[0];
             ccw_in_blocked <= pe_requests[1];
             sn_in_blocked <= pe_requests[3];
           end
           2'b11: begin
             $display("Router: PE granted SN data to go to PE output channel");
-            pe_data_in <= sn_data_out;
+            pe_data_in <= {sn_data_out[63:56], sn_data_out[55:52] >> 1, sn_data_out[51:0]};
             cw_in_blocked <= pe_requests[0];
             ccw_in_blocked <= pe_requests[1];
             ns_in_blocked <= pe_requests[2];
@@ -367,28 +367,28 @@ module router (
         case (ns_granted)
           2'b00: begin 
             $display("Router: NS granted CW data to go to NS output channel");
-            ns_data_in <= cw_data_out; 
+            ns_data_in <= {cw_data_out[63:56], cw_data_out[55:52] >> 1, cw_data_out[51:0]};
             ccw_in_blocked <= pe_requests[1];
             pe_in_blocked <= pe_requests[2];
             sn_in_blocked <= pe_requests[3];
           end
           2'b01: begin 
             $display("Router: NS granted CCW data to go to NS output channel");
-            ns_data_in <= ccw_data_out; 
+            ns_data_in <= {ccw_data_out[63:56], ccw_data_out[55:52] >> 1, ccw_data_out[51:0]}; 
             cw_in_blocked <= pe_requests[0];
             pe_in_blocked <= pe_requests[2];
             sn_in_blocked <= pe_requests[3];
           end
           2'b10: begin 
             $display("Router: NS granted PE data to go to NS output channel");
-            ns_data_in <= pe_data_out; 
+            ns_data_in <= {pe_data_out[63:56], pe_data_out[55:52] >> 1, pe_data_out[51:0]};
             cw_in_blocked <= pe_requests[0];
             ccw_in_blocked <= pe_requests[1];
             sn_in_blocked <= pe_requests[3];
           end
           2'b11: begin 
             $display("Router: NS granted SN data to go to NS output channel");
-            ns_data_in <= ns_data_out; 
+            ns_data_in <= {ns_data_out[63:56], ns_data_out[55:52] >> 1, ns_data_out[51:0]};
             cw_in_blocked <= pe_requests[0];
             ccw_in_blocked <= pe_requests[1];
             pe_in_blocked <= pe_requests[2];
@@ -401,28 +401,28 @@ module router (
         case (sn_granted)
           2'b00: begin 
             $display("Router: SN granted CW data to go to SN output channel");
-            sn_data_in <= cw_data_out; 
+            sn_data_in <= {cw_data_out[63:56], cw_data_out[55:52] >> 1, cw_data_out[51:0]};
             ccw_in_blocked <= pe_requests[1];
             pe_in_blocked <= pe_requests[2];
             sn_in_blocked <= pe_requests[3];
           end
           2'b01: begin
             $display("Router: SN granted CCW data to go to SN output channel");
-            sn_data_in <= ccw_data_out; 
+            sn_data_in <= {ccw_data_out[63:56], ccw_data_out[55:52] >> 1, ccw_data_out[51:0]}; 
             cw_in_blocked <= pe_requests[0];
             pe_in_blocked <= pe_requests[2];
             sn_in_blocked <= pe_requests[3];
           end
           2'b10: begin
             $display("Router: SN granted PE data to go to SN output channel");
-            sn_data_in <= pe_data_out; 
+            sn_data_in <= {pe_data_out[63:56], pe_data_out[55:52] >> 1, pe_data_out[51:0]};
             cw_in_blocked <= pe_requests[0];
             ccw_in_blocked <= pe_requests[1];
             sn_in_blocked <= pe_requests[3];
           end
           2'b11: begin
             $display("Router: SN granted SN data to go to SN output channel");
-            sn_data_in <= sn_data_out; 
+            sn_data_in <= {sn_data_out[63:56], sn_data_out[55:52] >> 1, sn_data_out[51:0]};
             cw_in_blocked <= pe_requests[0];
             ccw_in_blocked <= pe_requests[1];
             pe_in_blocked <= pe_requests[2];
@@ -584,8 +584,10 @@ module router (
         if (ns_data_out[NORTH_SOUTH_BIT] == NORTH_TO_SOUTH && 
             ns_data_out[Y_HOP_BIT: Y_HOP_BIT-HOP_BIT_WIDTH] > 0) begin
 
-          ns_requests[2] = 1'b1;
+          $display("Router: NS data is traveling north to south with %b hops left", ns_data_out[Y_HOP_BIT: Y_HOP_BIT-HOP_BIT_WIDTH]);
+          ns_requests[3] = 1'b1;
         end else begin
+          $display("Router: NS data is at its destination.");
           // There are no more hops left, so we've reached our destination.
           pe_requests[2] = 1'b1;
         end
@@ -601,8 +603,10 @@ module router (
         if (sn_data_out[NORTH_SOUTH_BIT] == SOUTH_TO_NORTH && 
             sn_data_out[Y_HOP_BIT: Y_HOP_BIT-HOP_BIT_WIDTH] > 0) begin
 
+          $display("Router: SN data is traveling south to north with %b hops left", sn_data_out[Y_HOP_BIT: Y_HOP_BIT-HOP_BIT_WIDTH]);
           sn_requests[3] = 1'b1;
         end else begin
+          $display("Router: SN data is at its destination.");
           // There are no more hops left, so we've reached our destination.
           pe_requests[3] = 1'b1;
         end
