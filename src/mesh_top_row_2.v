@@ -66,7 +66,7 @@ module mesh_top_row_2 #(
         output [63:0] nsdo_0_2,
         output [63:0] nsdo_1_2,
         output [63:0] nsdo_2_2,
-        output [63:0] nsdo_3_2,
+        output [63:0] nsdo_3_2
 
     );
     
@@ -77,6 +77,39 @@ module mesh_top_row_2 #(
     wire [63:0] cwdi_cwdo_1, ccwdo_ccwdi_1; 
     wire cwsi_cwso_2, cwri_cwro_2, ccwso_ccwsi_2, ccwro_ccwri_2;
     wire [63:0] cwdi_cwdo_2, ccwdo_ccwdi_2;
+
+
+    // Disconnected from CPU as of part 1
+    wire [1:0] addr_0_2, addr_1_2, addr_2_2, addr_3_2;
+    wire [PACKET_WIDTH-1:0] d_in_0_2, d_out_0_2;
+    wire [PACKET_WIDTH-1:0] d_in_1_2, d_out_1_2;
+    wire [PACKET_WIDTH-1:0] d_in_2_2, d_out_2_2;
+    wire [PACKET_WIDTH-1:0] d_in_3_2, d_out_3_2;
+    wire nicEn_0_2, nicEnWR_0_2;
+    wire nicEn_1_2, nicEnWR_1_2;
+    wire nicEn_2_2, nicEnWR_2_2;
+    wire nicEn_3_2, nicEnWR_3_2;
+    
+    wire net_si_0_2, net_so_0_2;
+    wire net_ri_0_2, net_ro_0_2;
+    wire [PACKET_WIDTH-1:0] net_di_0_2, net_do_0_2;
+    wire net_polarity_0_2;
+    
+    wire net_si_1_2, net_so_1_2;
+    wire net_ri_1_2, net_ro_1_2;
+    wire [PACKET_WIDTH-1:0] net_di_1_2, net_do_1_2;
+    wire net_polarity_1_2;
+    
+    wire net_si_2_2, net_so_2_2;
+    wire net_ri_2_2, net_ro_2_2;
+    wire [PACKET_WIDTH-1:0] net_di_2_2, net_do_2_2;
+    wire net_polarity_2_2;
+    
+    wire net_si_3_2, net_so_3_2;
+    wire net_ri_3_2, net_ro_3_2;
+    wire [PACKET_WIDTH-1:0] net_di_3_2, net_do_3_2;
+    wire net_polarity_3_2;
+
 
     // bottom left corner 
     router router_0_2 (
@@ -95,10 +128,33 @@ module mesh_top_row_2 #(
         .snsi(snsi_0_2), .snri(snri_0_2), .sndi(sndi_0_2), .nsso(nsso_0_2), .nsro(nsro_0_2), .nsdo(nsdo_0_2),
  
         // PE input/output to NIC
-        .pesi(), .pedi(), .peri(), 
-        .pero(), .peso(), .pedo()
+        .pesi(net_so_0_2), .pedi(net_do_0_2), .peri(net_ro_0_2), 
+        .pero(net_ri_0_2), .peso(net_si_0_2), .pedo(net_di_0_2)
     );
-   
+   // NIC module instantiation for 0_2
+    nic #(
+        .PACKET_WIDTH(PACKET_WIDTH)
+    ) nic_0_2 (
+        .clk(clk),
+        .reset(reset),
+    
+        // CPU-NIC Interface
+        .addr(addr_0_2),
+        .d_in(d_in_0_2),
+        .d_out(d_out_0_2),
+        .nicEn(nicEn_0_2),
+        .nicEnWR(nicEnWR_0_2),
+    
+        // Router-NIC Interface
+        .net_si(net_si_0_2),
+        .net_so(net_so_0_2),
+        .net_ri(net_ri_0_2),
+        .net_ro(net_ro_0_2),
+    
+        .net_di(net_di_0_2),
+        .net_do(net_do_0_2),
+        .net_polarity(net_polarity_0_2)
+    );
     
     router router_1_2 (
         .clk(clk), .reset(reset), .router_position(), .polarity_out(),
@@ -116,10 +172,33 @@ module mesh_top_row_2 #(
         .snsi(snsi_1_2), .snri(snri_1_2), .sndi(sndi_1_2), .nsso(nsso_1_2), .nsro(nsro_1_2), .nsdo(nsdo_1_2),
 
         // PE input/output to NIC
-        .pesi(), .pedi(), .peri(), 
-        .pero(), .peso(), .pedo()
+        .pesi(net_so_1_2), .pedi(net_do_1_2), .peri(net_ro_1_2), 
+        .pero(net_ri_1_2), .peso(net_si_1_2), .pedo(net_di_1_2)
     );
     
+    nic #(
+        .PACKET_WIDTH(PACKET_WIDTH)
+    ) nic_1_2 (
+        .clk(clk),
+        .reset(reset),
+    
+        // CPU-NIC Interface
+        .addr(addr_1_2),
+        .d_in(d_in_1_2),
+        .d_out(d_out_1_2),
+        .nicEn(nicEn_1_2),
+        .nicEnWR(nicEnWR_1_2),
+    
+        // Router-NIC Interface
+        .net_si(net_si_1_2),
+        .net_so(net_so_1_2),
+        .net_ri(net_ri_1_2),
+        .net_ro(net_ro_1_2),
+    
+        .net_di(net_di_1_2),
+        .net_do(net_do_1_2),
+        .net_polarity(net_polarity_1_2)
+    );
     
     router router_2_2 (
         .clk(clk), .reset(reset), .router_position(), .polarity_out(),
@@ -137,10 +216,33 @@ module mesh_top_row_2 #(
         .snsi(snsi_2_2), .snri(snri_2_2), .sndi(sndi_2_2), .nsso(nsso_2_2), .nsro(nsro_2_2), .nsdo(nsdo_2_2),
 
         // PE input/output to NIC
-        .pesi(), .pedi(), .peri(), 
-        .pero(), .peso(), .pedo()
+        .pesi(net_so_2_2), .pedi(net_do_2_2), .peri(net_ro_2_2), 
+        .pero(net_ri_2_2), .peso(net_si_2_2), .pedo(net_di_2_2)
     );
-
+    
+    nic #(
+        .PACKET_WIDTH(PACKET_WIDTH)
+    ) nic_2_2 (
+        .clk(clk),
+        .reset(reset),
+    
+        // CPU-NIC Interface
+        .addr(addr_2_2),
+        .d_in(d_in_2_2),
+        .d_out(d_out_2_2),
+        .nicEn(nicEn_2_2),
+        .nicEnWR(nicEnWR_2_2),
+    
+        // Router-NIC Interface
+        .net_si(net_si_2_2),
+        .net_so(net_so_2_2),
+        .net_ri(net_ri_2_2),
+        .net_ro(net_ro_2_2),
+    
+        .net_di(net_di_2_2),
+        .net_do(net_do_2_2),
+        .net_polarity(net_polarity_2_2)
+    );
      
     router router_3_2 (
         .clk(clk), .reset(reset), .router_position(), .polarity_out(),
@@ -158,8 +260,31 @@ module mesh_top_row_2 #(
         .snsi(snsi_3_2), .snri(snri_3_2), .sndi(sndi_3_2), .nsso(nsso_3_2), .nsro(nsro_3_2), .nsdo(nsdo_3_2),
 
         // PE input/output to NIC
-        .pesi(), .pedi(), .peri(), 
-        .pero(), .peso(), .pedo()
+        .pesi(net_so_3_2), .pedi(net_do_3_2), .peri(net_ro_2_2), 
+        .pero(net_ri_3_2), .peso(net_si_3_2), .pedo(net_di_2_2)
     );
-
+    
+    nic #(
+        .PACKET_WIDTH(PACKET_WIDTH)
+    ) nic_3_2 (
+        .clk(clk),
+        .reset(reset),
+    
+        // CPU-NIC Interface
+        .addr(addr_3_2),
+        .d_in(d_in_3_2),
+        .d_out(d_out_3_2),
+        .nicEn(nicEn_3_2),
+        .nicEnWR(nicEnWR_3_2),
+    
+        // Router-NIC Interface
+        .net_si(net_si_3_2),
+        .net_so(net_so_3_2),
+        .net_ri(net_ri_3_2),
+        .net_ro(net_ro_3_2),
+    
+        .net_di(net_di_3_2),
+        .net_do(net_do_3_2),
+        .net_polarity(net_polarity_3_2)
+    );
 endmodule

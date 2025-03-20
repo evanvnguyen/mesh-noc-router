@@ -14,6 +14,7 @@
                   ===================================================
                       GND           GND         GND          GND
 */
+
 module mesh_top_flat (
         input clk,
         input reset);
@@ -52,7 +53,7 @@ module mesh_top_flat (
 
    
     mesh_top_row_3 #(
-        .PACKET_WIDTH(PACKET_WIDTH),
+        .PACKET_WIDTH(PACKET_WIDTH)
     ) row_3 (
         .clk(clk), 
         .reset(reset),
@@ -67,8 +68,7 @@ module mesh_top_flat (
         .snsi_2_3(snso_from_22_to_snsi_23), .snri_2_3(snro_from_22_to_snri_23), .sndi_2_3(sndo_from_22_to_sndi_23), .nsso_2_3(nssi_from_22_to_nsso_23), .nsro_2_3(nsri_from_22_to_nsro_23), .nsdo_2_3(nsdi_from_22_to_nsdo_23), 
         
         // bottom signal router 3,3 
-        .snsi_3_3(snso_from_32_to_snsi_33), .snri_3_3(snso_from_32_to_snsi_33), .sndi_3_3(sndo_from_32_to_sndi_33), .nsso_3_3(nssi_from_32_to_nsso_33), .nsro_3_3(nsri_from_32_to_nsro_33), .nsdo_3_3(nsdi_from_32_to_nsdo_33)
-        
+        .snsi_3_3(snso_from_32_to_snsi_33), .snri_3_3(snso_from_32_to_snsi_33), .sndi_3_3(sndo_from_32_to_sndi_33), .nsso_3_3(nssi_from_32_to_nsso_33), .nsro_3_3(nsri_from_32_to_nsro_33), .nsdo_3_3(nsdi_from_32_to_nsdo_33) 
     );
 
     wire [63:0] sndo_from_01_to_sndi_02;
@@ -102,7 +102,7 @@ module mesh_top_flat (
     wire nsri_from_31_to_nsro_32;
 
     mesh_top_row_2 #(
-        .PACKET_WIDTH(PACKET_WIDTH),
+        .PACKET_WIDTH(PACKET_WIDTH)
     ) row_2 (
         .clk(clk), 
         .reset(reset),
@@ -130,7 +130,6 @@ module mesh_top_flat (
 
         // bottom signal router 3,2
         .snsi_3_2(snso_from_31_to_snsi_32), .snri_3_2(snro_from_31_to_snri_32), .sndi_3_2(sndo_from_31_to_sndi_32), .nsso_3_2(nssi_from_31_to_nsso_32), .nsro_3_2(nsri_from_31_to_nsro_32), .nsdo_3_2(nsdi_from_31_to_nsdo_32)
-
     );
 
     wire [63:0] sndo_from_00_to_sndi_01;
@@ -164,7 +163,7 @@ module mesh_top_flat (
     wire nsri_from_30_to_nsro_31;
 
     mesh_top_row_1 #(
-        .PACKET_WIDTH(PACKET_WIDTH),
+        .PACKET_WIDTH(PACKET_WIDTH)
     ) row_1 (
         .clk(clk), 
         .reset(reset),
@@ -192,12 +191,11 @@ module mesh_top_flat (
 
         // botto2 signal router 3,1
         .snsi_3_1(snso_from_30_to_snsi_31), .snri_3_1(snro_from_30_to_snri_31), .sndi_3_1(sndo_from_30_to_sndi_31), .nsso_3_1(nssi_from_30_to_nsso_31), .nsro_3_1(nsri_from_30_to_nsro_31), .nsdo_3_1(nsdi_from_30_to_nsdo_31)
-
     );
 
 
     mesh_top_row_0 #(
-        .PACKET_WIDTH(PACKET_WIDTH),
+        .PACKET_WIDTH(PACKET_WIDTH)
     ) row_0 (
         .clk(clk), 
         .reset(reset),
@@ -213,7 +211,6 @@ module mesh_top_flat (
         
         // top signal router 3,0 
         .snso_3_0(snso_from_30_to_snsi_31), .snro_3_0(snro_from_30_to_snri_31), .sndo_3_0(sndo_from_30_to_sndi_31), .nssi_3_0(nssi_from_30_to_nsso_31), .nsri_3_0(nsri_from_30_to_nsro_31), .nsdi_3_0(nsdi_from_30_to_nsdo_31)
-
     );
 
 
