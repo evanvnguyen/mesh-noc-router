@@ -43,6 +43,10 @@ module four_way_arbiter (
           else if (requests[2] && !blockedRequests[2]) begin granted = 2'b10; last_granted = 2'b10; end
           else if (requests[3] && !blockedRequests[3]) begin granted = 2'b11; last_granted = 2'b11; end
         end
+        default: begin
+          granted = 2'b00;
+          last_granted = 2'b00;
+        end
       endcase
     end
   end

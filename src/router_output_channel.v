@@ -46,10 +46,10 @@ module router_output_channel (
 
   always @(*) begin
     if (reset) begin
-      send <= 1'b0;
-      data_out <= 64'b0;
-      vc_1_sent <= 1'b1;
-      vc_2_sent <= 1'b1;
+      send = 1'b0;
+      data_out = 64'b0;
+      vc_1_sent = 1'b1;
+      vc_2_sent = 1'b1;
     end else begin
       send = 1'b0;
       data_out = 64'b0;

@@ -23,8 +23,8 @@ module router_input_channel (
 
   always @(*) begin
     if (reset) begin
-      virtual_channel_1 <= 64'b0;
-      virtual_channel_2 <= 64'b0;
+      virtual_channel_1 = 64'b0;
+      virtual_channel_2 = 64'b0;
     end else begin
         // 0 (even) input goes to vc1. 1 (odd) input goes to vc2
         if (polarity) begin

@@ -51,6 +51,7 @@ module two_way_arbiter (
         end
         default: begin
           granted = 0;
+          last_granted = 0;
         end
       endcase
     end

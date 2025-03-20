@@ -292,7 +292,6 @@ module router (
   always @(posedge clk) begin
     if (reset) begin
       $display("Router: Resetting...");
-      reset_values;
       reset_clocked_values;
       polarity <= 1'b0;
     end else begin
@@ -368,28 +367,28 @@ module router (
         case (ns_granted)
           2'b00: begin 
             $display("Router: NS granted CW data to go to NS output channel");
-            ns_data_in = cw_data_out; 
+            ns_data_in <= cw_data_out; 
             ccw_in_blocked <= pe_requests[1];
             pe_in_blocked <= pe_requests[2];
             sn_in_blocked <= pe_requests[3];
           end
           2'b01: begin 
             $display("Router: NS granted CCW data to go to NS output channel");
-            ns_data_in = ccw_data_out; 
+            ns_data_in <= ccw_data_out; 
             cw_in_blocked <= pe_requests[0];
             pe_in_blocked <= pe_requests[2];
             sn_in_blocked <= pe_requests[3];
           end
           2'b10: begin 
             $display("Router: NS granted PE data to go to NS output channel");
-            ns_data_in = pe_data_out; 
+            ns_data_in <= pe_data_out; 
             cw_in_blocked <= pe_requests[0];
             ccw_in_blocked <= pe_requests[1];
             sn_in_blocked <= pe_requests[3];
           end
           2'b11: begin 
             $display("Router: NS granted SN data to go to NS output channel");
-            ns_data_in = ns_data_out; 
+            ns_data_in <= ns_data_out; 
             cw_in_blocked <= pe_requests[0];
             ccw_in_blocked <= pe_requests[1];
             pe_in_blocked <= pe_requests[2];
@@ -402,28 +401,28 @@ module router (
         case (sn_granted)
           2'b00: begin 
             $display("Router: SN granted CW data to go to SN output channel");
-            sn_data_in = cw_data_out; 
+            sn_data_in <= cw_data_out; 
             ccw_in_blocked <= pe_requests[1];
             pe_in_blocked <= pe_requests[2];
             sn_in_blocked <= pe_requests[3];
           end
           2'b01: begin
             $display("Router: SN granted CCW data to go to SN output channel");
-            sn_data_in = ccw_data_out; 
+            sn_data_in <= ccw_data_out; 
             cw_in_blocked <= pe_requests[0];
             pe_in_blocked <= pe_requests[2];
             sn_in_blocked <= pe_requests[3];
           end
           2'b10: begin
             $display("Router: SN granted PE data to go to SN output channel");
-            sn_data_in = pe_data_out; 
+            sn_data_in <= pe_data_out; 
             cw_in_blocked <= pe_requests[0];
             ccw_in_blocked <= pe_requests[1];
             sn_in_blocked <= pe_requests[3];
           end
           2'b11: begin
             $display("Router: SN granted SN data to go to SN output channel");
-            sn_data_in = sn_data_out; 
+            sn_data_in <= sn_data_out; 
             cw_in_blocked <= pe_requests[0];
             ccw_in_blocked <= pe_requests[1];
             pe_in_blocked <= pe_requests[2];
@@ -436,9 +435,9 @@ module router (
   end
 
   always @(*) begin
+    reset_values;
     if (!reset) begin
       $display("Router: Running router");
-      reset_values;
       $display("cw_data_in: %h, pe_data_out=%h", cw_data_in, pe_data_out);
 
       // We need to look at the direction of the data and figure out where to 

@@ -26,7 +26,15 @@ $designDir = "src"
 $tbDir = "tb"
 $outputFile = ".\iverilog-out\sim.out"
 $vcdFile = ".\iverilog-out\dump.vcd"
-$ignoreFiles = @("dummy_cpu.v", "mesh_top.v")
+$ignoreFiles = @("dummy_cpu.v",
+    "mesh_top.v", 
+    "mesh_top_flat.v", 
+    "mesh_top_flat_2x2.v",
+    "mesh_top_row_0.v", 
+    "mesh_top_row_1.v", 
+    "mesh_top_row_2.v", 
+    "mesh_top_row_3.v", 
+    "mesh_top_row_4.v")
 
 # Find all Verilog files
 if ($tbModule -eq "") {
