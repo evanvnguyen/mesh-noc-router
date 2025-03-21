@@ -95,41 +95,42 @@ module router (
   reg [3:0] ns_requests;  // Index 0 is for cw, index 1 is for ccw, index 2 is for pe, and index 3 is for ns
   reg [3:0] sn_requests;  // Index 0 is for cw, index 1 is for ccw, index 2 is for pe, and index 3 is for sn
 
+  // These signals control which request was granted or allowed to pass to the given output channel
   wire cw_granted;
   wire ccw_granted;
   wire [1:0] pe_granted;
   wire [1:0] ns_granted;
   wire [1:0] sn_granted;
 
-  wire cw_out_blocked;
-  wire ccw_out_blocked;
-  wire pe_out_blocked;
-  wire ns_out_blocked;
-  wire sn_out_blocked;
+  wire cw_output_channel_blocked;
+  wire ccw_output_channel_blocked;
+  wire pe_output_channel_blocked;
+  wire ns_output_channel_blocked;
+  wire sn_output_channel_blocked;
 
-  reg cw_in_blocked;
-  reg ccw_in_blocked;
-  reg pe_in_blocked;
-  reg ns_in_blocked;
-  reg sn_in_blocked;
-
-  // These will be used to connect the output of the input channels
-  // to the input of the output channels. This connection will be determined
-  // by the arbiter.
-  wire [63:0] cw_data_out;
-  wire [63:0] ccw_data_out;
-  wire [63:0] pe_data_out;
-  wire [63:0] ns_data_out;
-  wire [63:0] sn_data_out;
+  reg block_cw_input_channel;
+  reg block_ccw_input_channel;
+  reg block_pe_input_channel;
+  reg block_ns_input_channel;
+  reg block_sn_input_channel;
 
   // These will be used to connect the output of the input channels
   // to the input of the output channels. This connection will be determined
   // by the arbiter.
-  reg [63:0] cw_data_in;
-  reg [63:0] ccw_data_in;
-  reg [63:0] pe_data_in;
-  reg [63:0] ns_data_in;
-  reg [63:0] sn_data_in;
+  wire [63:0] cw_input_channel_data_out;
+  wire [63:0] ccw_input_channel_data_out;
+  wire [63:0] pe_input_channel_data_out;
+  wire [63:0] ns_input_channel_data_out;
+  wire [63:0] sn_input_channel_data_out;
+
+  // These will be used to connect the output of the input channels
+  // to the input of the output channels. This connection will be determined
+  // by the arbiter.
+  reg [63:0] cw_output_channel_data_in;
+  reg [63:0] ccw_output_channel_data_in;
+  reg [63:0] pe_output_channel_data_in;
+  reg [63:0] ns_output_channel_data_in;
+  reg [63:0] sn_output_channel_data_in;
 
   // Instantiate the input and output channels of the router
   router_input_channel cw_input_channel (
@@ -137,10 +138,10 @@ module router (
     .reset(reset),
     .polarity(polarity),
     .send(cwsi),
-    .blocked(cw_in_blocked),
+    .blocked(block_cw_input_channel),
     .data_in(cwdi),
     .ready(cwri),
-    .data_out(cw_data_out)
+    .data_out(cw_input_channel_data_out)
   );
 
   router_input_channel ccw_input_channel (
@@ -148,10 +149,10 @@ module router (
     .reset(reset),
     .polarity(polarity),
     .send(ccwsi),
-    .blocked(ccw_in_blocked),
+    .blocked(block_ccw_input_channel),
     .data_in(ccwdi),
     .ready(ccwri),
-    .data_out(ccw_data_out)
+    .data_out(ccw_input_channel_data_out)
   );
 
   router_input_channel pe_input_channel (
@@ -159,10 +160,10 @@ module router (
     .reset(reset),
     .polarity(polarity),
     .send(pesi),
-    .blocked(pe_in_blocked),
+    .blocked(block_pe_input_channel),
     .data_in(pedi),
     .ready(peri),
-    .data_out(pe_data_out)
+    .data_out(pe_input_channel_data_out)
   );
 
   router_input_channel ns_input_channel (
@@ -170,10 +171,10 @@ module router (
     .reset(reset),
     .polarity(polarity),
     .send(nssi),
-    .blocked(ns_in_blocked),
+    .blocked(block_ns_input_channel),
     .data_in(nsdi),
     .ready(nsri),
-    .data_out(ns_data_out)
+    .data_out(ns_input_channel_data_out)
   );
 
   router_input_channel sn_input_channel (
@@ -181,10 +182,10 @@ module router (
     .reset(reset),
     .polarity(polarity),
     .send(snsi),
-    .blocked(sn_in_blocked),
+    .blocked(block_sn_input_channel),
     .data_in(sndi),
     .ready(snri),
-    .data_out(sn_data_out)
+    .data_out(sn_input_channel_data_out)
   );
 
   router_output_channel cw_output_channel (
@@ -192,8 +193,8 @@ module router (
     .reset(reset),
     .polarity(polarity),
     .ready(cwro),
-    .data_in(cw_data_in),
-    .blocked(cw_out_blocked),
+    .data_in(cw_output_channel_data_in),
+    .blocked(cw_output_channel_blocked),
     .send(cwso),
     .data_out(cwdo)
   );
@@ -203,8 +204,8 @@ module router (
     .reset(reset),
     .polarity(polarity),
     .ready(ccwro),
-    .data_in(ccw_data_in),
-    .blocked(ccw_out_blocked),
+    .data_in(ccw_output_channel_data_in),
+    .blocked(ccw_output_channel_blocked),
     .send(ccwso),
     .data_out(ccwdo)
   );
@@ -214,8 +215,8 @@ module router (
     .reset(reset),
     .polarity(polarity),
     .ready(pero),
-    .data_in(pe_data_in),
-    .blocked(pe_out_blocked),
+    .data_in(pe_output_channel_data_in),
+    .blocked(pe_output_channel_blocked),
     .send(peso),
     .data_out(pedo)
   );
@@ -225,8 +226,8 @@ module router (
     .reset(reset),
     .polarity(polarity),
     .ready(nsro),
-    .data_in(ns_data_in),
-    .blocked(ns_out_blocked),
+    .data_in(ns_output_channel_data_in),
+    .blocked(ns_output_channel_blocked),
     .send(nsso),
     .data_out(nsdo)
   );
@@ -236,8 +237,8 @@ module router (
     .reset(reset),
     .polarity(polarity),
     .ready(snro),
-    .data_in(sn_data_in),
-    .blocked(sn_out_blocked),
+    .data_in(sn_output_channel_data_in),
+    .blocked(sn_output_channel_blocked),
     .send(snso),
     .data_out(sndo)
   );
@@ -246,85 +247,83 @@ module router (
   two_way_arbiter cw_arbiter (
     .reset(reset),
     .requests(cw_requests),
-    .blockedRequests({pe_in_blocked | pe_out_blocked,
-                      cw_in_blocked | cw_out_blocked}),
+    .blockedRequests({block_pe_input_channel | pe_output_channel_blocked,
+                      block_cw_input_channel | cw_output_channel_blocked}),
     .granted(cw_granted)
   );
 
   two_way_arbiter ccw_arbiter (
     .reset(reset),
     .requests(ccw_requests),
-    .blockedRequests({pe_in_blocked | pe_out_blocked,
-                      cw_in_blocked | cw_out_blocked}),
+    .blockedRequests({block_pe_input_channel | pe_output_channel_blocked,
+                      block_ccw_input_channel | ccw_output_channel_blocked}),
     .granted(ccw_granted)
   );
 
   four_way_arbiter pe_arbiter (
     .reset(reset),
     .requests(pe_requests),
-    .blockedRequests({sn_in_blocked | sn_out_blocked,
-                      ns_in_blocked | ns_out_blocked,
-                      ccw_in_blocked | ccw_out_blocked,
-                      cw_in_blocked | cw_out_blocked}),
+    .blockedRequests({block_sn_input_channel | sn_output_channel_blocked,
+                      block_ns_input_channel | ns_output_channel_blocked,
+                      block_ccw_input_channel | ccw_output_channel_blocked,
+                      block_cw_input_channel | cw_output_channel_blocked}),
     .granted(pe_granted)
   );
 
   four_way_arbiter ns_arbiter (
     .reset(reset),
     .requests(ns_requests),
-    .blockedRequests({ns_in_blocked | ns_out_blocked,
-                      pe_in_blocked | pe_out_blocked,
-                      ccw_in_blocked | ccw_out_blocked,
-                      cw_in_blocked | cw_out_blocked}),
+    .blockedRequests({block_ns_input_channel | ns_output_channel_blocked,
+                      block_pe_input_channel | pe_output_channel_blocked,
+                      block_ccw_input_channel | ccw_output_channel_blocked,
+                      block_cw_input_channel | cw_output_channel_blocked}),
     .granted(ns_granted)
   );
 
   four_way_arbiter sn_arbiter (
     .reset(reset),
     .requests(sn_requests),
-    .blockedRequests({sn_in_blocked | sn_out_blocked,
-                      pe_in_blocked | pe_out_blocked,
-                      ccw_in_blocked | ccw_out_blocked,
-                      cw_in_blocked | cw_out_blocked}),
+    .blockedRequests({block_sn_input_channel | sn_output_channel_blocked,
+                      block_pe_input_channel | pe_output_channel_blocked,
+                      block_ccw_input_channel | ccw_output_channel_blocked,
+                      block_cw_input_channel | cw_output_channel_blocked}),
     .granted(sn_granted)
   );
 
   always @(posedge clk) begin
     if (reset) begin
-      $display("Router: Resetting...");
       reset_clocked_values;
       polarity <= 1'b0;
     end else begin
-      $display("Router: Looking at the granted requests");
+      cw_output_channel_data_in <= 0;
+      ccw_output_channel_data_in <= 0;
+      pe_output_channel_data_in <= 0;
+      ns_output_channel_data_in <= 0;
+      sn_output_channel_data_in <= 0;
+
       // more the data from the input channels to the output channels
       if (cw_requests > 0) begin
-        $display("Router: CW requests are %b", cw_requests);
         if (cw_granted) begin
-          $display("Router: CW granted PE data to go to CW output channel");
-          cw_data_in <= {pe_data_out[63:52], pe_data_out[51:48] >> 1, pe_data_out[47:0]};
+          cw_output_channel_data_in <= {pe_input_channel_data_out[63:52], pe_input_channel_data_out[51:48] >> 1, pe_input_channel_data_out[47:0]};
 
           // If cw also requested to send data to cw out, we need to block it.
-          cw_in_blocked <= cw_requests[0];
+          block_cw_input_channel <= cw_requests[0];
         end else begin
-          $display("Router: CW granted CW data to go to CW output channel");
-          cw_data_in <= {cw_data_out[63:52], cw_data_out[51:48] >> 1, cw_data_out[47:0]};
+          cw_output_channel_data_in <= {cw_input_channel_data_out[63:52], cw_input_channel_data_out[51:48] >> 1, cw_input_channel_data_out[47:0]};
 
-          pe_in_blocked <= cw_requests[1];
+          block_pe_input_channel <= cw_requests[1];
         end
       end
 
       if (ccw_requests > 0) begin
-        $display("Router: CCW requests are %b", ccw_requests);
         if (ccw_granted) begin
-          $display("Router: CCW granted PE data to go to CCW output channel");
-          ccw_data_in <= {pe_data_out[63:52], pe_data_out[51:48] >> 1, pe_data_out[47:0]};
+          ccw_output_channel_data_in <= {pe_input_channel_data_out[63:52], pe_input_channel_data_out[51:48] >> 1, pe_input_channel_data_out[47:0]};
 
-          ccw_in_blocked <= ccw_requests[0];
+          block_ccw_input_channel <= ccw_requests[0];
         end else begin
-          $display("Router: CCW granted CW data to go to CCW output channel");
-          ccw_data_in <= {ccw_data_out[63:52], ccw_data_out[51:48] >> 1, ccw_data_out[47:0]};
+          ccw_output_channel_data_in <= {ccw_input_channel_data_out[63:52], ccw_input_channel_data_out[51:48] >> 1, ccw_input_channel_data_out[47:0]};
 
-          pe_in_blocked <= ccw_requests[1];
+          block_pe_input_channel <= ccw_requests[1];
         end
       end
 
@@ -332,32 +331,28 @@ module router (
       if (pe_requests > 0) begin
         case (pe_granted)
           2'b00: begin
-            $display("Router: PE granted CW data to go to PE output channel");
-            pe_data_in <= {cw_data_out[63:52], cw_data_out[51:48] >> 1, cw_data_out[47:0]};
-            ccw_in_blocked <= pe_requests[1];
-            ns_in_blocked <= pe_requests[2];
-            sn_in_blocked <= pe_requests[3];
+            pe_output_channel_data_in <= {cw_input_channel_data_out[63:52], cw_input_channel_data_out[51:48] >> 1, cw_input_channel_data_out[47:0]};
+            block_ccw_input_channel <= pe_requests[1];
+            block_ns_input_channel <= pe_requests[2];
+            block_sn_input_channel <= pe_requests[3];
           end
           2'b01: begin
-            $display("Router: PE granted CCW data to go to PE output channel");
-            pe_data_in <= {ccw_data_out[63:52], ccw_data_out[51:48] >> 1, ccw_data_out[47:0]};
-            cw_in_blocked <= pe_requests[0];
-            ns_in_blocked <= pe_requests[2];
-            sn_in_blocked <= pe_requests[3];
+            pe_output_channel_data_in <= {ccw_input_channel_data_out[63:52], ccw_input_channel_data_out[51:48] >> 1, ccw_input_channel_data_out[47:0]};
+            block_cw_input_channel <= pe_requests[0];
+            block_ns_input_channel <= pe_requests[2];
+            block_sn_input_channel <= pe_requests[3];
           end
           2'b10: begin 
-            $display("Router: PE granted NS data to go to PE output channel");
-            pe_data_in <= {ns_data_out[63:56], ns_data_out[55:52] >> 1, ns_data_out[51:0]};
-            cw_in_blocked <= pe_requests[0];
-            ccw_in_blocked <= pe_requests[1];
-            sn_in_blocked <= pe_requests[3];
+            pe_output_channel_data_in <= {ns_input_channel_data_out[63:56], ns_input_channel_data_out[55:52] >> 1, ns_input_channel_data_out[51:0]};
+            block_cw_input_channel <= pe_requests[0];
+            block_ccw_input_channel <= pe_requests[1];
+            block_sn_input_channel <= pe_requests[3];
           end
           2'b11: begin
-            $display("Router: PE granted SN data to go to PE output channel");
-            pe_data_in <= {sn_data_out[63:56], sn_data_out[55:52] >> 1, sn_data_out[51:0]};
-            cw_in_blocked <= pe_requests[0];
-            ccw_in_blocked <= pe_requests[1];
-            ns_in_blocked <= pe_requests[2];
+            pe_output_channel_data_in <= {sn_input_channel_data_out[63:56], sn_input_channel_data_out[55:52] >> 1, sn_input_channel_data_out[51:0]};
+            block_cw_input_channel <= pe_requests[0];
+            block_ccw_input_channel <= pe_requests[1];
+            block_ns_input_channel <= pe_requests[2];
           end
         endcase
       end
@@ -366,32 +361,28 @@ module router (
       if (ns_requests > 0) begin
         case (ns_granted)
           2'b00: begin 
-            $display("Router: NS granted CW data to go to NS output channel");
-            ns_data_in <= {cw_data_out[63:56], cw_data_out[55:52] >> 1, cw_data_out[51:0]};
-            ccw_in_blocked <= pe_requests[1];
-            pe_in_blocked <= pe_requests[2];
-            sn_in_blocked <= pe_requests[3];
+            ns_output_channel_data_in <= {cw_input_channel_data_out[63:56], cw_input_channel_data_out[55:52] >> 1, cw_input_channel_data_out[51:0]};
+            block_ccw_input_channel <= ns_requests[1];
+            block_pe_input_channel <= ns_requests[2];
+            block_ns_input_channel <= ns_requests[3];
           end
           2'b01: begin 
-            $display("Router: NS granted CCW data to go to NS output channel");
-            ns_data_in <= {ccw_data_out[63:56], ccw_data_out[55:52] >> 1, ccw_data_out[51:0]}; 
-            cw_in_blocked <= pe_requests[0];
-            pe_in_blocked <= pe_requests[2];
-            sn_in_blocked <= pe_requests[3];
+            ns_output_channel_data_in <= {ccw_input_channel_data_out[63:56], ccw_input_channel_data_out[55:52] >> 1, ccw_input_channel_data_out[51:0]}; 
+            block_cw_input_channel <= ns_requests[0];
+            block_pe_input_channel <= ns_requests[2];
+            block_ns_input_channel <= ns_requests[3];
           end
           2'b10: begin 
-            $display("Router: NS granted PE data to go to NS output channel");
-            ns_data_in <= {pe_data_out[63:56], pe_data_out[55:52] >> 1, pe_data_out[51:0]};
-            cw_in_blocked <= pe_requests[0];
-            ccw_in_blocked <= pe_requests[1];
-            sn_in_blocked <= pe_requests[3];
+            ns_output_channel_data_in <= {pe_input_channel_data_out[63:56], pe_input_channel_data_out[55:52] >> 1, pe_input_channel_data_out[51:0]};
+            block_cw_input_channel <= ns_requests[0];
+            block_ccw_input_channel <= ns_requests[1];
+            block_ns_input_channel <= ns_requests[3];
           end
           2'b11: begin 
-            $display("Router: NS granted SN data to go to NS output channel");
-            ns_data_in <= {ns_data_out[63:56], ns_data_out[55:52] >> 1, ns_data_out[51:0]};
-            cw_in_blocked <= pe_requests[0];
-            ccw_in_blocked <= pe_requests[1];
-            pe_in_blocked <= pe_requests[2];
+            ns_output_channel_data_in <= {ns_input_channel_data_out[63:56], ns_input_channel_data_out[55:52] >> 1, ns_input_channel_data_out[51:0]};
+            block_cw_input_channel <= ns_requests[0];
+            block_ccw_input_channel <= ns_requests[1];
+            block_pe_input_channel <= ns_requests[2];
           end
         endcase
       end
@@ -400,32 +391,28 @@ module router (
       if (sn_requests > 0) begin
         case (sn_granted)
           2'b00: begin 
-            $display("Router: SN granted CW data to go to SN output channel");
-            sn_data_in <= {cw_data_out[63:56], cw_data_out[55:52] >> 1, cw_data_out[51:0]};
-            ccw_in_blocked <= pe_requests[1];
-            pe_in_blocked <= pe_requests[2];
-            sn_in_blocked <= pe_requests[3];
+            sn_output_channel_data_in <= {cw_input_channel_data_out[63:56], cw_input_channel_data_out[55:52] >> 1, cw_input_channel_data_out[51:0]};
+            block_ccw_input_channel <= sn_requests[1];
+            block_pe_input_channel <= sn_requests[2];
+            block_sn_input_channel <= sn_requests[3];
           end
           2'b01: begin
-            $display("Router: SN granted CCW data to go to SN output channel");
-            sn_data_in <= {ccw_data_out[63:56], ccw_data_out[55:52] >> 1, ccw_data_out[51:0]}; 
-            cw_in_blocked <= pe_requests[0];
-            pe_in_blocked <= pe_requests[2];
-            sn_in_blocked <= pe_requests[3];
+            sn_output_channel_data_in <= {ccw_input_channel_data_out[63:56], ccw_input_channel_data_out[55:52] >> 1, ccw_input_channel_data_out[51:0]}; 
+            block_cw_input_channel <= sn_requests[0];
+            block_pe_input_channel <= sn_requests[2];
+            block_sn_input_channel <= sn_requests[3];
           end
           2'b10: begin
-            $display("Router: SN granted PE data to go to SN output channel");
-            sn_data_in <= {pe_data_out[63:56], pe_data_out[55:52] >> 1, pe_data_out[51:0]};
-            cw_in_blocked <= pe_requests[0];
-            ccw_in_blocked <= pe_requests[1];
-            sn_in_blocked <= pe_requests[3];
+            sn_output_channel_data_in <= {pe_input_channel_data_out[63:56], pe_input_channel_data_out[55:52] >> 1, pe_input_channel_data_out[51:0]};
+            block_cw_input_channel <= sn_requests[0];
+            block_ccw_input_channel <= sn_requests[1];
+            block_sn_input_channel <= sn_requests[3];
           end
           2'b11: begin
-            $display("Router: SN granted SN data to go to SN output channel");
-            sn_data_in <= {sn_data_out[63:56], sn_data_out[55:52] >> 1, sn_data_out[51:0]};
-            cw_in_blocked <= pe_requests[0];
-            ccw_in_blocked <= pe_requests[1];
-            pe_in_blocked <= pe_requests[2];
+            sn_output_channel_data_in <= {sn_input_channel_data_out[63:56], sn_input_channel_data_out[55:52] >> 1, sn_input_channel_data_out[51:0]};
+            block_cw_input_channel <= sn_requests[0];
+            block_ccw_input_channel <= sn_requests[1];
+            block_pe_input_channel <= sn_requests[2];
           end
         endcase
       end
@@ -437,25 +424,17 @@ module router (
   always @(*) begin
     reset_values;
     if (!reset) begin
-      $display("Router: Running router");
-      $display("cw_data_in: %h, pe_data_out=%h", cw_data_in, pe_data_out);
-
       // We need to look at the direction of the data and figure out where to 
       // send it. We will use an arbiter to determine who has priority if
       // multiple channels are trying to send data to the same output channel.
-      $display("Router: Checking CW data");
       check_cw_data;
 
-      $display("Router: Checking CCW data");
       check_ccw_data;
 
-      $display("Router: Checking NS data");
       check_ns_data;
 
-      $display("Router: Checking SN data");
       check_sn_data;
 
-      $display("Router: Checking PE data");
       check_pe_data;
     end            
 
@@ -464,17 +443,17 @@ module router (
 
   task reset_clocked_values();
     begin
-        cw_data_in <= 64'b0;
-        ccw_data_in <= 64'b0;
-        pe_data_in <= 64'b0;
-        ns_data_in <= 64'b0;
-        sn_data_in <= 64'b0;
+        cw_output_channel_data_in <= 64'b0;
+        ccw_output_channel_data_in <= 64'b0;
+        pe_output_channel_data_in <= 64'b0;
+        ns_output_channel_data_in <= 64'b0;
+        sn_output_channel_data_in <= 64'b0;
 
-        cw_in_blocked <= 1'b0;
-        ccw_in_blocked <= 1'b0;
-        pe_in_blocked <= 1'b0;
-        ns_in_blocked <= 1'b0;
-        sn_in_blocked <= 1'b0;
+        block_cw_input_channel <= 1'b0;
+        block_ccw_input_channel <= 1'b0;
+        block_pe_input_channel <= 1'b0;
+        block_ns_input_channel <= 1'b0;
+        block_sn_input_channel <= 1'b0;
     end
   endtask
 
@@ -490,23 +469,18 @@ module router (
 
   task check_pe_data();
     begin
-      if (pe_data_out != 64'b0) begin
-        $display("Router: PE data is not 0");
+      if (pe_input_channel_data_out != 64'b0) begin
         // Is the packet traveling from west to east and are there any hops left?
-        if (pe_data_out[X_HOP_BIT: X_HOP_BIT-HOP_BIT_WIDTH] > 0) begin
-          if (pe_data_out[EAST_WEST_BIT] == WEST_TO_EAST) begin
-            $display("Router: PE data is traveling west to east with %b hops left", pe_data_out[X_HOP_BIT: X_HOP_BIT-HOP_BIT_WIDTH]);
+        if (pe_input_channel_data_out[X_HOP_BIT: X_HOP_BIT-HOP_BIT_WIDTH] > 0) begin
+          if (pe_input_channel_data_out[EAST_WEST_BIT] == WEST_TO_EAST) begin
             cw_requests[1] = 1'b1;
           end else begin
-            $display("Router: PE data is traveling east to west with %b hops left", pe_data_out[X_HOP_BIT: X_HOP_BIT-HOP_BIT_WIDTH]);
             ccw_requests[1] = 1'b1;
           end
-        end else if (pe_data_out[Y_HOP_BIT: Y_HOP_BIT-HOP_BIT_WIDTH] > 0) begin
-          if (pe_data_out[NORTH_SOUTH_BIT] == NORTH_TO_SOUTH) begin
-            $display("Router: PE data is traveling north to south with %b hops left", pe_data_out[Y_HOP_BIT: Y_HOP_BIT-HOP_BIT_WIDTH]);
+        end else if (pe_input_channel_data_out[Y_HOP_BIT: Y_HOP_BIT-HOP_BIT_WIDTH] > 0) begin
+          if (pe_input_channel_data_out[NORTH_SOUTH_BIT] == NORTH_TO_SOUTH) begin
             ns_requests[2] = 1'b1;
           end else begin
-            $display("Router: PE data is traveling south to north with %b hops left", pe_data_out[Y_HOP_BIT: Y_HOP_BIT-HOP_BIT_WIDTH]);
             sn_requests[2] = 1'b1;
           end
         end
@@ -520,25 +494,19 @@ module router (
       // After that, we will travel ns or sn until it runs out of hops.
       // Once we are out of y hops and x hops we have reached our destination and
       // we will send the data to the processing element.
-      if (cw_data_out != 64'b0) begin
-        $display("Router: CW data is not 0");
+      if (cw_input_channel_data_out != 64'b0) begin
         // Is the packet traveling from west to east and are there any hops left?
-        if (cw_data_out[EAST_WEST_BIT] == WEST_TO_EAST && 
-            cw_data_out[X_HOP_BIT: X_HOP_BIT-HOP_BIT_WIDTH] > 0) begin
-          $display("Router: CW data is traveling west to east with %b hops left", cw_data_out[X_HOP_BIT: X_HOP_BIT-HOP_BIT_WIDTH]);
+        if (cw_input_channel_data_out[EAST_WEST_BIT] == WEST_TO_EAST && 
+            cw_input_channel_data_out[X_HOP_BIT: X_HOP_BIT-HOP_BIT_WIDTH] > 0) begin
           cw_requests[0] = 1'b1;
-        end else if (cw_data_out[NORTH_SOUTH_BIT] == NORTH_TO_SOUTH &&
-                     cw_data_out[Y_HOP_BIT: Y_HOP_BIT-HOP_BIT_WIDTH] > 0) begin
-                    
-          $display("Router: CW data is traveling north to south with %b hops left", cw_data_out[Y_HOP_BIT: Y_HOP_BIT-HOP_BIT_WIDTH]);
+        end else if (cw_input_channel_data_out[NORTH_SOUTH_BIT] == NORTH_TO_SOUTH &&
+                     cw_input_channel_data_out[Y_HOP_BIT: Y_HOP_BIT-HOP_BIT_WIDTH] > 0) begin
           ns_requests[0] = 1'b1;
         end else begin
-          if (cw_data_out[Y_HOP_BIT: Y_HOP_BIT-HOP_BIT_WIDTH] > 0) begin
-            $display("Router: CW data is traveling south to north with %b hops left", cw_data_out[Y_HOP_BIT: Y_HOP_BIT-HOP_BIT_WIDTH]);
+          if (cw_input_channel_data_out[Y_HOP_BIT: Y_HOP_BIT-HOP_BIT_WIDTH] > 0) begin
             sn_requests[0] = 1'b1;
           end else begin
             // There are no more hops left, so we've reached our destination.
-            $display("Router: CW data is at its destination.");
             pe_requests[0] = 1'b1;
           end
         end
@@ -549,26 +517,19 @@ module router (
   task check_ccw_data();
     begin
       // If traveling ccw, we use the same logic as traveling cw.
-      if (ccw_data_out != 64'b0) begin
-        $display("Router: CCW data is not 0");
+      if (ccw_input_channel_data_out != 64'b0) begin
         // Is the packet traveling from west to east and are there any hops left?
-        if (ccw_data_out[EAST_WEST_BIT] == EAST_TO_WEST && 
-            ccw_data_out[X_HOP_BIT: X_HOP_BIT-HOP_BIT_WIDTH] > 0) begin
-
-          $display("Router: CCW data is traveling east to west with %b hops left", ccw_data_out[X_HOP_BIT: X_HOP_BIT-HOP_BIT_WIDTH]);
+        if (ccw_input_channel_data_out[EAST_WEST_BIT] == EAST_TO_WEST && 
+            ccw_input_channel_data_out[X_HOP_BIT: X_HOP_BIT-HOP_BIT_WIDTH] > 0) begin
           ccw_requests[0] = 1'b1;
-        end else if (ccw_data_out[NORTH_SOUTH_BIT] == NORTH_TO_SOUTH &&
-                     ccw_data_out[Y_HOP_BIT: Y_HOP_BIT-HOP_BIT_WIDTH] > 0) begin
-        
-          $display("Router: CCW data is traveling north to south with %b hops left", ccw_data_out[Y_HOP_BIT: Y_HOP_BIT-HOP_BIT_WIDTH]);
+        end else if (ccw_input_channel_data_out[NORTH_SOUTH_BIT] == NORTH_TO_SOUTH &&
+                     ccw_input_channel_data_out[Y_HOP_BIT: Y_HOP_BIT-HOP_BIT_WIDTH] > 0) begin
           ns_requests[1] = 1'b1;
         end else begin
-          if (ccw_data_out[Y_HOP_BIT: Y_HOP_BIT-HOP_BIT_WIDTH] > 0) begin
-            $display("Router: CCW data is traveling south to north with %b hops left", ccw_data_out[Y_HOP_BIT: Y_HOP_BIT-HOP_BIT_WIDTH]);
+          if (ccw_input_channel_data_out[Y_HOP_BIT: Y_HOP_BIT-HOP_BIT_WIDTH] > 0) begin
             sn_requests[1] = 1'b1;
           end else begin
             // There are no more hops left, so we've reached our destination.
-            $display("Router: CCW data is at its destination.");
             pe_requests[1] = 1'b1;
           end
         end
@@ -579,15 +540,12 @@ module router (
   task check_ns_data();
     begin
       // If traveling ns, we will conitnue to travel ns until it runs out of hops.
-      if (ns_data_out != 64'b0) begin
+      if (ns_input_channel_data_out != 64'b0) begin
         // Is the packet traveling from north to south and are there any hops left?
-        if (ns_data_out[NORTH_SOUTH_BIT] == NORTH_TO_SOUTH && 
-            ns_data_out[Y_HOP_BIT: Y_HOP_BIT-HOP_BIT_WIDTH] > 0) begin
-
-          $display("Router: NS data is traveling north to south with %b hops left", ns_data_out[Y_HOP_BIT: Y_HOP_BIT-HOP_BIT_WIDTH]);
+        if (ns_input_channel_data_out[NORTH_SOUTH_BIT] == NORTH_TO_SOUTH && 
+            ns_input_channel_data_out[Y_HOP_BIT: Y_HOP_BIT-HOP_BIT_WIDTH] > 0) begin
           ns_requests[3] = 1'b1;
         end else begin
-          $display("Router: NS data is at its destination.");
           // There are no more hops left, so we've reached our destination.
           pe_requests[2] = 1'b1;
         end
@@ -598,15 +556,12 @@ module router (
   task check_sn_data();
     begin
       // If traveling sn, we will conitnue to travel sn until it runs out of hops.
-      if (sn_data_out != 64'b0) begin
+      if (sn_input_channel_data_out != 64'b0) begin
         // Is the packet traveling from north to south and are there any hops left?
-        if (sn_data_out[NORTH_SOUTH_BIT] == SOUTH_TO_NORTH && 
-            sn_data_out[Y_HOP_BIT: Y_HOP_BIT-HOP_BIT_WIDTH] > 0) begin
-
-          $display("Router: SN data is traveling south to north with %b hops left", sn_data_out[Y_HOP_BIT: Y_HOP_BIT-HOP_BIT_WIDTH]);
+        if (sn_input_channel_data_out[NORTH_SOUTH_BIT] == SOUTH_TO_NORTH && 
+            sn_input_channel_data_out[Y_HOP_BIT: Y_HOP_BIT-HOP_BIT_WIDTH] > 0) begin
           sn_requests[3] = 1'b1;
         end else begin
-          $display("Router: SN data is at its destination.");
           // There are no more hops left, so we've reached our destination.
           pe_requests[3] = 1'b1;
         end

@@ -29,12 +29,16 @@ module router_input_channel (
         // 0 (even) input goes to vc1. 1 (odd) input goes to vc2
         if (polarity) begin
           // If send is high and we have space in vc2, store data in vc2
-          if (send && vc_2_read)
+          if (send && vc_2_read) begin
             virtual_channel_2 = data_in;
+            vc_2_read = 0;
+          end
         end else begin
           // If send is high and we have space in vc1, store data in vc1
-          if (send && vc_1_read)
+          if (send && vc_1_read) begin
             virtual_channel_1 = data_in;
+            vc_1_read = 0;
+          end
         end
 
         // We are ready to receive data if we have space in the virtual channel and we are not blocked.
@@ -52,23 +56,21 @@ module router_input_channel (
       vc_2_read <= 1'b1;
     end else begin
       data_out <= 64'b0;
-      vc_1_read <= 1'b1;
-      vc_2_read <= 1'b1;
 
       if (!polarity) begin
         // Check if we have data in vc1 and we are not blocked
-        if (virtual_channel_1 != 0 && !blocked) begin
+        if (virtual_channel_1 != 0 && !blocked && !vc_1_read) begin
           data_out <= virtual_channel_1;
+          vc_1_read <= 1'b1;
+        end else if (blocked && vc_1_read) 
           vc_1_read <= 1'b0;
-          //virtual_channel_1 <= 64'b0;
-        end
       end else begin      
         // Check if we have data in vc2 and we are not blocked
-        if (virtual_channel_2 != 0 && !blocked) begin
+        if (virtual_channel_2 != 0 && !blocked && !vc_2_read) begin
           data_out <= virtual_channel_2;
+          vc_2_read <= 1'b1;
+        end else if (blocked && vc_2_read) 
           vc_2_read <= 1'b0;
-          //virtual_channel_2 <= 64'b0;
-        end
       end
     end
   end

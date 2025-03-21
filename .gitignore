@@ -1,2 +1,4 @@
 dump.vcd
 sim.out
+mesh-noc-router*
+*.wcfg
