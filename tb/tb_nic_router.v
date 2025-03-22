@@ -93,6 +93,7 @@ module tb_nic_router();
 
     always #5 clk = ~clk;
     
+    // **** NIC functions **** 
     task reset_NIC_CPU_input;
         output reg [0:1] addr;
         output reg [0:PACKET_WIDTH-1] d_in;
@@ -143,13 +144,70 @@ module tb_nic_router();
         output reg nicEnWR;
         
         begin
-            addr = 2'b00;
-            nicEn = 1; // read data from input buffer and latch to d_out
-            nicEnWR = 0;
+            addr    = 2'b00; // also allows d_in to go into input buffer
+            nicEn   = 1'b1; // read data from input buffer and latch to d_out
+            nicEnWR = 1'b0;
             #10;
         end
     
     endtask
+        
+    // Case 0: Task for loading from the Network Input Channel Buffer (read-only, addr 2'b00)
+    task load_nic_input_channel_buffer;
+        output reg [1:0] addr;
+        output reg       nicEn;
+        output reg       nicEnWR;
+        begin
+            addr    = 2'b00;
+            nicEn   = 1'b1;
+            nicEnWR = 1'b0;  // Load (read) operation
+            #10;
+        end
+    endtask
+    
+    // Case 1: Task for loading from the Network Input Channel Status Register (read-only, addr 2'b01)
+    task load_nic_input_channel_status;
+        output reg [1:0] addr;
+        output reg       nicEn;
+        output reg       nicEnWR;
+        begin
+            addr    = 2'b01;
+            nicEn   = 1'b1;
+            nicEnWR = 1'b0;  // Load (read) operation
+            #10;
+        end
+    endtask
+    
+    // Case 2: Task for storing to the Network Output Channel Buffer (write-only, addr 2'b10)
+    task store_nic_output_channel_buffer;
+        output reg [63:0] d_in;
+        output reg [1:0] addr;
+        output reg       nicEn;
+        output reg       nicEnWR;
+        begin
+            d_in    = 64'h40100000ffffffff; // SN -> SN 1 hop
+            addr    = 2'b10;
+            nicEn   = 1'b1;
+            nicEnWR = 1'b1;  // Store (write) operation
+            #10;
+        end
+    endtask
+    
+    // Case 3: Task for loading from the Network Output Channel Status Register (read-only, addr 2'b11)
+    task load_nic_output_channel_status;
+        output reg [1:0] addr;
+        output reg       nicEn;
+        output reg       nicEnWR;
+        begin
+            addr    = 2'b11;
+            nicEn   = 1'b1;
+            nicEnWR = 1'b0;  // Load (read) operation
+            #10;
+        end
+    endtask
+
+
+    // **** End NIC functions **** 
     
     // Test stimulus
     initial begin
@@ -162,6 +220,12 @@ module tb_nic_router();
         // send a packet CPU->NIC->ROUTER 
         #10; send_packet_from_cpu_to_router(addr, d_in, nicEn, nicEnWR); 
         #10; disable_write_to_nic(addr, nicEn, nicEnWR);
+        #10; read_data_from_nic_to_cpu(addr, nicEn, nicEnWR);
+        #10; load_nic_input_channel_buffer(addr, nicEn, nicEnWR);
+        #10; load_nic_input_channel_status(addr, nicEn, nicEnWR);
+        #10; store_nic_output_channel_buffer(d_in, addr, nicEn, nicEnWR); // < store new data
+        //#10; disable_write_to_nic(addr, nicEn, nicEnWR);
+        #10; load_nic_output_channel_status(addr, nicEn, nicEnWR);
         #10; read_data_from_nic_to_cpu(addr, nicEn, nicEnWR);
         
         #100;

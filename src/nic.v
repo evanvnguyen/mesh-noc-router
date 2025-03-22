@@ -35,8 +35,8 @@ module nic #(parameter PACKET_WIDTH = 64)(
     // Update Status Registers (0-empty, 1-full)
     // reduced by 1 cycle
     always @(*) begin
-        channel_input_buffer_status = (channel_input_buffer == 0) ? 1'b0 : 1'b1;
-        channel_output_buffer_status = (channel_output_buffer == 0) ? 1'b0 : 1'b1;
+        assign channel_input_buffer_status = (channel_input_buffer == 0) ? 1'b0 : 1'b1;
+        assign channel_output_buffer_status = (channel_output_buffer == 0) ? 1'b0 : 1'b1;
     end
     
     // router handhsake
@@ -53,6 +53,8 @@ module nic #(parameter PACKET_WIDTH = 64)(
         end else begin
             // Write to Output Buffer (if nicEnWR, nicEn, addr to output buffer, output buffer is empty)
             if (nicEnWR && nicEn && addr == 2'b10 && !channel_output_buffer_status) begin
+                channel_output_buffer <= d_in;
+            end else if (net_so && net_si) begin // next data logic
                 channel_output_buffer <= d_in;
             end
     
@@ -76,9 +78,9 @@ module nic #(parameter PACKET_WIDTH = 64)(
             if (nicEn && !nicEnWR) begin
                 case (addr)
                     2'b00: d_out <= channel_input_buffer;                             // Read input buffer
-                    2'b01: d_out <= {62'b0, channel_input_buffer_status};             // Read input status
+                    2'b01: d_out <= {63'b0, channel_input_buffer_status};             // Read input status
                     2'b10: d_out <= 64'b0;                                            // Invalid read from output buffer
-                    2'b11: d_out <= {62'b0, channel_output_buffer_status};            // Read output status
+                    2'b11: d_out <= {63'b0, channel_output_buffer_status};            // Read output status
                     default: d_out <= 64'b0;
                 endcase
             end
