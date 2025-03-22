@@ -29,22 +29,27 @@ module router_input_channel (
         // 0 (even) input goes to vc1. 1 (odd) input goes to vc2
         if (polarity) begin
           // If send is high and we have space in vc2, store data in vc2
-          if (send && vc_2_read) begin
+          if (send && vc_2_read && !blocked) begin
             virtual_channel_2 = data_in;
             vc_2_read = 0;
           end
         end else begin
           // If send is high and we have space in vc1, store data in vc1
-          if (send && vc_1_read) begin
+          if (send && vc_1_read && !blocked) begin
             virtual_channel_1 = data_in;
             vc_1_read = 0;
           end
         end
 
+      if (blocked && vc_1_read)
+        vc_1_read <= 1'b0;
+      if (blocked && vc_2_read) 
+        vc_2_read <= 1'b0;
+
         // We are ready to receive data if we have space in the virtual channel and we are not blocked.
         // We also check our polarity depending on the virtual channel we are going to be using in the
         // next clock cycle.
-        ready = ((vc_1_read && !polarity) || (vc_2_read && polarity)) && !blocked;
+        ready = ((vc_1_read && polarity) || (vc_2_read && !polarity)) && !blocked;
     end
   end
 
@@ -59,18 +64,16 @@ module router_input_channel (
 
       if (!polarity) begin
         // Check if we have data in vc1 and we are not blocked
-        if (virtual_channel_1 != 0 && !blocked && !vc_1_read) begin
+        if (virtual_channel_1 != 0 && !vc_1_read) begin
           data_out <= virtual_channel_1;
           vc_1_read <= 1'b1;
-        end else if (blocked && vc_1_read) 
-          vc_1_read <= 1'b0;
+        end
       end else begin      
         // Check if we have data in vc2 and we are not blocked
-        if (virtual_channel_2 != 0 && !blocked && !vc_2_read) begin
+        if (virtual_channel_2 != 0 && !vc_2_read) begin
           data_out <= virtual_channel_2;
           vc_2_read <= 1'b1;
-        end else if (blocked && vc_2_read) 
-          vc_2_read <= 1'b0;
+        end
       end
     end
   end

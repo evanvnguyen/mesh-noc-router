@@ -295,35 +295,22 @@ module router (
       reset_clocked_values;
       polarity <= 1'b0;
     end else begin
-      cw_output_channel_data_in <= 0;
-      ccw_output_channel_data_in <= 0;
-      pe_output_channel_data_in <= 0;
-      ns_output_channel_data_in <= 0;
-      sn_output_channel_data_in <= 0;
+      reset_clocked_values;
 
       // more the data from the input channels to the output channels
       if (cw_requests > 0) begin
         if (cw_granted) begin
           cw_output_channel_data_in <= {pe_input_channel_data_out[63:52], pe_input_channel_data_out[51:48] >> 1, pe_input_channel_data_out[47:0]};
-
-          // If cw also requested to send data to cw out, we need to block it.
-          block_cw_input_channel <= cw_requests[0];
         end else begin
           cw_output_channel_data_in <= {cw_input_channel_data_out[63:52], cw_input_channel_data_out[51:48] >> 1, cw_input_channel_data_out[47:0]};
-
-          block_pe_input_channel <= cw_requests[1];
         end
       end
 
       if (ccw_requests > 0) begin
         if (ccw_granted) begin
           ccw_output_channel_data_in <= {pe_input_channel_data_out[63:52], pe_input_channel_data_out[51:48] >> 1, pe_input_channel_data_out[47:0]};
-
-          block_ccw_input_channel <= ccw_requests[0];
         end else begin
           ccw_output_channel_data_in <= {ccw_input_channel_data_out[63:52], ccw_input_channel_data_out[51:48] >> 1, ccw_input_channel_data_out[47:0]};
-
-          block_pe_input_channel <= ccw_requests[1];
         end
       end
 
@@ -332,27 +319,15 @@ module router (
         case (pe_granted)
           2'b00: begin
             pe_output_channel_data_in <= {cw_input_channel_data_out[63:52], cw_input_channel_data_out[51:48] >> 1, cw_input_channel_data_out[47:0]};
-            block_ccw_input_channel <= pe_requests[1];
-            block_ns_input_channel <= pe_requests[2];
-            block_sn_input_channel <= pe_requests[3];
           end
           2'b01: begin
             pe_output_channel_data_in <= {ccw_input_channel_data_out[63:52], ccw_input_channel_data_out[51:48] >> 1, ccw_input_channel_data_out[47:0]};
-            block_cw_input_channel <= pe_requests[0];
-            block_ns_input_channel <= pe_requests[2];
-            block_sn_input_channel <= pe_requests[3];
           end
           2'b10: begin 
             pe_output_channel_data_in <= {ns_input_channel_data_out[63:56], ns_input_channel_data_out[55:52] >> 1, ns_input_channel_data_out[51:0]};
-            block_cw_input_channel <= pe_requests[0];
-            block_ccw_input_channel <= pe_requests[1];
-            block_sn_input_channel <= pe_requests[3];
           end
           2'b11: begin
             pe_output_channel_data_in <= {sn_input_channel_data_out[63:56], sn_input_channel_data_out[55:52] >> 1, sn_input_channel_data_out[51:0]};
-            block_cw_input_channel <= pe_requests[0];
-            block_ccw_input_channel <= pe_requests[1];
-            block_ns_input_channel <= pe_requests[2];
           end
         endcase
       end
@@ -362,27 +337,15 @@ module router (
         case (ns_granted)
           2'b00: begin 
             ns_output_channel_data_in <= {cw_input_channel_data_out[63:56], cw_input_channel_data_out[55:52] >> 1, cw_input_channel_data_out[51:0]};
-            block_ccw_input_channel <= ns_requests[1];
-            block_pe_input_channel <= ns_requests[2];
-            block_ns_input_channel <= ns_requests[3];
           end
           2'b01: begin 
             ns_output_channel_data_in <= {ccw_input_channel_data_out[63:56], ccw_input_channel_data_out[55:52] >> 1, ccw_input_channel_data_out[51:0]}; 
-            block_cw_input_channel <= ns_requests[0];
-            block_pe_input_channel <= ns_requests[2];
-            block_ns_input_channel <= ns_requests[3];
           end
           2'b10: begin 
             ns_output_channel_data_in <= {pe_input_channel_data_out[63:56], pe_input_channel_data_out[55:52] >> 1, pe_input_channel_data_out[51:0]};
-            block_cw_input_channel <= ns_requests[0];
-            block_ccw_input_channel <= ns_requests[1];
-            block_ns_input_channel <= ns_requests[3];
           end
           2'b11: begin 
             ns_output_channel_data_in <= {ns_input_channel_data_out[63:56], ns_input_channel_data_out[55:52] >> 1, ns_input_channel_data_out[51:0]};
-            block_cw_input_channel <= ns_requests[0];
-            block_ccw_input_channel <= ns_requests[1];
-            block_pe_input_channel <= ns_requests[2];
           end
         endcase
       end
@@ -392,33 +355,36 @@ module router (
         case (sn_granted)
           2'b00: begin 
             sn_output_channel_data_in <= {cw_input_channel_data_out[63:56], cw_input_channel_data_out[55:52] >> 1, cw_input_channel_data_out[51:0]};
-            block_ccw_input_channel <= sn_requests[1];
-            block_pe_input_channel <= sn_requests[2];
-            block_sn_input_channel <= sn_requests[3];
           end
           2'b01: begin
             sn_output_channel_data_in <= {ccw_input_channel_data_out[63:56], ccw_input_channel_data_out[55:52] >> 1, ccw_input_channel_data_out[51:0]}; 
-            block_cw_input_channel <= sn_requests[0];
-            block_pe_input_channel <= sn_requests[2];
-            block_sn_input_channel <= sn_requests[3];
           end
           2'b10: begin
             sn_output_channel_data_in <= {pe_input_channel_data_out[63:56], pe_input_channel_data_out[55:52] >> 1, pe_input_channel_data_out[51:0]};
-            block_cw_input_channel <= sn_requests[0];
-            block_ccw_input_channel <= sn_requests[1];
-            block_sn_input_channel <= sn_requests[3];
           end
           2'b11: begin
             sn_output_channel_data_in <= {sn_input_channel_data_out[63:56], sn_input_channel_data_out[55:52] >> 1, sn_input_channel_data_out[51:0]};
-            block_cw_input_channel <= sn_requests[0];
-            block_ccw_input_channel <= sn_requests[1];
-            block_pe_input_channel <= sn_requests[2];
           end
         endcase
       end
 
+      block_channels;
+
       polarity <= ~polarity;
     end
+  end
+
+  always @(posedge polarity) begin
+    if (block_cw_input_channel)
+      block_cw_input_channel = 1'b0;
+    if (block_ccw_input_channel)
+      block_ccw_input_channel = 1'b0;
+    if (block_pe_input_channel)
+      block_pe_input_channel = 1'b0;
+    if (block_ns_input_channel)
+      block_ns_input_channel = 1'b0;
+    if (block_sn_input_channel)
+      block_sn_input_channel = 1'b0;
   end
 
   always @(*) begin
@@ -435,7 +401,7 @@ module router (
 
       check_sn_data;
 
-      check_pe_data;
+      check_pe_data;      
     end            
 
     polarity_out = polarity;
@@ -449,11 +415,13 @@ module router (
         ns_output_channel_data_in <= 64'b0;
         sn_output_channel_data_in <= 64'b0;
 
-        block_cw_input_channel <= 1'b0;
-        block_ccw_input_channel <= 1'b0;
-        block_pe_input_channel <= 1'b0;
-        block_ns_input_channel <= 1'b0;
-        block_sn_input_channel <= 1'b0;
+      if (reset) begin
+        block_cw_input_channel = 1'b0;
+        block_ccw_input_channel = 1'b0;
+        block_pe_input_channel = 1'b0;
+        block_ns_input_channel = 1'b0;
+        block_sn_input_channel = 1'b0;
+      end
     end
   endtask
 
@@ -565,6 +533,106 @@ module router (
           // There are no more hops left, so we've reached our destination.
           pe_requests[3] = 1'b1;
         end
+      end
+    end
+  endtask
+
+  task block_channels();
+    begin
+      // more the data from the input channels to the output channels
+      if (cw_requests > 0) begin
+        if (cw_granted) begin
+          // If cw also requested to send data to cw out, we need to block it.
+          block_cw_input_channel = cw_requests[0];
+        end else begin
+          block_pe_input_channel = cw_requests[1];
+        end
+      end
+
+      if (ccw_requests > 0) begin
+        if (ccw_granted) begin
+          block_ccw_input_channel = ccw_requests[0];
+        end else begin
+          block_pe_input_channel = ccw_requests[1];
+        end
+      end
+
+      // Index 0 is for cw, index 1 is for ccw, index 2 is for ns, and index 3 is for sn
+      if (pe_requests > 0) begin
+        case (pe_granted)
+          2'b00: begin
+            block_ccw_input_channel = pe_requests[1];
+            block_ns_input_channel = pe_requests[2];
+            block_sn_input_channel = pe_requests[3];
+          end
+          2'b01: begin
+            block_cw_input_channel = pe_requests[0];
+            block_ns_input_channel = pe_requests[2];
+            block_sn_input_channel = pe_requests[3];
+          end
+          2'b10: begin 
+            block_cw_input_channel = pe_requests[0];
+            block_ccw_input_channel = pe_requests[1];
+            block_sn_input_channel = pe_requests[3];
+          end
+          2'b11: begin
+            block_cw_input_channel = pe_requests[0];
+            block_ccw_input_channel = pe_requests[1];
+            block_ns_input_channel = pe_requests[2];
+          end
+        endcase
+      end
+
+      // Index 0 is for cw, index 1 is for ccw, index 2 is for pe, and index 3 is for ns
+      if (ns_requests > 0) begin
+        case (ns_granted)
+          2'b00: begin 
+            block_ccw_input_channel = ns_requests[1];
+            block_pe_input_channel = ns_requests[2];
+            block_ns_input_channel = ns_requests[3];
+          end
+          2'b01: begin 
+            block_cw_input_channel = ns_requests[0];
+            block_pe_input_channel = ns_requests[2];
+            block_ns_input_channel = ns_requests[3];
+          end
+          2'b10: begin 
+            block_cw_input_channel = ns_requests[0];
+            block_ccw_input_channel = ns_requests[1];
+            block_ns_input_channel = ns_requests[3];
+          end
+          2'b11: begin 
+            block_cw_input_channel = ns_requests[0];
+            block_ccw_input_channel = ns_requests[1];
+            block_pe_input_channel = ns_requests[2];
+          end
+        endcase
+      end
+
+      // Index 0 is for cw, index 1 is for ccw, index 2 is for pe, and index 3 is for sn
+      if (sn_requests > 0) begin
+        case (sn_granted)
+          2'b00: begin 
+            block_ccw_input_channel = sn_requests[1];
+            block_pe_input_channel = sn_requests[2];
+            block_sn_input_channel = sn_requests[3];
+          end
+          2'b01: begin
+            block_cw_input_channel = sn_requests[0];
+            block_pe_input_channel = sn_requests[2];
+            block_sn_input_channel = sn_requests[3];
+          end
+          2'b10: begin
+            block_cw_input_channel = sn_requests[0];
+            block_ccw_input_channel = sn_requests[1];
+            block_sn_input_channel = sn_requests[3];
+          end
+          2'b11: begin
+            block_cw_input_channel = sn_requests[0];
+            block_ccw_input_channel = sn_requests[1];
+            block_pe_input_channel = sn_requests[2];
+          end
+        endcase
       end
     end
   endtask

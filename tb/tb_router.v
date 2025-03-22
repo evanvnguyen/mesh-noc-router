@@ -64,12 +64,13 @@ module tb_router();
     data_array[5] = 64'h00120000000fba34; // PE -> CCW 2 hops
     data_array[6] = 64'h0002000000053fda; // CCW -> CCW 2 hops
 
-    // Now Let's test a 4 way contention
+    // Now Let's test a 4 way contention to NS
     data_array[7] = 64'h0010000000abcdef;
     data_array[8] = 64'h0010000012345678;
     data_array[9] = 64'h0010000000def123;
     data_array[10] = 64'h0010000000011a11;
-    data_array[11] = 64'h0;
+
+    data_array[11] = 64'h00000000000dda42;
 
     for (i = 0; i < 10; i = i + 1) begin
       returnedData[i] = 64'h0;
@@ -80,13 +81,13 @@ module tb_router();
     cwsi = 0;
     ccwsi = 0;
     pesi = 0;
-    cwro = 0;
-    ccwro = 0;
-    pero = 0;
+    cwro = 1;
+    ccwro = 1;
+    pero = 1;
     nssi = 0;
     snsi = 0;
-    nsro = 0;
-    snro = 0;
+    nsro = 1;
+    snro = 1;
     cwdi = 64'b0;
     ccwdi = 64'b0;
     pedi = 64'b0;
@@ -103,9 +104,22 @@ module tb_router();
 
     $finish;
   end
+
+  always @(negedge clk) begin
+    if (cycle_count == 20) begin
+      if (peri) begin
+        pesi <= 1;
+        pedi <= data_array[5];
+      end
+      if (ccwri) begin
+        ccwsi <= 1;
+        ccwdi <= data_array[6];
+      end
+    end
+  end
     
 	always @(posedge clk) begin
-		if (!reset && cycle_count > 2) begin
+		if (!reset) begin
       cwsi <= 0;
       ccwsi <= 0;
       pesi <= 0;
@@ -117,38 +131,62 @@ module tb_router();
       nsdi <= 0;
       sndi <= 0;
 
-      case (data_index)
-        0: begin // test case 1 tests loading data into the cwsi virtual channel
+      case (cycle_count)
+        3: begin // test case 1 tests loading data into the cwsi virtual channel
           if (cwri) begin
             cwsi <= 1;
             cwdi <= data_array[0];
           end
         end
-        1: begin // test case 2 tests loading data into the ccwsi virtual channel
+        4: begin // test case 2 tests loading data into the ccwsi virtual channel
           if (ccwri) begin
             ccwsi <= 1;
             ccwdi <= data_array[1];
           end
         end
-        2: begin // test case 3 tests loading data into the pesi virtual channel
+        5: begin // test case 3 tests loading data into the pesi virtual channel
           if (peri) begin
             pesi <= 1;
             pedi <= data_array[2];
-          end
+          end          
         end
-        3: begin // test case 4 tests loading data into the nssi virtual channel
+        6: begin // test case 4 tests loading data into the nssi virtual channel
           if (nsri) begin
             nssi <= 1;
             nsdi <= data_array[3];
           end
+          
+          if (cwdo[31:0] == data_array[0][31:0])
+            passedTests[0] <= 1'b1;
+          else
+            passedTests[0] <= 1'b0;
+          returnedData[0] <= cwdo;
         end
-        4: begin // test case 5 tests loading data into the snsi virtual channel
+        7: begin // test case 5 tests loading data into the snsi virtual channel
           if (snri) begin
             snsi <= 1;
             sndi <= data_array[4];
           end
+
+          if (ccwdo[31:0] == data_array[1][31:0])
+            passedTests[1] <= 1'b1;
+          else
+            passedTests[1] <= 1'b0;
+          returnedData[1] <= ccwdo;
         end
-        5: begin // test case 6 tests loading data into both pe and ccw at the same time. We should get a staggered output with both test cases
+        8: begin // Tests that data goes to the pe output when there are not more hops
+          if (ccwri) begin
+            ccwsi <= 1;
+            ccwdi <= data_array[11];
+          end
+
+          if (ccwdo[31:0] == data_array[2][31:0])
+            passedTests[2] <= 1'b1;
+          else
+            passedTests[2] <= 1'b0;
+          returnedData[2] <= ccwdo;
+        end
+        9: begin // test case 6 tests loading data into both pe and ccw at the same time. We should get a staggered output with both test cases
           if (peri) begin
             pesi <= 1;
             pedi <= data_array[5];
@@ -157,8 +195,37 @@ module tb_router();
             ccwsi <= 1;
             ccwdi <= data_array[6];
           end
+
+          if (nsdo[31:0] == data_array[3][31:0])
+            passedTests[3] <= 1'b1;
+          else
+            passedTests[3] <= 1'b0;
+          returnedData[3] <= nsdo;
         end
-        7: begin
+        10: begin
+          if (sndo[31:0] == data_array[4][31:0])
+            passedTests[4] <= 1'b1;
+          else
+            passedTests[4] <= 1'b0;
+          returnedData[4] <= sndo;
+        end
+        11: begin
+          if (ccwdo[31:0] == data_array[5][31:0] || ccwdo[31:0] == data_array[6][31:0])
+            passedTests[5] <= 1'b1;
+          else
+            passedTests[5] <= 1'b0;
+          returnedData[5] <= ccwdo;
+        end
+
+        12: begin
+          if (ccwdo[31:0] == data_array[5][31:0] || ccwdo[31:0] == data_array[6][31:0])
+            passedTests[6] <= 1'b1;
+          else
+            passedTests[6] <= 1'b0;
+          returnedData[6] <= ccwdo;
+        end
+
+        14: begin
           if (peri) begin
             pesi <= 1;
             pedi <= data_array[7];
@@ -175,98 +242,9 @@ module tb_router();
             nssi <= 1;
             nsdi <= data_array[10];
           end
-        end
-        8: begin
-          if (peri) begin
-            pesi <= 1;
-            pedi <= data_array[7];
-          end
-          if (ccwri) begin
-            ccwsi <= 1;
-            ccwdi <= data_array[8];
-          end
-          if (cwri) begin
-            cwsi <= 1;
-            cwdi <= data_array[9];
-          end
-          if (nsri) begin
-            nssi <= 1;
-            nsdi <= data_array[10];
-          end
-        end
-        default: begin
-          cwsi <= 0;
-          ccwsi <= 0;
-          pesi <= 0;
-          nssi <= 0;
-          snsi <= 0;
-          cwdi <= 0;
-          ccwdi <= 0;
-          pedi <= 0;
-          nsdi <= 0;
-          sndi <= 0;
         end
       endcase
 
-      // Check if our first test case passed
-      if (cycle_count == 5) begin
-        cwro <= 1;
-      end else if (cycle_count == 6) begin
-        cwro <= 0;
-        if (cwdo == {data_array[0][63:52], data_array[0][51:48] >> 1, data_array[0][47:0]}) begin
-          passedTests[0] <= 1;
-          $display("cwdo: %h", cwdo);
-        end
-      end
-
-      // Check if our second test case passed
-      if (cycle_count == 6) begin
-        ccwro <= 1;
-      end else if (cycle_count == 7) begin
-        ccwro <= 0;
-        if (ccwdo == {data_array[1][63:52], data_array[1][51:48] >> 1, data_array[1][47:0]}) begin
-          passedTests[1] <= 1;
-          $display("ccwdo: %h", ccwdo);
-        end
-      end
-
-      // Check if our third test case passed
-      if (cycle_count == 7) begin
-        pero <= 1;
-      end else if (cycle_count == 8) begin
-        pero <= 0;
-        if (pedo == {data_array[2][63:56], data_array[2][55:52] >> 1, data_array[2][51:0]}) begin
-          passedTests[2] <= 1;
-          $display("pedo: %h", ccwdo);
-        end
-      end
-
-      // Check if our fourth test case passed
-      if (cycle_count == 8) begin
-        nsro <= 1;
-      end else if (cycle_count == 9) begin
-        if (nsdo == {data_array[3][63:56], data_array[3][55:52] >> 1, data_array[3][51:0]}) begin
-          passedTests[3] <= 1;
-          $display("nsdo: %h", ccwdo);
-        end
-      end
-
-      // Check if our fifth test case passed
-      if (cycle_count == 9) begin
-        snro <= 1;
-      end else if (cycle_count == 10) begin
-        snro <= 0;
-        if (sndo == {data_array[4][63:56], data_array[4][55:52] >> 1, data_array[4][51:0]}) begin
-          passedTests[4] <= 1;
-          $display("sndo: %h", ccwdo);
-        end
-      end
-
-      if (cycle_count >= 10 && cycle_count <= 16) begin
-        cwro <= 1;
-      end
-
-      data_index <= data_index + 1;
 		end
 
     cycle_count <= cycle_count + 1;

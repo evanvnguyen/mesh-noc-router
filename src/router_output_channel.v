@@ -60,7 +60,7 @@ module router_output_channel (
       // Low polarity means that the virtual channel 1 is the output channel
       if (!polarity) begin
         // Are we ready to receive data?
-        if (ready) begin
+        if (ready && virtual_channel_2 != 0) begin
           data_out <= virtual_channel_2;
           send <= 1'b1;
 
@@ -69,7 +69,7 @@ module router_output_channel (
         end
       end else begin
         // Are we ready to receive data?
-        if (ready) begin
+        if (ready && virtual_channel_1 != 0) begin
           data_out <= virtual_channel_1;
           send <= 1'b1;
 
