@@ -65,7 +65,31 @@ module mesh_top_row_1 #(
     output [63:0] nsdo_0_1,
     output [63:0] nsdo_1_1,
     output [63:0] nsdo_2_1,
-    output [63:0] nsdo_3_1
+    output [63:0] nsdo_3_1,
+    
+    input [1:0]   addr_0_1,
+    input [63:0]  d_in_0_1,
+    output [63:0]  d_out_0_1,
+    input         nicEn_0_1,
+    input         nicEnWR_0_1,
+    
+    input [1:0]   addr_1_1,
+    input [63:0]  d_in_1_1,
+    output [63:0]  d_out_1_1,
+    input         nicEn_1_1,
+    input         nicEnWR_1_1,
+    
+    input [1:0]   addr_2_1,
+    input [63:0]  d_in_2_1,
+    output [63:0]  d_out_2_1,
+    input         nicEn_2_1,
+    input         nicEnWR_2_1,
+    
+    input [1:0]   addr_3_1,
+    input [63:0]  d_in_3_1,
+    output [63:0]  d_out_3_1,
+    input         nicEn_3_1,
+    input         nicEnWR_3_1
 
     );       
 
@@ -78,15 +102,15 @@ module mesh_top_row_1 #(
     wire [63:0] cwdi_cwdo_2, ccwdo_ccwdi_2;
     
     // Disconnected from CPU as of part 1
-    wire [1:0] addr_0_1, addr_1_1, addr_2_1, addr_3_1;
-    wire [PACKET_WIDTH-1:0] d_in_0_1, d_out_0_1;
-    wire [PACKET_WIDTH-1:0] d_in_1_1, d_out_1_1;
-    wire [PACKET_WIDTH-1:0] d_in_2_1, d_out_2_1;
-    wire [PACKET_WIDTH-1:0] d_in_3_1, d_out_3_1;
-    wire nicEn_0_1, nicEnWR_0_1;
-    wire nicEn_1_1, nicEnWR_1_1;
-    wire nicEn_2_1, nicEnWR_2_1;
-    wire nicEn_3_1, nicEnWR_3_1;
+    //wire [1:0] addr_0_1, addr_1_1, addr_2_1, addr_3_1;
+    //wire [PACKET_WIDTH-1:0] d_in_0_1, d_out_0_1;
+    //wire [PACKET_WIDTH-1:0] d_in_1_1, d_out_1_1;
+    //wire [PACKET_WIDTH-1:0] d_in_2_1, d_out_2_1;
+    //wire [PACKET_WIDTH-1:0] d_in_3_1, d_out_3_1;
+    //wire nicEn_0_1, nicEnWR_0_1;
+    //wire nicEn_1_1, nicEnWR_1_1;
+    //wire nicEn_2_1, nicEnWR_2_1;
+    //wire nicEn_3_1, nicEnWR_3_1;
     
     wire net_si_0_1, net_so_0_1;
     wire net_ri_0_1, net_ro_0_1;

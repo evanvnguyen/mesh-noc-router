@@ -45,7 +45,31 @@ module mesh_top_row_3 #(
         output [63:0] nsdo_0_3,
         output [63:0] nsdo_1_3,
         output [63:0] nsdo_2_3,
-        output [63:0] nsdo_3_3
+        output [63:0] nsdo_3_3, 
+        
+        input [1:0] addr_0_3,
+        input [63:0] d_in_0_3,
+        output [63:0] d_out_0_3,
+        input nicEn_0_3,
+        input nicEnWR_0_3,
+        
+        input [1:0]   addr_1_3,
+        input [63:0]  d_in_1_3,
+        output [63:0]  d_out_1_3,
+        input         nicEn_1_3,
+        input         nicEnWR_1_3,
+        
+        input [1:0]   addr_2_3,
+        input [63:0]  d_in_2_3,
+        output [63:0]  d_out_2_3,
+        input         nicEn_2_3,
+        input         nicEnWR_2_3,
+        
+        input [1:0]   addr_3_3,
+        input [63:0]  d_in_3_3,
+        output [63:0]  d_out_3_3,
+        input         nicEn_3_3,
+        input         nicEnWR_3_3
     );       
     
     // naming scheme is first signal - left. second signal - right
@@ -57,15 +81,15 @@ module mesh_top_row_3 #(
     wire [63:0] cwdi_cwdo_2, ccwdo_ccwdi_2;
 
     // Disconnected from CPU as of part 1
-    wire [1:0] addr_0_3, addr_1_3, addr_2_3, addr_3_3;
-    wire [PACKET_WIDTH-1:0] d_in_0_3, d_out_0_3;
-    wire [PACKET_WIDTH-1:0] d_in_1_3, d_out_1_3;
-    wire [PACKET_WIDTH-1:0] d_in_2_3, d_out_2_3;
-    wire [PACKET_WIDTH-1:0] d_in_3_3, d_out_3_3;
-    wire nicEn_0_3, nicEnWR_0_3;
-    wire nicEn_1_3, nicEnWR_1_3;
-    wire nicEn_2_3, nicEnWR_2_3;
-    wire nicEn_3_3, nicEnWR_3_3;
+    //wire [1:0] addr_0_3, addr_1_3, addr_2_3, addr_3_3;
+    //wire [PACKET_WIDTH-1:0] d_in_0_3, d_out_0_3;
+    //wire [PACKET_WIDTH-1:0] d_in_1_3, d_out_1_3;
+    //wire [PACKET_WIDTH-1:0] d_in_2_3, d_out_2_3;
+    //wire [PACKET_WIDTH-1:0] d_in_3_3, d_out_3_3;
+    //wire nicEn_0_3, nicEnWR_0_3;
+    //wire nicEn_1_3, nicEnWR_1_3;
+    //wire nicEn_2_3, nicEnWR_2_3;
+    //wire nicEn_3_3, nicEnWR_3_3;
     
     wire net_si_0_3, net_so_0_3;
     wire net_ri_0_3, net_ro_0_3;
