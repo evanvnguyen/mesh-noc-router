@@ -120,6 +120,7 @@ module tb_mesh_top_flat;
         end
     endtask
 
+    // disable write, but enable reading the input buffer to the CPU
     task disable_write_to_all_nic;
         output reg [1:0] addr_0_3, addr_1_3, addr_2_3, addr_3_3;
         output reg       nicEn_0_3, nicEn_1_3, nicEn_2_3, nicEn_3_3;
@@ -138,27 +139,29 @@ module tb_mesh_top_flat;
         output reg       nicEnWR_0_0, nicEnWR_1_0, nicEnWR_2_0, nicEnWR_3_0;
     
         reg zero_val;
+        reg one_val;
         begin
-            zero_val = 1'b0; // Set zero value to 0
+            zero_val = 1'b0; // disable
+            one_val = 1'b1; // enable
     
             // Row 3
             {addr_0_3, addr_1_3, addr_2_3, addr_3_3}       = {4{2'b00}};
-            {nicEn_0_3, nicEn_1_3, nicEn_2_3, nicEn_3_3}   = {4{zero_val}};
+            {nicEn_0_3, nicEn_1_3, nicEn_2_3, nicEn_3_3}   = {4{one_val}};
             {nicEnWR_0_3, nicEnWR_1_3, nicEnWR_2_3, nicEnWR_3_3} = {4{zero_val}};
     
             // Row 2
             {addr_0_2, addr_1_2, addr_2_2, addr_3_2}       = {4{2'b00}};
-            {nicEn_0_2, nicEn_1_2, nicEn_2_2, nicEn_3_2}   = {4{zero_val}};
+            {nicEn_0_2, nicEn_1_2, nicEn_2_2, nicEn_3_2}   = {4{one_val}};
             {nicEnWR_0_2, nicEnWR_1_2, nicEnWR_2_2, nicEnWR_3_2} = {4{zero_val}};
     
             // Row 1
             {addr_0_1, addr_1_1, addr_2_1, addr_3_1}       = {4{2'b00}};
-            {nicEn_0_1, nicEn_1_1, nicEn_2_1, nicEn_3_1}   = {4{zero_val}};
+            {nicEn_0_1, nicEn_1_1, nicEn_2_1, nicEn_3_1}   = {4{one_val}};
             {nicEnWR_0_1, nicEnWR_1_1, nicEnWR_2_1, nicEnWR_3_1} = {4{zero_val}};
     
             // Row 0
             {addr_0_0, addr_1_0, addr_2_0, addr_3_0}       = {4{2'b00}};
-            {nicEn_0_0, nicEn_1_0, nicEn_2_0, nicEn_3_0}   = {4{zero_val}};
+            {nicEn_0_0, nicEn_1_0, nicEn_2_0, nicEn_3_0}   = {4{one_val}};
             {nicEnWR_0_0, nicEnWR_1_0, nicEnWR_2_0, nicEnWR_3_0} = {4{zero_val}};
     
             #10;
@@ -1411,9 +1414,26 @@ module tb_mesh_top_flat;
                 nicEn_0_3, nicEn_1_3, nicEn_2_3, nicEn_3_3,
                 nicEnWR_0_3, nicEnWR_1_3, nicEnWR_2_3, nicEnWR_3_3
             );
+            #10; disable_write_to_all_nic(
+                addr_0_3, addr_1_3, addr_2_3, addr_3_3,
+                nicEn_0_3, nicEn_1_3, nicEn_2_3, nicEn_3_3,
+                nicEnWR_0_3, nicEnWR_1_3, nicEnWR_2_3, nicEnWR_3_3,
+        
+                addr_0_2, addr_1_2, addr_2_2, addr_3_2,
+                nicEn_0_2, nicEn_1_2, nicEn_2_2, nicEn_3_2,
+                nicEnWR_0_2, nicEnWR_1_2, nicEnWR_2_2, nicEnWR_3_2,
+        
+                addr_0_1, addr_1_1, addr_2_1, addr_3_1,
+                nicEn_0_1, nicEn_1_1, nicEn_2_1, nicEn_3_1,
+                nicEnWR_0_1, nicEnWR_1_1, nicEnWR_2_1, nicEnWR_3_1,
+        
+                addr_0_0, addr_1_0, addr_2_0, addr_3_0,
+                nicEn_0_0, nicEn_1_0, nicEn_2_0, nicEn_3_0,
+                nicEnWR_0_0, nicEnWR_1_0, nicEnWR_2_0, nicEnWR_3_0
+            );
         
         
-        #1000;
+        #300;
         $finish;
     end
 
