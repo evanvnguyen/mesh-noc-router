@@ -27,6 +27,9 @@ module router_output_channel (
       virtual_channel_1 = 64'b0;
       virtual_channel_2 = 64'b0;
     end else begin
+      virtual_channel_1 = virtual_channel_1;
+      virtual_channel_2 = virtual_channel_2;
+    
       // High polarity means that the virtual channel 1 is the input channel
       // Low polarity means that the virtual channel 2 is the input channel
       if (polarity) begin
@@ -44,7 +47,7 @@ module router_output_channel (
     end
   end
 
-  always @(*) begin
+  always @(posedge clk) begin
     if (reset) begin
       send = 1'b0;
       data_out = 64'b0;
@@ -65,7 +68,7 @@ module router_output_channel (
           send <= 1'b1;
 
           // Reset the virtual channel. We sent the data so we have space for new data.
-          vc_2_sent = 1'b1;
+          vc_2_sent <= 1'b1;
         end
       end else begin
         // Are we ready to receive data?
@@ -74,7 +77,7 @@ module router_output_channel (
           send <= 1'b1;
 
           // Reset the virtual channel. We sent the data so we have space for new data.
-          vc_1_sent = 1'b1;
+          vc_1_sent <= 1'b1;
         end
       end
     end 

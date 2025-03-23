@@ -66,6 +66,9 @@ module router (
   output [63:0] sndo
 );
 
+  // Top bit is [3], left bit[0], bottom bit[2], right bit[1]
+  // T B R L
+  // 0 0 0 0
   parameter TOP_LEFT      = 4'b1001;
   parameter TOP           = 4'b1000;
   parameter TOP_RIGHT     = 4'b1010;
@@ -307,79 +310,6 @@ module router (
     end else begin
       reset_clocked_values;
 
-      // more the data from the input channels to the output channels
-      if (cw_requests > 0) begin
-        if (cw_granted) begin
-          cw_output_channel_data_in <= {pe_input_channel_data_out[63:52], pe_input_channel_data_out[51:48] >> 1, pe_input_channel_data_out[47:0]};
-        end else begin
-          cw_output_channel_data_in <= {cw_input_channel_data_out[63:52], cw_input_channel_data_out[51:48] >> 1, cw_input_channel_data_out[47:0]};
-        end
-      end
-
-      if (ccw_requests > 0) begin
-        if (ccw_granted) begin
-          ccw_output_channel_data_in <= {pe_input_channel_data_out[63:52], pe_input_channel_data_out[51:48] >> 1, pe_input_channel_data_out[47:0]};
-        end else begin
-          ccw_output_channel_data_in <= {ccw_input_channel_data_out[63:52], ccw_input_channel_data_out[51:48] >> 1, ccw_input_channel_data_out[47:0]};
-        end
-      end
-
-      // Index 0 is for cw, index 1 is for ccw, index 2 is for ns, and index 3 is for sn
-      if (pe_requests > 0) begin
-        case (pe_granted)
-          2'b00: begin
-            pe_output_channel_data_in <= {cw_input_channel_data_out[63:52], cw_input_channel_data_out[51:48] >> 1, cw_input_channel_data_out[47:0]};
-          end
-          2'b01: begin
-            pe_output_channel_data_in <= {ccw_input_channel_data_out[63:52], ccw_input_channel_data_out[51:48] >> 1, ccw_input_channel_data_out[47:0]};
-          end
-          2'b10: begin 
-            pe_output_channel_data_in <= {ns_input_channel_data_out[63:56], ns_input_channel_data_out[55:52] >> 1, ns_input_channel_data_out[51:0]};
-          end
-          2'b11: begin
-            pe_output_channel_data_in <= {sn_input_channel_data_out[63:56], sn_input_channel_data_out[55:52] >> 1, sn_input_channel_data_out[51:0]};
-          end
-        endcase
-      end
-
-      // Index 0 is for cw, index 1 is for ccw, index 2 is for pe, and index 3 is for ns
-      if (ns_requests > 0) begin
-        case (ns_granted)
-          2'b00: begin 
-            ns_output_channel_data_in <= {cw_input_channel_data_out[63:56], cw_input_channel_data_out[55:52] >> 1, cw_input_channel_data_out[51:0]};
-          end
-          2'b01: begin 
-            ns_output_channel_data_in <= {ccw_input_channel_data_out[63:56], ccw_input_channel_data_out[55:52] >> 1, ccw_input_channel_data_out[51:0]}; 
-          end
-          2'b10: begin 
-            ns_output_channel_data_in <= {pe_input_channel_data_out[63:56], pe_input_channel_data_out[55:52] >> 1, pe_input_channel_data_out[51:0]};
-          end
-          2'b11: begin 
-            ns_output_channel_data_in <= {ns_input_channel_data_out[63:56], ns_input_channel_data_out[55:52] >> 1, ns_input_channel_data_out[51:0]};
-          end
-        endcase
-      end
-
-      // Index 0 is for cw, index 1 is for ccw, index 2 is for pe, and index 3 is for sn
-      if (sn_requests > 0) begin
-        case (sn_granted)
-          2'b00: begin 
-            sn_output_channel_data_in <= {cw_input_channel_data_out[63:56], cw_input_channel_data_out[55:52] >> 1, cw_input_channel_data_out[51:0]};
-          end
-          2'b01: begin
-            sn_output_channel_data_in <= {ccw_input_channel_data_out[63:56], ccw_input_channel_data_out[55:52] >> 1, ccw_input_channel_data_out[51:0]}; 
-          end
-          2'b10: begin
-            sn_output_channel_data_in <= {pe_input_channel_data_out[63:56], pe_input_channel_data_out[55:52] >> 1, pe_input_channel_data_out[51:0]};
-          end
-          2'b11: begin
-            sn_output_channel_data_in <= {sn_input_channel_data_out[63:56], sn_input_channel_data_out[55:52] >> 1, sn_input_channel_data_out[51:0]};
-          end
-        endcase
-      end
-
-      block_channels;
-
       polarity <= ~polarity;
     end
   end
@@ -398,7 +328,11 @@ module router (
 
       check_sn_data;
 
-      check_pe_data;      
+      check_pe_data;
+
+      execute_requests;
+
+      block_channels;
     end            
 
     polarity_out = polarity;
@@ -406,12 +340,6 @@ module router (
 
   task reset_clocked_values();
     begin
-        cw_output_channel_data_in <= 64'b0;
-        ccw_output_channel_data_in <= 64'b0;
-        pe_output_channel_data_in <= 64'b0;
-        ns_output_channel_data_in <= 64'b0;
-        sn_output_channel_data_in <= 64'b0;
-
       if (reset) begin
         block_cw_input_channel = 1'b0;
         block_ccw_input_channel = 1'b0;
@@ -429,6 +357,20 @@ module router (
       pe_requests = 4'b0; 
       ns_requests = 4'b0; 
       sn_requests = 4'b0;
+
+      cw_output_channel_data_in = 64'b0;
+      ccw_output_channel_data_in = 64'b0;
+      pe_output_channel_data_in = 64'b0;
+      ns_output_channel_data_in = 64'b0;
+      sn_output_channel_data_in = 64'b0;
+
+      if (reset) begin
+        block_cw_input_channel = 1'b0;
+        block_ccw_input_channel = 1'b0;
+        block_pe_input_channel = 1'b0;
+        block_ns_input_channel = 1'b0;
+        block_sn_input_channel = 1'b0;
+      end
     end
   endtask
 
@@ -530,6 +472,81 @@ module router (
           // There are no more hops left, so we've reached our destination.
           pe_requests[3] = 1'b1;
         end
+      end
+    end
+  endtask
+
+  task execute_requests();
+    begin
+      // more the data from the input channels to the output channels
+      if (cw_requests > 0) begin
+        if (cw_granted) begin
+          cw_output_channel_data_in = {pe_input_channel_data_out[63:52], pe_input_channel_data_out[51:48] >> 1, pe_input_channel_data_out[47:0]};
+        end else begin
+          cw_output_channel_data_in = {cw_input_channel_data_out[63:52], cw_input_channel_data_out[51:48] >> 1, cw_input_channel_data_out[47:0]};
+        end
+      end
+
+      if (ccw_requests > 0) begin
+        if (ccw_granted) begin
+          ccw_output_channel_data_in = {pe_input_channel_data_out[63:52], pe_input_channel_data_out[51:48] >> 1, pe_input_channel_data_out[47:0]};
+        end else begin
+          ccw_output_channel_data_in = {ccw_input_channel_data_out[63:52], ccw_input_channel_data_out[51:48] >> 1, ccw_input_channel_data_out[47:0]};
+        end
+      end
+
+      // Index 0 is for cw, index 1 is for ccw, index 2 is for ns, and index 3 is for sn
+      if (pe_requests > 0) begin
+        case (pe_granted)
+          2'b00: begin
+            pe_output_channel_data_in = {cw_input_channel_data_out[63:52], cw_input_channel_data_out[51:48] >> 1, cw_input_channel_data_out[47:0]};
+          end
+          2'b01: begin
+            pe_output_channel_data_in = {ccw_input_channel_data_out[63:52], ccw_input_channel_data_out[51:48] >> 1, ccw_input_channel_data_out[47:0]};
+          end
+          2'b10: begin 
+            pe_output_channel_data_in = {ns_input_channel_data_out[63:56], ns_input_channel_data_out[55:52] >> 1, ns_input_channel_data_out[51:0]};
+          end
+          2'b11: begin
+            pe_output_channel_data_in = {sn_input_channel_data_out[63:56], sn_input_channel_data_out[55:52] >> 1, sn_input_channel_data_out[51:0]};
+          end
+        endcase
+      end
+
+      // Index 0 is for cw, index 1 is for ccw, index 2 is for pe, and index 3 is for ns
+      if (ns_requests > 0) begin
+        case (ns_granted)
+          2'b00: begin 
+            ns_output_channel_data_in = {cw_input_channel_data_out[63:56], cw_input_channel_data_out[55:52] >> 1, cw_input_channel_data_out[51:0]};
+          end
+          2'b01: begin 
+            ns_output_channel_data_in = {ccw_input_channel_data_out[63:56], ccw_input_channel_data_out[55:52] >> 1, ccw_input_channel_data_out[51:0]}; 
+          end
+          2'b10: begin 
+            ns_output_channel_data_in = {pe_input_channel_data_out[63:56], pe_input_channel_data_out[55:52] >> 1, pe_input_channel_data_out[51:0]};
+          end
+          2'b11: begin 
+            ns_output_channel_data_in = {ns_input_channel_data_out[63:56], ns_input_channel_data_out[55:52] >> 1, ns_input_channel_data_out[51:0]};
+          end
+        endcase
+      end
+
+      // Index 0 is for cw, index 1 is for ccw, index 2 is for pe, and index 3 is for sn
+      if (sn_requests > 0) begin
+        case (sn_granted)
+          2'b00: begin 
+            sn_output_channel_data_in = {cw_input_channel_data_out[63:56], cw_input_channel_data_out[55:52] >> 1, cw_input_channel_data_out[51:0]};
+          end
+          2'b01: begin
+            sn_output_channel_data_in = {ccw_input_channel_data_out[63:56], ccw_input_channel_data_out[55:52] >> 1, ccw_input_channel_data_out[51:0]}; 
+          end
+          2'b10: begin
+            sn_output_channel_data_in = {pe_input_channel_data_out[63:56], pe_input_channel_data_out[55:52] >> 1, pe_input_channel_data_out[51:0]};
+          end
+          2'b11: begin
+            sn_output_channel_data_in = {sn_input_channel_data_out[63:56], sn_input_channel_data_out[55:52] >> 1, sn_input_channel_data_out[51:0]};
+          end
+        endcase
       end
     end
   endtask

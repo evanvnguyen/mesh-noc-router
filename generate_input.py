@@ -58,10 +58,10 @@ def update_hops_and_dirs():
         entries['x_src'].delete(0, tk.END)
         entries['x_src'].insert(0, sx)
         entries['y_hop'].delete(0, tk.END)
-        entries['y_hop'].insert(0, 0 if abs(dy - sy) == 0 else 1 << abs(dy - sy))
+        entries['y_hop'].insert(0, 0 if abs(dy - sy) == 0 else 1 << abs(dy - sy) - 1)
         entries['x_hop'].delete(0, tk.END)
-        entries['x_hop'].insert(0, 0 if abs(dx - sx) == 0 else 1 << abs(dx - sx))
-        ns_dir = int(dy < sy)
+        entries['x_hop'].insert(0, 0 if abs(dx - sx) == 0 else 1 << abs(dx - sx) - 1)
+        ns_dir = int(dy > sy)
         ew_dir = int(dx > sx)
         for k, v in dir_options.items():
             if v == (ns_dir, ew_dir):
@@ -71,31 +71,32 @@ def generate_packet():
     if auto_data.get():
         regenerate_data()
     try:
-        if source:
-          sy, sx = source
-          entries['y_src'].delete(0, tk.END)
-          entries['y_src'].insert(0, sy)
-          entries['x_src'].delete(0, tk.END)
-          entries['x_src'].insert(0, sx)
+        if source and dest:
+            sy, sx = source
+            dy, dx = dest
+            entries['y_src'].delete(0, tk.END)
+            entries['y_src'].insert(0, sy)
+            entries['x_src'].delete(0, tk.END)
+            entries['x_src'].insert(0, sx)
             
-        vc = int(entries['vc'].get(), 0)
-        y_hop = int(entries['y_hop'].get(), 0)
-        x_hop = int(entries['x_hop'].get(), 0)
-        y_src = sy
-        x_src = sx
-        data = int(entries['data'].get(), 0)
-        ns_dir, ew_dir = dir_options[dir_var.get()]
-        packet = make_packet(vc, ns_dir, ew_dir, y_hop, x_hop, y_src, x_src, data)
-        hex_value = f"{packet:016X}"
-        hex_output.set(hex_value)
-        packet_listbox.insert(tk.END, f"{hex_value}, {source}, {dest}")
-        bitfield_output.set(
-            f"VC: {vc}\n"
-            f"NS Dir (62): {ns_dir}  |  EW Dir (61): {ew_dir}\n"
-            f"Y-Hop (55-52): {y_hop:04b}  |  X-Hop (51-48): {x_hop:04b}\n"
-            f"Y-Source (47-40): {y_src:08b}  |  X-Source (39-32): {x_src:08b}\n"
-            f"Data (31-0): {data:032b}"
-        )
+            vc = int(entries['vc'].get(), 0)
+            y_hop = int(entries['y_hop'].get(), 0)
+            x_hop = int(entries['x_hop'].get(), 0)
+            y_src = sy
+            x_src = sx
+            data = int(entries['data'].get(), 0)
+            ns_dir, ew_dir = dir_options[dir_var.get()]
+            packet = make_packet(vc, ns_dir, ew_dir, y_hop, x_hop, y_src, x_src, data)
+            hex_value = f"{packet:016X}"
+            hex_output.set(hex_value)
+            packet_listbox.insert(tk.END, f"{hex_value}, ({sx}, {sy}), ({dx}, {dy})")
+            bitfield_output.set(
+                f"VC: {vc}\n"
+                f"NS Dir (62): {ns_dir}  |  EW Dir (61): {ew_dir}\n"
+                f"Y-Hop (55-52): {y_hop:04b}  |  X-Hop (51-48): {x_hop:04b}\n"
+                f"Y-Source (47-40): {y_src:08b}  |  X-Source (39-32): {x_src:08b}\n"
+                f"Data (31-0): {data:032b}"
+            )
     except Exception as e:
         messagebox.showerror("Error", str(e))
 

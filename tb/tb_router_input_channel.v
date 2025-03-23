@@ -42,11 +42,11 @@ module tb_router_input_channel;
     
 	always @(posedge clk) begin
 		if (!reset) begin
-		    if (ready && data_index < 10 && !blocked) begin
-				send <= 1;
-				data_in <= data_array[data_index];
-				
-				data_index <= data_index + 1;
+		  if (ready && data_index < 10 && !blocked) begin
+					send <= 1;
+					data_in <= data_array[data_index];
+					
+					data_index <= data_index + 1;
 			end else begin
 				send <= 0;
 				data_in <= 0;

@@ -21,7 +21,7 @@
 // bottom row of mesh
 // need integrate to NIC
 
-module mesh_top_row_0 #(
+module mesh_top_row_2 #(
     parameter PACKET_WIDTH = 64
 ) (
     input clk,

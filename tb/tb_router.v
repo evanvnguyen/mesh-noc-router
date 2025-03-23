@@ -172,6 +172,7 @@ module tb_router();
             sndi <= data_array[4];
           end
 
+          #0.5
           if (ccwdo[31:0] == data_array[1][31:0]) begin
             passedTests[1] <= 1'b1;
             returnedData[1] <= ccwdo;

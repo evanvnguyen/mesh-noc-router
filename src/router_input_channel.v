@@ -23,6 +23,7 @@ module router_input_channel (
 
   always @(*) begin
     if (reset) begin
+      ready = 1'b1;
       virtual_channel_1 = 64'b0;
       virtual_channel_2 = 64'b0;
     end else begin
@@ -55,7 +56,6 @@ module router_input_channel (
 
   always @(posedge clk) begin
     if (reset) begin
-      ready <= 1'b1;
       data_out <= 64'b0;
       vc_1_read <= 1'b1;
       vc_2_read <= 1'b1;
@@ -64,13 +64,13 @@ module router_input_channel (
 
       if (!polarity) begin
         // Check if we have data in vc1 and we are not blocked
-        if (virtual_channel_1 != 0 && !vc_1_read) begin
+        if (virtual_channel_1 != 0 && !vc_1_read && !blocked) begin
           data_out <= virtual_channel_1;
           vc_1_read <= 1'b1;
         end
       end else begin      
         // Check if we have data in vc2 and we are not blocked
-        if (virtual_channel_2 != 0 && !vc_2_read) begin
+        if (virtual_channel_2 != 0 && !vc_2_read && !blocked) begin
           data_out <= virtual_channel_2;
           vc_2_read <= 1'b1;
         end

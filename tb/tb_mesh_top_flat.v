@@ -1362,6 +1362,8 @@ module tb_mesh_top_flat;
     
     // Empty initial block for stimulus
     initial begin
+        $dumpfile("iverilog-out/dump.vcd");
+		$dumpvars(0, tb_mesh_top_flat);
         // Add stimulus here
         clk=0;
         reset=1; 
