@@ -66,6 +66,16 @@ module router (
   output [63:0] sndo
 );
 
+  parameter TOP_LEFT      = 4'b1001;
+  parameter TOP           = 4'b1000;
+  parameter TOP_RIGHT     = 4'b1010;
+  parameter RIGHT         = 4'b0010;
+  parameter BOTTOM_RIGHT  = 4'b0110;
+  parameter BOTTOM        = 4'b0100;
+  parameter BOTTOM_LEFT   = 4'b0101;
+  parameter LEFT          = 4'b0001;
+  parameter CENTER        = 4'b0000;
+
   localparam NORTH_TO_SOUTH = 1'b0; 
   localparam SOUTH_TO_NORTH = 1'b1;
   localparam EAST_TO_WEST = 1'b0;
@@ -374,19 +384,6 @@ module router (
     end
   end
 
-  always @(posedge polarity) begin
-    if (block_cw_input_channel)
-      block_cw_input_channel = 1'b0;
-    if (block_ccw_input_channel)
-      block_ccw_input_channel = 1'b0;
-    if (block_pe_input_channel)
-      block_pe_input_channel = 1'b0;
-    if (block_ns_input_channel)
-      block_ns_input_channel = 1'b0;
-    if (block_sn_input_channel)
-      block_sn_input_channel = 1'b0;
-  end
-
   always @(*) begin
     reset_values;
     if (!reset) begin
@@ -539,6 +536,12 @@ module router (
 
   task block_channels();
     begin
+      block_cw_input_channel = 1'b0;
+      block_ccw_input_channel = 1'b0;
+      block_pe_input_channel = 1'b0;
+      block_ns_input_channel = 1'b0;
+      block_sn_input_channel = 1'b0;
+
       // more the data from the input channels to the output channels
       if (cw_requests > 0) begin
         if (cw_granted) begin

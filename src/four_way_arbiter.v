@@ -4,6 +4,12 @@
 * The arbiter has a reset input that resets the granted output to 0.
 */
 
+// 0000
+// 0001
+// 0010
+// 0100
+// 1000
+
 module four_way_arbiter (
   input reset,
   input [3:0] requests,  // 4 request inputs
@@ -48,6 +54,7 @@ module four_way_arbiter (
           last_granted = 2'b00;
         end
       endcase
+      
     end
   end
 

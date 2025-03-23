@@ -102,6 +102,11 @@ module tb_router();
     reset = 0;
     #100
 
+    for (i = 0; i < 11; i = i + 1) begin
+      $display("Test %d %s, sent value %h, returned value %h", i, 
+              (passedTests[i] ? "Passed" : "Failed"), data_array[i], returnedData[i]);
+    end
+
     $finish;
   end
 
@@ -156,11 +161,10 @@ module tb_router();
             nsdi <= data_array[3];
           end
           
-          if (cwdo[31:0] == data_array[0][31:0])
+          if (cwdo[31:0] == data_array[0][31:0]) begin
             passedTests[0] <= 1'b1;
-          else
-            passedTests[0] <= 1'b0;
-          returnedData[0] <= cwdo;
+            returnedData[0] <= cwdo;
+          end
         end
         7: begin // test case 5 tests loading data into the snsi virtual channel
           if (snri) begin
@@ -168,11 +172,10 @@ module tb_router();
             sndi <= data_array[4];
           end
 
-          if (ccwdo[31:0] == data_array[1][31:0])
+          if (ccwdo[31:0] == data_array[1][31:0]) begin
             passedTests[1] <= 1'b1;
-          else
-            passedTests[1] <= 1'b0;
-          returnedData[1] <= ccwdo;
+            returnedData[1] <= ccwdo;
+          end
         end
         8: begin // Tests that data goes to the pe output when there are not more hops
           if (ccwri) begin
@@ -180,11 +183,10 @@ module tb_router();
             ccwdi <= data_array[11];
           end
 
-          if (ccwdo[31:0] == data_array[2][31:0])
+          if (ccwdo[31:0] == data_array[2][31:0]) begin
             passedTests[2] <= 1'b1;
-          else
-            passedTests[2] <= 1'b0;
-          returnedData[2] <= ccwdo;
+            returnedData[2] <= ccwdo;
+          end
         end
         9: begin // test case 6 tests loading data into both pe and ccw at the same time. We should get a staggered output with both test cases
           if (peri) begin
@@ -196,33 +198,25 @@ module tb_router();
             ccwdi <= data_array[6];
           end
 
-          if (nsdo[31:0] == data_array[3][31:0])
+          if (nsdo[31:0] == data_array[3][31:0]) begin
             passedTests[3] <= 1'b1;
-          else
-            passedTests[3] <= 1'b0;
-          returnedData[3] <= nsdo;
+            returnedData[3] <= nsdo;
+          end
         end
         10: begin
-          if (sndo[31:0] == data_array[4][31:0])
+          if (sndo[31:0] == data_array[4][31:0]) begin
             passedTests[4] <= 1'b1;
-          else
-            passedTests[4] <= 1'b0;
-          returnedData[4] <= sndo;
+            returnedData[4] <= sndo;
+          end
         end
-        11: begin
-          if (ccwdo[31:0] == data_array[5][31:0] || ccwdo[31:0] == data_array[6][31:0])
-            passedTests[5] <= 1'b1;
-          else
-            passedTests[5] <= 1'b0;
-          returnedData[5] <= ccwdo;
-        end
-
         12: begin
-          if (ccwdo[31:0] == data_array[5][31:0] || ccwdo[31:0] == data_array[6][31:0])
+          if (ccwdo[31:0] == data_array[5][31:0]) begin
+            passedTests[5] <= 1'b1;
+            returnedData[5] <= ccwdo;
+          end else if (ccwdo[31:0] == data_array[6][31:0]) begin
             passedTests[6] <= 1'b1;
-          else
-            passedTests[6] <= 1'b0;
-          returnedData[6] <= ccwdo;
+            returnedData[6] <= ccwdo;
+          end
         end
 
         14: begin
@@ -241,6 +235,78 @@ module tb_router();
           if (nsri) begin
             nssi <= 1;
             nsdi <= data_array[10];
+          end
+
+          if (ccwdo[31:0] == data_array[5][31:0]) begin
+            passedTests[5] <= 1'b1;
+            returnedData[5] <= ccwdo;
+          end else if (ccwdo[31:0] == data_array[6][31:0]) begin
+            passedTests[6] <= 1'b1;
+            returnedData[6] <= ccwdo;
+          end
+        end
+
+        17: begin
+          if (nsdo[31:0] == data_array[7][31:0]) begin
+            passedTests[7] <= 1'b1;
+            returnedData[7] <= nsdo;
+          end else if (nsdo[31:0] == data_array[8][31:0]) begin
+            passedTests[8] <= 1'b1;
+            returnedData[8] <= nsdo;
+          end else if (nsdo[31:0] == data_array[9][31:0]) begin
+            passedTests[9] <= 1'b1;
+            returnedData[9] <= nsdo;
+          end else if (nsdo[31:0] == data_array[10][31:0]) begin
+            passedTests[10] <= 1'b1;
+            returnedData[10] <= nsdo;
+          end
+        end
+
+       19: begin
+          if (nsdo[31:0] == data_array[7][31:0]) begin
+            passedTests[7] <= 1'b1;
+            returnedData[7] <= nsdo;
+          end else if (nsdo[31:0] == data_array[8][31:0]) begin
+            passedTests[8] <= 1'b1;
+            returnedData[8] <= nsdo;
+          end else if (nsdo[31:0] == data_array[9][31:0]) begin
+            passedTests[9] <= 1'b1;
+            returnedData[9] <= nsdo;
+          end else if (nsdo[31:0] == data_array[10][31:0]) begin
+            passedTests[10] <= 1'b1;
+            returnedData[10] <= nsdo;
+          end
+        end
+
+        21: begin
+          if (nsdo[31:0] == data_array[7][31:0]) begin
+            passedTests[7] <= 1'b1;
+            returnedData[7] <= nsdo;
+          end else if (nsdo[31:0] == data_array[8][31:0]) begin
+            passedTests[8] <= 1'b1;
+            returnedData[8] <= nsdo;
+          end else if (nsdo[31:0] == data_array[9][31:0]) begin
+            passedTests[9] <= 1'b1;
+            returnedData[9] <= nsdo;
+          end else if (nsdo[31:0] == data_array[10][31:0]) begin
+            passedTests[10] <= 1'b1;
+            returnedData[10] <= nsdo;
+          end
+        end
+
+        23: begin
+          if (nsdo[31:0] == data_array[7][31:0]) begin
+            passedTests[7] <= 1'b1;
+            returnedData[7] <= nsdo;
+          end else if (nsdo[31:0] == data_array[8][31:0]) begin
+            passedTests[8] <= 1'b1;
+            returnedData[8] <= nsdo;
+          end else if (nsdo[31:0] == data_array[9][31:0]) begin
+            passedTests[9] <= 1'b1;
+            returnedData[9] <= nsdo;
+          end else if (nsdo[31:0] == data_array[10][31:0]) begin
+            passedTests[10] <= 1'b1;
+            returnedData[10] <= nsdo;
           end
         end
       endcase

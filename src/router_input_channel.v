@@ -41,10 +41,10 @@ module router_input_channel (
           end
         end
 
-      if (blocked && vc_1_read)
-        vc_1_read <= 1'b0;
-      if (blocked && vc_2_read) 
-        vc_2_read <= 1'b0;
+        if (blocked && vc_1_read)
+          vc_1_read = 1'b0;
+        if (blocked && vc_2_read) 
+          vc_2_read = 1'b0;
 
         // We are ready to receive data if we have space in the virtual channel and we are not blocked.
         // We also check our polarity depending on the virtual channel we are going to be using in the
