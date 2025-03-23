@@ -134,7 +134,7 @@ module mesh_top_row_1 #(
 
     // bottom left corner 
     router router_0_1 (
-        .clk(clk), .reset(reset), .router_position(), .polarity_out(),
+        .clk(clk), .reset(reset), .router_position(), .polarity_out(net_polarity_0_1),
         
         //right 
         .cwsi(cwsi_cwso_0), .cwri(cwri_cwro_0), .cwdi(cwdi_cwdo_0), .ccwso(ccwso_ccwsi_0), .ccwro(ccwro_ccwri_0), .ccwdo(ccwdo_ccwdi_0),
@@ -179,7 +179,7 @@ module mesh_top_row_1 #(
     );
 
     router router_1_1 (
-        .clk(clk), .reset(reset), .router_position(), .polarity_out(),
+        .clk(clk), .reset(reset), .router_position(), .polarity_out(net_polarity_1_1),
         
         //right 
         .cwsi(cwsi_cwso_1), .cwri(cwri_cwro_1), .cwdi(cwdi_cwdo_1), .ccwso(ccwso_ccwsi_1), .ccwro(ccwro_ccwri_1), .ccwdo(ccwdo_ccwdi_1),
@@ -224,7 +224,7 @@ module mesh_top_row_1 #(
     );
     
     router router_2_1 (
-        .clk(clk), .reset(reset), .router_position(), .polarity_out(),
+        .clk(clk), .reset(reset), .router_position(), .polarity_out(net_polarity_2_1),
         
         //right 
         .cwsi(cwsi_cwso_2), .cwri(cwri_cwro_2), .cwdi(cwdi_cwdo_2), .ccwso(ccwso_ccwsi_2), .ccwro(ccwro_ccwri_2), .ccwdo(ccwdo_ccwdi_2),
@@ -269,7 +269,7 @@ module mesh_top_row_1 #(
     );
      
     router router_3_1 (
-        .clk(clk), .reset(reset), .router_position(), .polarity_out(),
+        .clk(clk), .reset(reset), .router_position(), .polarity_out(net_polarity_3_1),
         
         //right - gnd 
         .cwsi(), .cwri(), .cwdi(), .ccwso(), .ccwro(), .ccwdo(),
