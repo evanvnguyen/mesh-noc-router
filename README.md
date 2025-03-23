@@ -24,5 +24,5 @@ The router also moves in the X direction first and then in the Y direction.
 
 - North to South packet[62] = 0
 - South to North packet[62] = 1
-- East to West(CCW) packet[61] = 0
+- East to West (CCW) packet[61] = 0
 - West to East (CW) packet[61] = 1
