@@ -54,9 +54,9 @@ module nic #(parameter PACKET_WIDTH = 64)(
             // Write to Output Buffer (if nicEnWR, nicEn, addr to output buffer, output buffer is empty)
             if (nicEnWR && nicEn && addr == 2'b10 && !channel_output_buffer_status) begin
                 channel_output_buffer <= d_in;
-            end else if (net_so && net_si) begin // next data logic
-                channel_output_buffer <= d_in;
-            end
+            end //else if (net_ro && net_si) begin // next data logic
+                //channel_output_buffer <= d_in;
+            //end
     
             // Receive Data from Router into Input Buffer (only if ready and valid)
             if (net_ri && net_si) begin
@@ -69,6 +69,9 @@ module nic #(parameter PACKET_WIDTH = 64)(
             // Send data to router (if router ready, polarity ok, buffer is full)
             if (channel_output_buffer_status && net_ro && net_polarity) begin
                 net_do <= channel_output_buffer;
+                if (nicEnWR && nicEn && addr == 2'b10) begin // get next data if it was blocked
+                    channel_output_buffer <= d_in;
+                end
                 net_so <= 1;
             end else begin
                 net_so <= 0;
