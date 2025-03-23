@@ -17,7 +17,109 @@
 
 module mesh_top_flat (
         input clk,
-        input reset);
+        input reset,
+        // create CPU probe for each nic
+       
+        
+        // row 3
+        input [1:0]   addr_0_3,
+        input [63:0]  d_in_0_3,
+        output [63:0]  d_out_0_3,
+        input         nicEn_0_3,
+        input         nicEnWR_0_3,
+        
+        input [1:0]   addr_1_3,
+        input [63:0]  d_in_1_3,
+        output [63:0]  d_out_1_3,
+        input         nicEn_1_3,
+        input         nicEnWR_1_3,
+        
+        input [1:0]   addr_2_3,
+        input [63:0]  d_in_2_3,
+        output [63:0]  d_out_2_3,
+        input         nicEn_2_3,
+        input         nicEnWR_2_3,
+        
+        input [1:0]   addr_3_3,
+        input [63:0]  d_in_3_3,
+        output [63:0]  d_out_3_3,
+        input         nicEn_3_3,
+        input         nicEnWR_3_3,
+        
+        // row 2
+        input [1:0]   addr_0_2,
+        input [63:0]  d_in_0_2,
+        output [63:0]  d_out_0_2,
+        input         nicEn_0_2,
+        input         nicEnWR_0_2,
+        
+        input [1:0]   addr_1_2,
+        input [63:0]  d_in_1_2,
+        output [63:0]  d_out_1_2,
+        input         nicEn_1_2,
+        input         nicEnWR_1_2,
+        
+        input [1:0]   addr_2_2,
+        input [63:0]  d_in_2_2,
+        output [63:0]  d_out_2_2,
+        input         nicEn_2_2,
+        input         nicEnWR_2_2,
+        
+        input [1:0]   addr_3_2,
+        input [63:0]  d_in_3_2,
+        output [63:0]  d_out_3_2,
+        input         nicEn_3_2,
+        input         nicEnWR_3_2,
+        
+        // row 1
+        input [1:0]   addr_0_1,
+        input [63:0]  d_in_0_1,
+        output [63:0]  d_out_0_1,
+        input         nicEn_0_1,
+        input         nicEnWR_0_1,
+        
+        input [1:0]   addr_1_1,
+        input [63:0]  d_in_1_1,
+        output [63:0]  d_out_1_1,
+        input         nicEn_1_1,
+        input         nicEnWR_1_1,
+        
+        input [1:0]   addr_2_1,
+        input [63:0]  d_in_2_1,
+        output [63:0]  d_out_2_1,
+        input         nicEn_2_1,
+        input         nicEnWR_2_1,
+        
+        input [1:0]   addr_3_1,
+        input [63:0]  d_in_3_1,
+        output [63:0]  d_out_3_1,
+        input         nicEn_3_1,
+        input         nicEnWR_3_1,
+        
+        input [1:0]   addr_0_0,
+        input [63:0]  d_in_0_0,
+        output [63:0] d_out_0_0,
+        input         nicEn_0_0,
+        input         nicEnWR_0_0,
+        
+        input [1:0]   addr_1_0,
+        input [63:0]  d_in_1_0,
+        output [63:0] d_out_1_0,
+        input         nicEn_1_0,
+        input         nicEnWR_1_0,
+        
+        input [1:0]   addr_2_0,
+        input [63:0]  d_in_2_0,
+        output [63:0] d_out_2_0,
+        input         nicEn_2_0,
+        input         nicEnWR_2_0,
+        
+        input [1:0]   addr_3_0,
+        input [63:0]  d_in_3_0,
+        output [63:0] d_out_3_0,
+        input         nicEn_3_0,
+        input         nicEnWR_3_0
+        );
 
     localparam PACKET_WIDTH = 64;
     wire [63:0] sndo_from_02_to_sndi_03;
@@ -50,6 +152,14 @@ module mesh_top_flat (
     wire snro_from_32_to_snri_33;
     wire nssi_from_32_to_nsso_33;
     wire nsri_from_32_to_nsro_33;
+    
+    always @(sndo_from_12_to_sndi_13 or sndo_from_22_to_sndi_23 or sndo_from_32_to_sndi_33 or
+         nsdi_from_02_to_nsdo_03 or nsdi_from_12_to_nsdo_13 or nsdi_from_22_to_nsdo_23 or nsdi_from_32_to_nsdo_33) begin
+        $display("Time = %0t | sndo_from_12_to_sndi_13 = %h, sndo_from_22_to_sndi_23 = %h, sndo_from_32_to_sndi_33 = %h | nsdi_from_02_to_nsdo_03 = %h, nsdi_from_12_to_nsdo_13 = %h, nsdi_from_22_to_nsdo_23 = %h, nsdi_from_32_to_nsdo_33 = %h",
+                 $time,
+                 sndo_from_12_to_sndi_13, sndo_from_22_to_sndi_23, sndo_from_32_to_sndi_33,
+                 nsdi_from_02_to_nsdo_03, nsdi_from_12_to_nsdo_13, nsdi_from_22_to_nsdo_23, nsdi_from_32_to_nsdo_33);
+    end
 
    
     mesh_top_row_3 #(
@@ -68,7 +178,34 @@ module mesh_top_flat (
         .snsi_2_3(snso_from_22_to_snsi_23), .snri_2_3(snro_from_22_to_snri_23), .sndi_2_3(sndo_from_22_to_sndi_23), .nsso_2_3(nssi_from_22_to_nsso_23), .nsro_2_3(nsri_from_22_to_nsro_23), .nsdo_2_3(nsdi_from_22_to_nsdo_23), 
         
         // bottom signal router 3,3 
-        .snsi_3_3(snso_from_32_to_snsi_33), .snri_3_3(snso_from_32_to_snsi_33), .sndi_3_3(sndo_from_32_to_sndi_33), .nsso_3_3(nssi_from_32_to_nsso_33), .nsro_3_3(nsri_from_32_to_nsro_33), .nsdo_3_3(nsdi_from_32_to_nsdo_33) 
+        .snsi_3_3(snso_from_32_to_snsi_33), .snri_3_3(snso_from_32_to_snsi_33), .sndi_3_3(sndo_from_32_to_sndi_33), .nsso_3_3(nssi_from_32_to_nsso_33), .nsro_3_3(nsri_from_32_to_nsro_33), .nsdo_3_3(nsdi_from_32_to_nsdo_33),
+        
+
+        .addr_0_3(addr_0_3),
+        .d_in_0_3(d_in_0_3),
+        .d_out_0_3(d_out_0_3),
+        .nicEn_0_3(nicEn_0_3),
+        .nicEnWR_0_3(nicEnWR_0_3),
+        
+        .addr_1_3(addr_1_3),
+        .d_in_1_3(d_in_1_3),
+        .d_out_1_3(d_out_1_3),
+        .nicEn_1_3(nicEn_1_3),
+        .nicEnWR_1_3(nicEnWR_1_3),
+        
+        .addr_2_3(addr_2_3),
+        .d_in_2_3(d_in_2_3),
+        .d_out_2_3(d_out_2_3),
+        .nicEn_2_3(nicEn_2_3),
+        .nicEnWR_2_3(nicEnWR_2_3),
+        
+        .addr_3_3(addr_3_3),
+        .d_in_3_3(d_in_3_3),
+        .d_out_3_3(d_out_3_3),
+        .nicEn_3_3(nicEn_3_3),
+        .nicEnWR_3_3(nicEnWR_3_3)
+
+         
     );
 
     wire [63:0] sndo_from_01_to_sndi_02;
@@ -129,7 +266,32 @@ module mesh_top_flat (
         .snso_3_2(snso_from_32_to_snsi_33), .snro_3_2(snso_from_32_to_snsi_33), .sndo_3_2(sndo_from_32_to_sndi_33), .nssi_3_2(nssi_from_32_to_nsso_33), .nsri_3_2(nsri_from_32_to_nsro_33), .nsdi_3_2(nsdi_from_32_to_nsdo_33),
 
         // bottom signal router 3,2
-        .snsi_3_2(snso_from_31_to_snsi_32), .snri_3_2(snro_from_31_to_snri_32), .sndi_3_2(sndo_from_31_to_sndi_32), .nsso_3_2(nssi_from_31_to_nsso_32), .nsro_3_2(nsri_from_31_to_nsro_32), .nsdo_3_2(nsdi_from_31_to_nsdo_32)
+        .snsi_3_2(snso_from_31_to_snsi_32), .snri_3_2(snro_from_31_to_snri_32), .sndi_3_2(sndo_from_31_to_sndi_32), .nsso_3_2(nssi_from_31_to_nsso_32), .nsro_3_2(nsri_from_31_to_nsro_32), .nsdo_3_2(nsdi_from_31_to_nsdo_32),
+        
+        .addr_0_2(addr_0_2),
+        .d_in_0_2(d_in_0_2),
+        .d_out_0_2(d_out_0_2),
+        .nicEn_0_2(nicEn_0_2),
+        .nicEnWR_0_2(nicEnWR_0_2),
+        
+        .addr_1_2(addr_1_2),
+        .d_in_1_2(d_in_1_2),
+        .d_out_1_2(d_out_1_2),
+        .nicEn_1_2(nicEn_1_2),
+        .nicEnWR_1_2(nicEnWR_1_2),
+        
+        .addr_2_2(addr_2_2),
+        .d_in_2_2(d_in_2_2),
+        .d_out_2_2(d_out_2_2),
+        .nicEn_2_2(nicEn_2_2),
+        .nicEnWR_2_2(nicEnWR_2_2),
+        
+        .addr_3_2(addr_3_2),
+        .d_in_3_2(d_in_3_2),
+        .d_out_3_2(d_out_3_2),
+        .nicEn_3_2(nicEn_3_2),
+        .nicEnWR_3_2(nicEnWR_3_2)
+        
     );
 
     wire [63:0] sndo_from_00_to_sndi_01;
@@ -190,7 +352,32 @@ module mesh_top_flat (
         .snso_3_1(snso_from_31_to_snsi_32), .snro_3_1(snro_from_31_to_snri_32), .sndo_3_1(sndo_from_31_to_sndi_32), .nssi_3_1(nssi_from_31_to_nsso_32), .nsri_3_1(nsri_from_31_to_nsro_32), .nsdi_3_1(nsdi_from_31_to_nsdo_32),
 
         // botto2 signal router 3,1
-        .snsi_3_1(snso_from_30_to_snsi_31), .snri_3_1(snro_from_30_to_snri_31), .sndi_3_1(sndo_from_30_to_sndi_31), .nsso_3_1(nssi_from_30_to_nsso_31), .nsro_3_1(nsri_from_30_to_nsro_31), .nsdo_3_1(nsdi_from_30_to_nsdo_31)
+        .snsi_3_1(snso_from_30_to_snsi_31), .snri_3_1(snro_from_30_to_snri_31), .sndi_3_1(sndo_from_30_to_sndi_31), .nsso_3_1(nssi_from_30_to_nsso_31), .nsro_3_1(nsri_from_30_to_nsro_31), .nsdo_3_1(nsdi_from_30_to_nsdo_31),
+        
+        .addr_0_1(addr_0_1),
+        .d_in_0_1(d_in_0_1),
+        .d_out_0_1(d_out_0_1),
+        .nicEn_0_1(nicEn_0_1),
+        .nicEnWR_0_1(nicEnWR_0_1),
+        
+        .addr_1_1(addr_1_1),
+        .d_in_1_1(d_in_1_1),
+        .d_out_1_1(d_out_1_1),
+        .nicEn_1_1(nicEn_1_1),
+        .nicEnWR_1_1(nicEnWR_1_1),
+        
+        .addr_2_1(addr_2_1),
+        .d_in_2_1(d_in_2_1),
+        .d_out_2_1(d_out_2_1),
+        .nicEn_2_1(nicEn_2_1),
+        .nicEnWR_2_1(nicEnWR_2_1),
+        
+        .addr_3_1(addr_3_1),
+        .d_in_3_1(d_in_3_1),
+        .d_out_3_1(d_out_3_1),
+        .nicEn_3_1(nicEn_3_1),
+        .nicEnWR_3_1(nicEnWR_3_1)
+
     );
 
 
@@ -210,7 +397,32 @@ module mesh_top_flat (
         .snso_2_0(snso_from_20_to_snsi_21), .snro_2_0(snro_from_20_to_snri_21), .sndo_2_0(sndo_from_20_to_sndi_21), .nssi_2_0(nssi_from_20_to_nsso_21), .nsri_2_0(nsri_from_20_to_nsro_21), .nsdi_2_0(nsdi_from_20_to_nsdo_21),
         
         // top signal router 3,0 
-        .snso_3_0(snso_from_30_to_snsi_31), .snro_3_0(snro_from_30_to_snri_31), .sndo_3_0(sndo_from_30_to_sndi_31), .nssi_3_0(nssi_from_30_to_nsso_31), .nsri_3_0(nsri_from_30_to_nsro_31), .nsdi_3_0(nsdi_from_30_to_nsdo_31)
+        .snso_3_0(snso_from_30_to_snsi_31), .snro_3_0(snro_from_30_to_snri_31), .sndo_3_0(sndo_from_30_to_sndi_31), .nssi_3_0(nssi_from_30_to_nsso_31), .nsri_3_0(nsri_from_30_to_nsro_31), .nsdi_3_0(nsdi_from_30_to_nsdo_31),
+        
+        .addr_0_0(addr_0_0),
+        .d_in_0_0(d_in_0_0),
+        .d_out_0_0(d_out_0_0),
+        .nicEn_0_0(nicEn_0_0),
+        .nicEnWR_0_0(nicEnWR_0_0),
+        
+        .addr_1_0(addr_1_0),
+        .d_in_1_0(d_in_1_0),
+        .d_out_1_0(d_out_1_0),
+        .nicEn_1_0(nicEn_1_0),
+        .nicEnWR_1_0(nicEnWR_1_0),
+        
+        .addr_2_0(addr_2_0),
+        .d_in_2_0(d_in_2_0),
+        .d_out_2_0(d_out_2_0),
+        .nicEn_2_0(nicEn_2_0),
+        .nicEnWR_2_0(nicEnWR_2_0),
+        
+        .addr_3_0(addr_3_0),
+        .d_in_3_0(d_in_3_0),
+        .d_out_3_0(d_out_3_0),
+        .nicEn_3_0(nicEn_3_0),
+        .nicEnWR_3_0(nicEnWR_3_0)
+
     );
 
 
