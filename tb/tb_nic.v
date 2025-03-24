@@ -46,6 +46,8 @@ always #5 clk = ~clk;
 
 // Test stimulus
 initial begin
+    $dumpfile("iverilog-out/dump.vcd");
+	$dumpvars(0, nic_tb);
     // Initialize inputs
     clk = 0;
     reset = 1;

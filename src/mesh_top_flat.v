@@ -152,14 +152,6 @@ module mesh_top_flat (
     wire snro_from_32_to_snri_33;
     wire nssi_from_32_to_nsso_33;
     wire nsri_from_32_to_nsro_33;
-    
-    always @(sndo_from_12_to_sndi_13 or sndo_from_22_to_sndi_23 or sndo_from_32_to_sndi_33 or
-         nsdi_from_02_to_nsdo_03 or nsdi_from_12_to_nsdo_13 or nsdi_from_22_to_nsdo_23 or nsdi_from_32_to_nsdo_33) begin
-        $display("Time = %0t | sndo_from_12_to_sndi_13 = %h, sndo_from_22_to_sndi_23 = %h, sndo_from_32_to_sndi_33 = %h | nsdi_from_02_to_nsdo_03 = %h, nsdi_from_12_to_nsdo_13 = %h, nsdi_from_22_to_nsdo_23 = %h, nsdi_from_32_to_nsdo_33 = %h",
-                 $time,
-                 sndo_from_12_to_sndi_13, sndo_from_22_to_sndi_23, sndo_from_32_to_sndi_33,
-                 nsdi_from_02_to_nsdo_03, nsdi_from_12_to_nsdo_13, nsdi_from_22_to_nsdo_23, nsdi_from_32_to_nsdo_33);
-    end
 
    
     mesh_top_row_3 #(

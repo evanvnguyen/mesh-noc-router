@@ -1435,17 +1435,14 @@ module tb_mesh_top_flat;
                 nicEn_0_0, nicEn_1_0, nicEn_2_0, nicEn_3_0,
                 nicEnWR_0_0, nicEnWR_1_0, nicEnWR_2_0, nicEnWR_3_0
             );
-
-
         
-        #300;
-        $finish;
     end
 
     always @(posedge clk) begin
-        $display(uut.mesh_top_row_0.router_0_0)
-
         cycle_count <= cycle_count + 1;
+
+        if (cycle_count == 100)
+            $finish;
     end
 
 endmodule

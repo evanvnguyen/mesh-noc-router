@@ -25,12 +25,6 @@ module nic #(parameter PACKET_WIDTH = 64)(
     reg [PACKET_WIDTH-1:0] channel_output_buffer;
     reg channel_input_buffer_status;   
     reg channel_output_buffer_status;
-    
-    // debug
-    always @(posedge clk) begin
-        if (net_ro && net_polarity) $display("NIC: net_ro=1 & polarity OK. Router input buffer is empty & ready. Placing data onto network output channel.");
-        if (net_ri) $display("NIC: net_ri=1, we have space for incoming data.");
-    end
 
     // Update Status Registers (0-empty, 1-full)
     // reduced by 1 cycle
@@ -87,6 +81,14 @@ module nic #(parameter PACKET_WIDTH = 64)(
                     default: d_out <= 64'b0;
                 endcase
             end
+        end
+    end
+
+    always @(posedge clk) begin
+        if (net_si) begin
+            $display("blah %b", net_si);
+            $display("Phase=%b, Time=%0t, Destination=%b, Source=%b, Packet Value=%h",
+                     net_polarity, $time, channel_input_buffer[55:48], channel_input_buffer[47:32], channel_input_buffer);
         end
     end
 
