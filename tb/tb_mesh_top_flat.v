@@ -4,6 +4,7 @@ module tb_mesh_top_flat;
     // Clock and reset
     reg clk;
     reg reset;
+    integer cycle_count;
     
     // row 3 signals
     reg  [1:0]  addr_0_3, addr_1_3, addr_2_3, addr_3_3;
@@ -168,7 +169,7 @@ module tb_mesh_top_flat;
         end
     endtask
     
-    // **** Gather Phase tasks ****
+/*     // **** Gather Phase tasks ****
     // - Unfortuantely since the wire locations are flattened, we have to do this manually
     
     // Probe each routers direction input buffer for changes 
@@ -349,7 +350,7 @@ module tb_mesh_top_flat;
             mesh_top_flat.row_0.router_3_0.ccw_input_channel.data_in,
             mesh_top_flat.row_0.router_3_0.ns_input_channel.data_in,
             mesh_top_flat.row_0.router_3_0.sn_input_channel.data_in);
-    end
+    end */
 
     
     // Phase 0
@@ -1362,7 +1363,10 @@ module tb_mesh_top_flat;
     
     // Empty initial block for stimulus
     initial begin
+        $dumpfile("iverilog-out/dump.vcd");
+		$dumpvars(0, tb_mesh_top_flat);
         // Add stimulus here
+        cycle_count = 0;
         clk=0;
         reset=1; 
         
@@ -1431,10 +1435,17 @@ module tb_mesh_top_flat;
                 nicEn_0_0, nicEn_1_0, nicEn_2_0, nicEn_3_0,
                 nicEnWR_0_0, nicEnWR_1_0, nicEnWR_2_0, nicEnWR_3_0
             );
-        
+
+
         
         #300;
         $finish;
+    end
+
+    always @(posedge clk) begin
+        $display(uut.mesh_top_row_0.router_0_0)
+
+        cycle_count <= cycle_count + 1;
     end
 
 endmodule
