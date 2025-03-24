@@ -131,16 +131,20 @@ module mesh_top_row_2 #(
     wire net_ri_3_1, net_ro_3_2;
     wire [PACKET_WIDTH-1:0] net_di_3_2, net_do_3_2;
     wire net_polarity_3_2;
-
+    wire wasd0, wasd1, wasd2, wasd3;
+    wire [63:0] wasd5, wasd6; 
+    
     // bottom left corner 
-    router router_0_1 (
+    router router_0_2 (
         .clk(clk), .reset(reset), .router_position(), .polarity_out(net_polarity_0_2),
         
         //right 
-        .cwsi(cwsi_cwso_0), .cwri(cwri_cwro_0), .cwdi(cwdi_cwdo_0), .ccwso(ccwso_ccwsi_0), .ccwro(ccwro_ccwri_0), .ccwdo(ccwdo_ccwdi_0),
+        .cwsi(), .cwri(), .cwdi(), .ccwso(), .ccwro(), .ccwdo(),
+        //.cwso(wasd0), .cwro(wasd1), .cwdo(wasd5), .ccwsi(wasd2), .ccwri(wasd3), .ccwdi(wasd6),
 
         //left - gnd
-        .cwso(), .cwro(), .cwdo(), .ccwsi(), .ccwri(), .ccwdi(),
+        //.cwso(), .cwro(), .cwdo(), .ccwsi(), .ccwri(), .ccwdi(),
+        .cwso(wasd0), .cwro(wasd1), .cwdo(wasd5), .ccwsi(wasd2), .ccwri(wasd3), .ccwdi(wasd6),
         
         // top
         .snso(snso_0_2), .snro(snro_0_2), .sndo(sndo_0_2), .nssi(nssi_0_2), .nsri(nsri_0_2), .nsdi(nsdi_0_2),  
@@ -156,7 +160,7 @@ module mesh_top_row_2 #(
     // NIC module instantiation for 0_1
     nic #(
         .PACKET_WIDTH(PACKET_WIDTH)
-    ) nic_0_1 (
+    ) nic_0_2 (
         .clk(clk),
         .reset(reset),
     
@@ -178,14 +182,15 @@ module mesh_top_row_2 #(
         .net_polarity(net_polarity_0_2)
     );
 
-    router router_1_1 (
+    router router_1_2 (
         .clk(clk), .reset(reset), .router_position(), .polarity_out(net_polarity_1_2),
         
         //right 
-        .cwsi(cwsi_cwso_1), .cwri(cwri_cwro_1), .cwdi(cwdi_cwdo_1), .ccwso(ccwso_ccwsi_1), .ccwro(ccwro_ccwri_1), .ccwdo(ccwdo_ccwdi_1),
+        //.cwsi(cwsi_cwso_1), .cwri(cwri_cwro_1), .cwdi(cwdi_cwdo_1), .ccwso(ccwso_ccwsi_1), .ccwro(ccwro_ccwri_1), .ccwdo(ccwdo_ccwdi_1),
+        .cwsi(wasd0), .cwri(wasd1), .cwdi(wasd5), .ccwso(wasd2), .ccwro(wasd3), .ccwdo(wasd6),
 
         //left 
-        .cwso(cwsi_cwso_0), .cwro(cwri_cwro_0), .cwdo(cwdi_cwdo_0), .ccwsi(ccwso_ccwsi_0), .ccwri(ccwro_ccwri_0), .ccwdi(ccwdo_ccwdi_0),
+        .cwso(cwsi_cwso_2), .cwro(cwri_cwro_2), .cwdo(cwdi_cwdo_2), .ccwsi(ccwso_ccwsi_2), .ccwri(ccwro_ccwri_2), .ccwdi(ccwdo_ccwdi_2),
         
         // top
         .snso(snso_1_2), .snro(snro_1_2), .sndo(sndo_1_2), .nssi(nssi_1_2), .nsri(nsri_1_2), .nsdi(nsdi_1_2),  
@@ -201,7 +206,7 @@ module mesh_top_row_2 #(
     // NIC module instantiation for 1_1
     nic #(
         .PACKET_WIDTH(PACKET_WIDTH)
-    ) nic_1_1 (
+    ) nic_1_2 (
         .clk(clk),
         .reset(reset),
     
@@ -223,7 +228,7 @@ module mesh_top_row_2 #(
         .net_polarity(net_polarity_1_2)
     );
     
-    router router_2_1 (
+    router router_2_2 (
         .clk(clk), .reset(reset), .router_position(), .polarity_out(net_polarity_2_2),
         
         //right 
@@ -246,7 +251,7 @@ module mesh_top_row_2 #(
     // NIC module instantiation for 2_1
     nic #(
         .PACKET_WIDTH(PACKET_WIDTH)
-    ) nic_2_1 (
+    ) nic_2_2 (
         .clk(clk),
         .reset(reset),
     
@@ -268,14 +273,14 @@ module mesh_top_row_2 #(
         .net_polarity(net_polarity_2_2)
     );
      
-    router router_3_1 (
+    router router_3_2 (
         .clk(clk), .reset(reset), .router_position(), .polarity_out(net_polarity_3_2),
         
         //right - gnd 
-        .cwsi(), .cwri(), .cwdi(), .ccwso(), .ccwro(), .ccwdo(),
+        .cwsi(cwsi_cwso_1), .cwri(cwri_cwro_1), .cwdi(cwdi_cwdo_1), .ccwso(ccwso_ccwsi_1), .ccwro(ccwro_ccwri_1), .ccwdo(ccwdo_ccwdi_1),
 
         //left
-        .cwso(cwsi_cwso_1), .cwro(cwri_cwro_1), .cwdo(cwdi_cwdo_1), .ccwsi(ccwso_ccwsi_1), .ccwri(ccwro_ccwri_1), .ccwdi(ccwdo_ccwdi_1),
+        .cwso(), .cwro(), .cwdo(), .ccwsi(), .ccwri(), .ccwdi(),
         
         // top
         .snso(snso_3_2), .snro(snro_3_2), .sndo(sndo_3_2), .nssi(nssi_3_2), .nsri(nsri_3_2), .nsdi(nsdi_3_2),  
@@ -291,7 +296,7 @@ module mesh_top_row_2 #(
     // NIC module instantiation for 3_1
     nic #(
         .PACKET_WIDTH(PACKET_WIDTH)
-    ) nic_3_1 (
+    ) nic_3_2 (
         .clk(clk),
         .reset(reset),
     

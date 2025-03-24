@@ -131,16 +131,19 @@ module mesh_top_row_1 #(
     wire net_ri_3_1, net_ro_3_1;
     wire [PACKET_WIDTH-1:0] net_di_3_1, net_do_3_1;
     wire net_polarity_3_1;
-
+    wire wasd0, wasd1, wasd2, wasd3;
+    wire [63:0] wasd5, wasd6; 
+    
     // bottom left corner 
     router router_0_1 (
         .clk(clk), .reset(reset), .router_position(), .polarity_out(net_polarity_0_1),
         
-        //right 
-        .cwsi(cwsi_cwso_0), .cwri(cwri_cwro_0), .cwdi(cwdi_cwdo_0), .ccwso(ccwso_ccwsi_0), .ccwro(ccwro_ccwri_0), .ccwdo(ccwdo_ccwdi_0),
+        //right -- THIS IS GROUNDED!!!! rework this
+        .cwsi(), .cwri(), .cwdi(), .ccwso(), .ccwro(), .ccwdo(),
 
-        //left - gnd
-        .cwso(), .cwro(), .cwdo(), .ccwsi(), .ccwri(), .ccwdi(),
+        //left - gnd - BUT NOT REALLY
+        //.cwso(cwsi_cwso_1), .cwro(cwri_cwro_1), .cwdo(cwdi_cwdo_1), .ccwsi(ccwso_ccwsi_1), .ccwri(ccwro_ccwri_1), .ccwdi(ccwdo_ccwdi_1),
+        .cwso(wasd0), .cwro(wasd1), .cwdo(wasd5), .ccwsi(wasd2), .ccwri(wasd3), .ccwdi(wasd6),
         
         // top
         .snso(snso_0_1), .snro(snro_0_1), .sndo(sndo_0_1), .nssi(nssi_0_1), .nsri(nsri_0_1), .nsdi(nsdi_0_1),  
@@ -182,10 +185,10 @@ module mesh_top_row_1 #(
         .clk(clk), .reset(reset), .router_position(), .polarity_out(net_polarity_1_1),
         
         //right 
-        .cwsi(cwsi_cwso_1), .cwri(cwri_cwro_1), .cwdi(cwdi_cwdo_1), .ccwso(ccwso_ccwsi_1), .ccwro(ccwro_ccwri_1), .ccwdo(ccwdo_ccwdi_1),
+        .cwsi(wasd0), .cwri(wasd1), .cwdi(wasd5), .ccwso(wasd2), .ccwro(wasd3), .ccwdo(wasd6),
 
         //left 
-        .cwso(cwsi_cwso_0), .cwro(cwri_cwro_0), .cwdo(cwdi_cwdo_0), .ccwsi(ccwso_ccwsi_0), .ccwri(ccwro_ccwri_0), .ccwdi(ccwdo_ccwdi_0),
+        .cwso(cwsi_cwso_2), .cwro(cwri_cwro_2), .cwdo(cwdi_cwdo_2), .ccwsi(ccwso_ccwsi_2), .ccwri(ccwro_ccwri_2), .ccwdi(ccwdo_ccwdi_2),
         
         // top
         .snso(snso_1_1), .snro(snro_1_1), .sndo(sndo_1_1), .nssi(nssi_1_1), .nsri(nsri_1_1), .nsdi(nsdi_1_1),  
@@ -271,11 +274,11 @@ module mesh_top_row_1 #(
     router router_3_1 (
         .clk(clk), .reset(reset), .router_position(), .polarity_out(net_polarity_3_1),
         
-        //right - gnd 
-        .cwsi(), .cwri(), .cwdi(), .ccwso(), .ccwro(), .ccwdo(),
+        //right -- THIS IS GROUNDED!!!! rework this -- right -> left
+        .cwsi(cwsi_cwso_1), .cwri(cwri_cwro_1), .cwdi(cwdi_cwdo_1), .ccwso(ccwso_ccwsi_1), .ccwro(ccwro_ccwri_1), .ccwdo(ccwdo_ccwdi_1),
 
         //left
-        .cwso(cwsi_cwso_1), .cwro(cwri_cwro_1), .cwdo(cwdi_cwdo_1), .ccwsi(ccwso_ccwsi_1), .ccwri(ccwro_ccwri_1), .ccwdi(ccwdo_ccwdi_1),
+        .cwso(), .cwro(), .cwdo(), .ccwsi(), .ccwri(), .ccwdi(),
         
         // top
         .snso(snso_3_1), .snro(snro_3_1), .sndo(sndo_3_1), .nssi(nssi_3_1), .nsri(nsri_3_1), .nsdi(nsdi_3_1),  
