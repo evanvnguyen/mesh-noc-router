@@ -110,16 +110,19 @@ module mesh_top_row_3 #(
     wire net_ri_3_3, net_ro_3_3;
     wire [PACKET_WIDTH-1:0] net_di_3_3, net_do_3_3;
     wire net_polarity_3_3;
-
+    wire wasd0, wasd1, wasd2, wasd3;
+    wire [63:0] wasd5, wasd6; 
     // bottom left corner 
     router router_0_3 (
         .clk(clk), .reset(reset), .router_position(), .polarity_out(net_polarity_0_3),
         
         //right 
-        .cwsi(cwsi_cwso_0), .cwri(cwri_cwro_0), .cwdi(cwdi_cwdo_0), .ccwso(ccwso_ccwsi_0), .ccwro(ccwro_ccwri_0), .ccwdo(ccwdo_ccwdi_0),
-
+        //.cwsi(cwsi_cwso_0), .cwri(cwri_cwro_0), .cwdi(cwdi_cwdo_0), .ccwso(ccwso_ccwsi_0), .ccwro(ccwro_ccwri_0), .ccwdo(ccwdo_ccwdi_0),
+        .cwsi(), .cwri(), .cwdi(), .ccwso(), .ccwro(), .ccwdo(),
+ 
         //left - gnd
-        .cwso(), .cwro(), .cwdo(), .ccwsi(), .ccwri(), .ccwdi(),
+        //.cwso(), .cwro(), .cwdo(), .ccwsi(), .ccwri(), .ccwdi(),
+        .cwso(wasd0), .cwro(wasd1), .cwdo(wasd5), .ccwsi(wasd2), .ccwri(wasd3), .ccwdi(wasd6),
         
         // top
         .snso(), .snro(), .sndo(), .nssi(), .nsri(), .nsdi(),  
@@ -163,7 +166,7 @@ module mesh_top_row_3 #(
         .cwsi(cwsi_cwso_1), .cwri(cwri_cwro_1), .cwdi(cwdi_cwdo_1), .ccwso(ccwso_ccwsi_1), .ccwro(ccwro_ccwri_1), .ccwdo(ccwdo_ccwdi_1),
 
         //left 
-        .cwso(cwsi_cwso_0), .cwro(cwri_cwro_0), .cwdo(cwdi_cwdo_0), .ccwsi(ccwso_ccwsi_0), .ccwri(ccwro_ccwri_0), .ccwdi(ccwdo_ccwdi_0),
+        .cwso(cwsi_cwso_2), .cwro(cwri_cwro_2), .cwdo(cwdi_cwdo_2), .ccwsi(ccwso_ccwsi_2), .ccwri(ccwro_ccwri_2), .ccwdi(ccwdo_ccwdi_2),
         
         // top
         .snso(), .snro(), .sndo(), .nssi(), .nsri(), .nsdi(),  
@@ -248,10 +251,10 @@ module mesh_top_row_3 #(
         .clk(clk), .reset(reset), .router_position(), .polarity_out(net_polarity_3_3),
         
         //right 
-        .cwsi(), .cwri(), .cwdi(), .ccwso(), .ccwro(), .ccwdo(),
+        .cwsi(cwsi_cwso_1), .cwri(cwri_cwro_1), .cwdi(cwdi_cwdo_1), .ccwso(ccwso_ccwsi_1), .ccwro(ccwro_ccwri_1), .ccwdo(ccwdo_ccwdi_1),
 
         //left
-        .cwso(cwsi_cwso_1), .cwro(cwri_cwro_1), .cwdo(cwdi_cwdo_1), .ccwsi(ccwso_ccwsi_1), .ccwri(ccwro_ccwri_1), .ccwdi(ccwdo_ccwdi_1),
+        .cwso(), .cwro(), .cwdo(), .ccwsi(), .ccwri(), .ccwdi(),
         
         // top
         .snso(), .snro(), .sndo(), .nssi(), .nsri(), .nsdi(),  
