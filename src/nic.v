@@ -37,6 +37,7 @@ module nic #(parameter PACKET_WIDTH = 64)(
     always @(*) begin
         channel_input_buffer_status = (channel_input_buffer == 0) ? 1'b0 : 1'b1;
         channel_output_buffer_status = (channel_output_buffer == 0) ? 1'b0 : 1'b1;
+        net_ri = (channel_input_buffer_status == 0) ? 1'b1 : 1'b0;
     end
     
     // router handhsake
@@ -58,13 +59,15 @@ module nic #(parameter PACKET_WIDTH = 64)(
                 //channel_output_buffer <= d_in;
             //end
     
-            // Receive Data from Router into Input Buffer (only if ready and valid)
+            // Receive Data from Router into Input Buffer (only if ready and input buffer is empty)\
+            // * add an explicit condition that even though its full, d_out to CPU can get the next piece of data immediately
             if (net_ri && net_si) begin
                 channel_input_buffer <= net_di;
             end
 
+
             // Update net_ri based on input buffer status
-            net_ri <= (channel_input_buffer_status == 0) ? 1'b1 : 1'b0;
+            //net_ri <= (channel_input_buffer_status == 0) ? 1'b1 : 1'b0;
     
             // Send data to router (if router ready, polarity ok, buffer is full)
             if (channel_output_buffer_status && net_ro && net_polarity) begin
@@ -80,10 +83,16 @@ module nic #(parameter PACKET_WIDTH = 64)(
             // Processor Read Logic
             if (nicEn && !nicEnWR) begin
                 case (addr)
-                    2'b00: d_out <= channel_input_buffer;                             // Read input buffer
-                    2'b01: d_out <= {63'b0, channel_input_buffer_status};             // Read input status
-                    2'b10: d_out <= 64'b0;                                            // Invalid read from output buffer
-                    2'b11: d_out <= {63'b0, channel_output_buffer_status};            // Read output status
+                    2'b00: begin
+                        d_out <= channel_input_buffer;  // Read input buffer
+                        if (net_si)
+                            channel_input_buffer <= net_di;  // Immediately load new data if available
+                        else
+                            channel_input_buffer <= 64'b0;    // Otherwise clear the buffer
+                    end
+                    2'b01: d_out <= {63'b0, channel_input_buffer_status};               // Read input status
+                    2'b10: d_out <= 64'b0;                                              // Invalid read from output buffer
+                    2'b11: d_out <= {63'b0, channel_output_buffer_status};              // Read output status
                     default: d_out <= 64'b0;
                 endcase
             end
