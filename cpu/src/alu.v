@@ -31,10 +31,10 @@ module alu (
         VSUB    = 6'b000111, // 7  - sub - done
         VMULEU  = 6'b001000, // 8  - multiply even unsigned - done
         VMULOU  = 6'b001001, // 9  - mulitiply odd unsigned - done
-        VSLL    = 6'b001010, // 10 - shift left logical - 
-        VSRL    = 6'b001011, // 11 - shift right logical - 
+        VSLL    = 6'b001010, // 10 - shift left logical - done
+        VSRL    = 6'b001011, // 11 - shift right logical -  done
         VSRA    = 6'b001100, // 12 - shift right arithmetic - 
-        VRTTH   = 6'b001101, // 13 - rotate by half -
+        VRTTH   = 6'b001101, // 13 - rotate by half - done
         VDIV    = 6'b001110, // 14 - division integer unsigned
         VMOD    = 6'b001111, // 15 - modulo integer unsigned
         VSQEU   = 6'b010000, // 16 - square even unsigned
