@@ -60,7 +60,7 @@ always @(posedge clk) begin
     registerFile[31] <= 64'b0;
   end else begin
     if (writeEnable) begin
-      if (rD_address != 0)
+      if (rD_address != 5'b0)
         registerFile[rD_address] <= rD_data;
     end
   end
