@@ -137,29 +137,50 @@ module alu (
             VMULEU: begin                     // Arithmetic EVEN index MUL (width-dependent)
                 case (width)
                     // 8b multiplication // take even indice { even, odd, even, odd, even, odd }
-                    2'b00: compute = { reg_a_data[0:7] * reg_b_data[0:7], reg_a_data[16:23] * reg_b_data[16:23], reg_a_data[32:39] * reg_b_data[32:39], reg_a_data[48:55] * reg_b_data[48:55] };
+                    2'b00: begin
+                        compute[48:63] = reg_a_data[48:55] * reg_b_data[48:55]; // byte 6
+                        compute[32:47] = reg_a_data[32:39] * reg_b_data[32:39]; // byte 4
+                        compute[16:31] = reg_a_data[16:23] * reg_b_data[16:23]; // byte 2
+                        compute[0:15]   = reg_a_data[0:7] * reg_b_data[0:7];     // byte 0
+                    end
                     
-                    // 16b multiplication (16b -> 32b result)
-                    2'b01: compute = { reg_a_data[0:15] * reg_b_data[0:15], reg_a_data[32:47] * reg_b_data[32:47]  };
+                    // 16b multiplication (16b × 16b = 32b × 2 lanes)
+                    2'b01: begin
+                        compute[0:31]   = reg_a_data[0:15]   * reg_b_data[0:15];    
+                        compute[32:63]  = reg_a_data[32:47]  * reg_b_data[32:47];   
+                    end
                     
-                    // 32b multiplication (32b -> 64b result)
-                    2'b10: compute = { reg_a_data[0:31] * reg_b_data[0:31] };
-    
+                    // 32b multiplication (32b × 32b = 64b result)
+                    2'b10: begin
+                        compute[0:63] = reg_a_data[0:31] * reg_b_data[0:31];
+                    end
+                    // 2'b11 not possible
                     default: compute = 64'b0;
                 endcase
             end
             
             VMULOU: begin                     // Arithmetic ODD index MUL (width-dependent)
                 case (width)
-                    // 8b multiplication (8-bit * 8-bit -> 16-bit result) - Odd indices { odd, even, odd, even, odd, even }
-                    2'b00: compute = { reg_a_data[8:15] * reg_b_data[8:15], reg_a_data[24:31] * reg_b_data[24:31], reg_a_data[40:47] * reg_b_data[40:47], reg_a_data[56:63] * reg_b_data[56:63] };
+                    // 8b multiplication // take odd indice { even, odd, even, odd, even, odd }
+                    2'b00: begin
+                        compute[48:63] = reg_a_data[56:63] * reg_b_data[56:63]; // byte 7
+                        compute[32:47] = reg_a_data[40:47] * reg_b_data[40:47]; // byte 5
+                        compute[16:31] = reg_a_data[24:31] * reg_b_data[24:31]; // byte 3 
+                        compute[0:15]  = reg_a_data[8:15]  * reg_b_data[8:15];  // byte 1
+                    end
+
                     
-                    // 16b multiplication (16-bit * 16-bit -> 32-bit result) - Odd indices
-                    2'b01: compute = { reg_a_data[16:31] * reg_b_data[16:31], reg_a_data[48:63] * reg_b_data[48:63] };
+                    // 16b multiplication (16b × 16b = 32b × 2 lanes)
+                    2'b01: begin
+                        compute[0:31]   = reg_a_data[16:31]   * reg_b_data[16:31];    
+                        compute[32:63]  = reg_a_data[48:63]  * reg_b_data[48:63];   
+                    end
                     
-                    // 32b multiplication (32-bit * 32-bit -> 64-bit result) - Odd indices
-                    2'b10: compute = { reg_a_data[32:63] * reg_b_data[32:63] };
-            
+                    // 32b multiplication (32b × 32b = 64b result)
+                    2'b10: begin
+                        compute[0:63] = reg_a_data[32:63] * reg_b_data[32:63];
+                    end
+                    // 2'b11 not possible
                     default: compute = 64'b0;
                 endcase
             end
