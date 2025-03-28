@@ -26,7 +26,7 @@ module alu (
         VOR     = 6'b000010, // 2  - or - done
         VXOR    = 6'b000011, // 3  - xor - done
         VNOT    = 6'b000100, // 4  - not - done
-        VMOV    = 6'b000101, // 5  - move - done
+        //VMOV    = 6'b000101, // 5  - move - done
         VADD    = 6'b000110, // 6  - add - done
         VSUB    = 6'b000111, // 7  - sub - done
         VMULEU  = 6'b001000, // 8  - multiply even unsigned - done
@@ -69,7 +69,7 @@ module alu (
 
             // just take the the incoming reg_A data to be written back in the WB stage
             // maybe check PPP field?
-            VMOV: compute = reg_a_data;
+            //VMOV: compute = reg_a_data;
 
             // Arithmetic ops
             VADD: begin                     // Arithmetic ADD (width-dependent)
@@ -174,10 +174,10 @@ module alu (
             //   1101_1110_1111_0000   // [48:63]  = 0xDEF0
             //
             // reg_B = 64'b
-            //   xxxx_xxxx_xxxx_0001   // [0:15]   = shift0 = 1  → used for reg_A[0:15]
-            //   xxxx_xxxx_xxxx_0010   // [16:31]  = shift1 = 2  → used for reg_A[16:31]
-            //   xxxx_xxxx_xxxx_0011   // [32:47]  = shift2 = 3  → used for reg_A[32:47]
-            //   xxxx_xxxx_xxxx_0100   // [48:63]  = shift3 = 4  → used for reg_A[48:63]
+            //   xxxx_xxxx_xxxx_0001   // [0:15]   = shift0 = 1  ? used for reg_A[0:15]
+            //   xxxx_xxxx_xxxx_0010   // [16:31]  = shift1 = 2  ? used for reg_A[16:31]
+            //   xxxx_xxxx_xxxx_0011   // [32:47]  = shift2 = 3  ? used for reg_A[32:47]
+            //   xxxx_xxxx_xxxx_0100   // [48:63]  = shift3 = 4  ? used for reg_A[48:63]
             //
             // Result (compute):
             // compute[0:15]   = reg_A[0:15]   << reg_B[0:3];    // 0x1234 << 1 = 0x2468 = 0010_0100_0110_1000
@@ -195,66 +195,73 @@ module alu (
             // << should not wrap or borrow bits from adjacent slices
             VSLL: begin
                 case (width)
-                    2'b00: begin // Byte mode (8b), shift = 3 bits
-                        compute[0:7]    = reg_a_data[0:7]    << reg_b_data[0:2];
-                        compute[8:15]   = reg_a_data[8:15]   << reg_b_data[8:10];
-                        compute[16:23]  = reg_a_data[16:23]  << reg_b_data[16:18];
-                        compute[24:31]  = reg_a_data[24:31]  << reg_b_data[24:26];
-                        compute[32:39]  = reg_a_data[32:39]  << reg_b_data[32:34];
-                        compute[40:47]  = reg_a_data[40:47]  << reg_b_data[40:42];
-                        compute[48:55]  = reg_a_data[48:55]  << reg_b_data[48:50];
-                        compute[56:63]  = reg_a_data[56:63]  << reg_b_data[56:58];
+                // weird issue at 00
+                    2'b00:  begin
+                        compute[56:63] = reg_a_data[56:63] << reg_b_data[62:63]; // byte 0 (MSB)
+                        compute[48:55] = reg_a_data[48:55] << reg_b_data[54:55]; // byte 1
+                        compute[40:47] = reg_a_data[40:47] << reg_b_data[46:47]; // byte 2
+                        compute[32:39] = reg_a_data[32:39] << reg_b_data[38:39]; // byte 3
+                        compute[24:31] = reg_a_data[24:31] << reg_b_data[30:31]; // byte 4
+                        compute[16:23] = reg_a_data[16:23] << reg_b_data[22:23]; // byte 5
+                        compute[8:15]  = reg_a_data[8:15]  << reg_b_data[14:15];  // byte 6
+                        compute[0:7]   = reg_a_data[0:7]   << reg_b_data[6:7];   // byte 7 (LSB)
                     end
             
                     2'b01: begin // Half-word (16b), shift = 4 bits
-                        compute[0:15]   = reg_a_data[0:15]   << reg_b_data[0:3];
-                        compute[16:31]  = reg_a_data[16:31]  << reg_b_data[16:19];
-                        compute[32:47]  = reg_a_data[32:47]  << reg_b_data[32:35];
-                        compute[48:63]  = reg_a_data[48:63]  << reg_b_data[48:51];
+                        compute[0:15]  = reg_a_data[0:15]  << reg_b_data[12:15];   // halfword 3
+                        compute[16:31] = reg_a_data[16:31] << reg_b_data[28:31]; // halfword 2
+                        compute[32:47] = reg_a_data[32:47] << reg_b_data[44:47]; // halfword 1
+                        compute[48:63] = reg_a_data[48:63] << reg_b_data[60:63]; // halfword 0
                     end
             
                     2'b10: begin // Word (32b), shift = 5 bits
-                        compute[0:31]   = reg_a_data[0:31]   << reg_b_data[0:4];
-                        compute[32:63]  = reg_a_data[32:63]  << reg_b_data[32:36];
+                        compute[32:63]  = reg_a_data[32:63] << reg_b_data[59:63];   // LSB word
+                        compute[0:31]   = reg_a_data[0:31]  << reg_b_data[27:31]; // MSB word
                     end
             
                     2'b11: begin // Double-word (64-bit), shift = 6 bits
-                        compute[0:63] = reg_a_data[0:63] << reg_b_data[0:5];
+                        compute[0:63] = reg_a_data[0:63] << reg_b_data[58:63];   // use MSB 6 bits
                     end
                 endcase
             end
             
             VSRL: begin  
                 case (width)
-                    2'b00: begin // Byte mode (8b), shift = 3 bits
-                        compute[0:7]    = reg_a_data[0:7]    >> reg_b_data[0:2];
-                        compute[8:15]   = reg_a_data[8:15]   >> reg_b_data[8:10];
-                        compute[16:23]  = reg_a_data[16:23]  >> reg_b_data[16:18];
-                        compute[24:31]  = reg_a_data[24:31]  >> reg_b_data[24:26];
-                        compute[32:39]  = reg_a_data[32:39]  >> reg_b_data[32:34];
-                        compute[40:47]  = reg_a_data[40:47]  >> reg_b_data[40:42];
-                        compute[48:55]  = reg_a_data[48:55]  >> reg_b_data[48:50];
-                        compute[56:63]  = reg_a_data[56:63]  >> reg_b_data[56:58];
+                    // Byte mode (8-bit fields), shift = 3 bits
+                    // weird issue at 00
+                    2'b00: begin
+                        compute[56:63] = reg_a_data[56:63] >> reg_b_data[62:63]; // byte 0 (MSB)
+                        compute[48:55] = reg_a_data[48:55] >> reg_b_data[54:55]; // byte 1
+                        compute[40:47] = reg_a_data[40:47] >> reg_b_data[46:47]; // byte 2
+                        compute[32:39] = reg_a_data[32:39] >> reg_b_data[38:39]; // byte 3
+                        compute[24:31] = reg_a_data[24:31] >> reg_b_data[30:31]; // byte 4
+                        compute[16:23] = reg_a_data[16:23] >> reg_b_data[22:23]; // byte 5
+                        compute[8:15]  = reg_a_data[8:15]  >> reg_b_data[14:15];  // byte 6
+                        compute[0:7]   = reg_a_data[0:7]   >> reg_b_data[6:7];   // byte 7 (LSB)
                     end
             
-                    2'b01: begin // Half-word (16b), shift = 4 bits
-                        compute[0:15]   = reg_a_data[0:15]   >> reg_b_data[0:3];
-                        compute[16:31]  = reg_a_data[16:31]  >> reg_b_data[16:19];
-                        compute[32:47]  = reg_a_data[32:47]  >> reg_b_data[32:35];
-                        compute[48:63]  = reg_a_data[48:63]  >> reg_b_data[48:51];
+                    // Half-word mode (16-bit), shift = 4 bits
+                    2'b01: begin
+                        compute[0:15]  = reg_a_data[0:15]  >> reg_b_data[12:15];   // halfword 3
+                        compute[16:31] = reg_a_data[16:31] >> reg_b_data[28:31]; // halfword 2
+                        compute[32:47] = reg_a_data[32:47] >> reg_b_data[44:47]; // halfword 1
+                        compute[48:63] = reg_a_data[48:63] >> reg_b_data[60:63]; // halfword 0
                     end
             
-                    2'b10: begin // Word (32b), shift = 5 bits
-                        compute[0:31]   = reg_a_data[0:31]   >> reg_b_data[0:4];
-                        compute[32:63]  = reg_a_data[32:63]  >> reg_b_data[32:36];
+                    // Word mode (32-bit), shift = 5 bits
+                    2'b10: begin // Word mode (32-bit), shift = 5 bits
+                        compute[32:63]  = reg_a_data[32:63] >> reg_b_data[59:63];   // LSB word
+                        compute[0:31]   = reg_a_data[0:31]  >> reg_b_data[27:31]; // MSB word
                     end
+
             
-                    2'b11: begin // Double-word (64b), shift = 6 bits
-                        compute[0:63] = reg_a_data[0:63] >> reg_b_data[0:5];
+                    // Double-word (64-bit), shift = 6 bits
+                    2'b11: begin
+                        compute[0:63] = reg_a_data[0:63] >> reg_b_data[58:63];   // use MSB 6 bits
                     end
                 endcase
             end
-            
+
             VSRA  : begin  
             
             end
