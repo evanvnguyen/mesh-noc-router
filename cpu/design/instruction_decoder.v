@@ -107,6 +107,8 @@ always @(instruction) begin
         bez = 1'b1;
         rD_address = instruction[RD_MSB:RD_LSB];
         rA_address = 5'b0;
+        // We set this to rB so we can get the data from the RF
+        rB_address = instruction[RD_MSB:RD_LSB];
         immediate_address = instruction[IM_MSB:IM_LSB];
       end
 
@@ -114,6 +116,8 @@ always @(instruction) begin
         bnez = 1'b1;
         rD_address = instruction[RD_MSB:RD_LSB];
         rA_address = 5'b0;
+        // We set this to rB so we can get the data from the RF
+        rB_address = instruction[RD_MSB:RD_LSB];
         immediate_address = instruction[IM_MSB:IM_LSB];
       end
 
