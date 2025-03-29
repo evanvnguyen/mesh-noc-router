@@ -1,6 +1,6 @@
 `timescale 1ps / 1ps
 
-module alu_tb;
+module tb; 
 
     // Inputs
     reg ld, sd;
@@ -208,7 +208,29 @@ module alu_tb;
                 $display("(FAIL) VSRL - Width %b: regA = %h, regB = %h, compute = %h (expected %h)", width, regA, regB, alu_out, expected);
         end
     endtask
-    
+   
+    task execute_vdiv;
+	input [0:63] regA;
+	input [0:63] regB;
+	input [0:63] expected;
+	input [1:0]  width_setting;
+	begin
+	    alu = 1; sfu = 0;
+	    alu_op = 6'b001010; // VDIV operation (unsigned division)
+	    width  = width_setting;
+	    reg_a_data = regA;
+	    reg_b_data = regB;
+	    #10;
+	    if (alu_out === expected)
+		$display("(PASS) VDIV - Width %b: regA = %h, regB = %h, compute = %h (expected %h)",
+			  width, regA, regB, alu_out, expected);
+	    else
+		$display("(FAIL) VDIV - Width %b: regA = %h, regB = %h, compute = %h (expected %h)",
+			  width, regA, regB, alu_out, expected);
+	end
+    endtask
+
+ 
     task execute_vsll;
         input [0:63] regA;
         input [0:63] regB;
@@ -715,6 +737,16 @@ module alu_tb;
             2'b11
         );
 
+	// ===================================================================
+        //  VDIV Instruction Test Cases
+        //  - regA divided by regB per width
+        //  - test cases will fail but its due to DW truncation
+        // ===================================================================
+
+	execute_vdiv(64'hFF00FF00FF00FF00, 64'h0101010101010101, 64'hFF00FF00FF00FF00, 2'b00);
+	execute_vdiv(64'h0001FFFF0001FFFF, 64'h0000000100000001, 64'h0001FFFF0001FFFF, 2'b01);
+	execute_vdiv(64'h0000FFFF0000FFFF, 64'h0000000100000001, 64'h0000FFFF0000FFFF, 2'b10);
+	execute_vdiv(64'h1234567812345678, 64'h0000000100000001, 64'h1234567812345678, 2'b11);
 
         
         // ===================================================================
@@ -827,15 +859,15 @@ module alu_tb;
         //  VSRA Instruction Test Cases
         //  - Performs arithmetic right shift on each data field in regA
         //  - Each field's bit-width is based on `width` (WW) setting:
-        //      00 → 8-bit fields   (8 results × 8-bit)
-        //      01 → 16-bit fields  (4 results × 16-bit)
-        //      10 → 32-bit fields  (2 results × 32-bit)
-        //      11 → 64-bit field   (1 result  × 64-bit)
-        //  - regB contains the per-field shift amounts
-        //      • For WW = 00 → 3-bit shift fields per 8-bit lane
-        //      • For WW = 01 → 4-bit shift fields per 16-bit lane
-        //      • For WW = 10 → 5-bit shift fields per 32-bit lane
-        //      • For WW = 11 → 6-bit shift value for full 64-bit word
+        // 00 → 8-bit fields   (8 results × 8-bit)
+        // 01 → 16-bit fields  (4 results × 16-bit)
+        // 10 → 32-bit fields  (2 results × 32-bit)
+        // 11 → 64-bit field   (1 result  × 64-bit)
+        // - regB contains the per-field shift amounts
+        // For WW = 00 → 3-bit shift fields per 8-bit lane
+        // For WW = 01 → 4-bit shift fields per 16-bit lane
+        // For WW = 10 → 5-bit shift fields per 32-bit lane
+        // For WW = 11 → 6-bit shift value for full 64-bit word
         //  - Sign bit (MSB of each field) is extended during shift
         //  - Results are packed into a single 64-bit value in field order
         // ===================================================================
