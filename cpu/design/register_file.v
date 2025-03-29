@@ -11,7 +11,7 @@ module register_file (
   output reg [0:63] rB_data
 );
 
-reg [63:0] registerFile [31:0]; 
+reg [0:63] registerFile [0:31]; 
 reg writeEn;
 
 always @(*) begin
@@ -73,25 +73,25 @@ always @(posedge clk) begin
           end
 
           001: begin
-            register_file[rD_address][0:31] = rD_data[0:31];
+            registerFile[rD_address][0:31] = rD_data[0:31];
           end
 
           010: begin
-            register_file[rD_address][32:63] = rD_data[32:63];
+            registerFile[rD_address][32:63] = rD_data[32:63];
           end
 
           011: begin
-            register_file[rD_address][0:7] = rD_data[0:7];
-            register_file[rD_address][16:23] = rD_data[16:23];
-            register_file[rD_address][32:39] = rD_data[32:39];
-            register_file[rD_address][48:55] = rD_data[48:55];
+            registerFile[rD_address][0:7] = rD_data[0:7];
+            registerFile[rD_address][16:23] = rD_data[16:23];
+            registerFile[rD_address][32:39] = rD_data[32:39];
+            registerFile[rD_address][48:55] = rD_data[48:55];
           end
 
           100: begin
-            register_file[rD_address][8:15] = rD_data[8:15];
-            register_file[rD_address][24:31] = rD_data[24:31];
-            register_file[rD_address][40:47] = rD_data[40:47];
-            register_file[rD_address][56:63] = rD_data[56:63];
+            registerFile[rD_address][8:15] = rD_data[8:15];
+            registerFile[rD_address][24:31] = rD_data[24:31];
+            registerFile[rD_address][40:47] = rD_data[40:47];
+            registerFile[rD_address][56:63] = rD_data[56:63];
           end
         endcase
       end

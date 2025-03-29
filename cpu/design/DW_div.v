@@ -53,7 +53,7 @@ module DW_div (a, b, quotient, remainder, divide_by_0);
   reg 		       b_x;
 
   // include modeling functions
-`include "/home/viterbi/05/evannguy/577B/project_alu/sim/design/DW_div_function.inc"
+`include "DW_div_function.inc"
 
   
  

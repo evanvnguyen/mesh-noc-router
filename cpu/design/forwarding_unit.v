@@ -1,8 +1,8 @@
 module forwarding_unit(
-  input id_rA_address,
-  input id_rB_address,
-  input ex_rA_address,
-  input ex_rB_address,
+  input [0:4] id_rA_address,
+  input [0:4] id_rB_address,
+  input [0:4] ex_rA_address,
+  input [0:4] ex_rB_address,
   output forward_rA,
   output forward_rB
 );

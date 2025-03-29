@@ -1,6 +1,7 @@
 module program_counter (
   input clk,
   input reset,
+  input stall,
   output reg [0:31] pc_out
 );
 
@@ -8,7 +9,8 @@ module program_counter (
     if (reset)
       pc_out <= 64'b0;
     else 
-      pc_out <= pc_out + 4;
+      if (!stall)
+        pc_out <= pc_out + 4;
   end
 
 endmodule

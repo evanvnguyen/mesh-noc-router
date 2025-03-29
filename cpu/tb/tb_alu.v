@@ -344,7 +344,7 @@ module tb;
     
         begin
             alu = 1; sfu = 0;
-            alu_op = 6'b001011; // hypothetical opcode for VSRA
+            alu_op = 6'b001100; // hypothetical opcode for VSRA
             width = width_setting;
             reg_a_data = regA;
             reg_b_data = regB;
@@ -359,6 +359,26 @@ module tb;
         end
     endtask
 
+    task execute_vsqrt;
+        input [0:63] regA;
+        input [0:63] expected;
+        input [1:0]  width_setting;
+    
+        begin
+            alu = 1; sfu = 0;
+            alu_op = 6'b010010; // hypothetical opcode for VSQR
+            width = width_setting;
+            reg_a_data = regA;
+            #10;
+    
+            if (alu_out === expected)
+                $display("(PASS) VSQRT - Width %b: regA = %h,compute = %h (expected %h)",
+                         width, regA, alu_out, expected);
+            else
+                $display("(FAIL) VSQRT - Width %b: regA = %h, compute = %h (expected %h)",
+                         width, regA, alu_out, expected);
+        end
+    endtask
 
     initial begin
         $display("Starting ALU test...");
@@ -647,8 +667,8 @@ module tb;
 
         // --- Byte mode (width = 2'b00) ---
         // Only bytes [1], [3], [5], [7] are multiplied
-       // WW = 00 → 8b chunks (odd indices only), result = 16b chunks
-        // WW = 00 → 8b chunks (odd indices only), result = 16b chunks
+       // WW = 00 â†’ 8b chunks (odd indices only), result = 16b chunks
+        // WW = 00 â†’ 8b chunks (odd indices only), result = 16b chunks
         execute_vmulou(
             64'h771e75677c50afdb,
             64'hf52036a015550881,
@@ -656,7 +676,7 @@ module tb;
             2'b00
         );
         
-        // WW = 01 → 16b chunks (odd indices only), result = 32b chunks
+        // WW = 01 â†’ 16b chunks (odd indices only), result = 32b chunks
         execute_vmulou(
             64'h07aee4abdacfa1a3,
             64'h21c3c968628eb93c,
@@ -664,7 +684,7 @@ module tb;
             2'b01
         );
         
-        // WW = 10 → 32b chunks (odd index only), result = 64b chunk
+        // WW = 10 â†’ 32b chunks (odd index only), result = 64b chunk
         execute_vmulou(
             64'hf7c60e2d6f8d1c01,
             64'h62f48db034736c2d,
@@ -869,28 +889,28 @@ module tb;
         //  VSQEU Instruction Test Cases
         //  - Squares only the even-indexed fields of regA
         //  - Each field's bit-width is based on `width` (WW) setting:
-        //      00 → 8-bit fields (4 results × 16-bit)
-        //      01 → 16-bit fields (2 results × 32-bit)
-        //      10 → 32-bit field  (1 result × 64-bit)
+        //      00 â†’ 8-bit fields (4 results Ã— 16-bit)
+        //      01 â†’ 16-bit fields (2 results Ã— 32-bit)
+        //      10 â†’ 32-bit field  (1 result Ã— 64-bit)
         //  - Results are zero-padded into 64-bit result
         //  - regB is unused (set to 0)
         // ===================================================================
 
-        // WW = 00 → 8b chunks (even indices only), result = 16b chunks
+        // WW = 00 â†’ 8b chunks (even indices only), result = 16b chunks
         execute_vsqeu(
             64'haa0f0103aa03aa0f,
             64'h70e4000170e470e4,
             2'b00
         );
         
-        // WW = 01 → 16b chunks (even indices only), result = 32b chunks
+        // WW = 01 â†’ 16b chunks (even indices only), result = 32b chunks
         execute_vsqeu(
             64'h00aa000f0001000f,
             64'h000070e400000001,
             2'b01
         );
         
-        // WW = 10 → 32b chunks (even index only), result = 64b chunk
+        // WW = 10 â†’ 32b chunks (even index only), result = 64b chunk
         execute_vsqeu(
             64'h0000000f0000000f,
             64'h00000000000000e1,
@@ -901,28 +921,28 @@ module tb;
         //  VSQOU Instruction Test Cases
         //  - Squares only the odd-indexed fields of regA
         //  - Each field's bit-width is based on `width` (WW) setting:
-        //      00 → 8-bit fields (4 results × 16-bit)
-        //      01 → 16-bit fields (2 results × 32-bit)
-        //      10 → 32-bit field  (1 result × 64-bit)
+        //      00 â†’ 8-bit fields (4 results Ã— 16-bit)
+        //      01 â†’ 16-bit fields (2 results Ã— 32-bit)
+        //      10 â†’ 32-bit field  (1 result Ã— 64-bit)
         //  - Results are zero-padded into 64-bit result
         //  - regB is unused (set to 0)
         // ===================================================================
 
-        // WW = 00 → 8b chunks (odd indices only), result = 16b chunks
+        // WW = 00 â†’ 8b chunks (odd indices only), result = 16b chunks
         execute_vsqou(
             64'hdc568eac28cba0ff,
             64'h1ce47390a0f9fe01,
             2'b00
         );
         
-        // WW = 01 → 16b chunks (odd indices only), result = 32b chunks
+        // WW = 01 â†’ 16b chunks (odd indices only), result = 32b chunks
         execute_vsqou(
             64'h4f392493b2ed5518,
             64'h0539ac691c48f240,
             2'b01
         );
         
-        // WW = 10 → 32b chunks (odd index only), result = 64b chunk
+        // WW = 10 â†’ 32b chunks (odd index only), result = 64b chunk
         execute_vsqou(
             64'h130d325bc2aa466d,
             64'h940683fed023ca69,
@@ -933,20 +953,20 @@ module tb;
         //  VSRA Instruction Test Cases
         //  - Performs arithmetic right shift on each data field in regA
         //  - Each field's bit-width is based on `width` (WW) setting:
-        // 00 → 8-bit fields   (8 results × 8-bit)
-        // 01 → 16-bit fields  (4 results × 16-bit)
-        // 10 → 32-bit fields  (2 results × 32-bit)
-        // 11 → 64-bit field   (1 result  × 64-bit)
+        // 00 8-bit fields   (8 results — 8-bit)
+        // 01 16-bit fields  (4 results — 16-bit)
+        // 10 32-bit fields  (2 results — 32-bit)
+        // 11 64-bit field   (1 result  — 64-bit)
         // - regB contains the per-field shift amounts
-        // For WW = 00 → 3-bit shift fields per 8-bit lane
-        // For WW = 01 → 4-bit shift fields per 16-bit lane
-        // For WW = 10 → 5-bit shift fields per 32-bit lane
-        // For WW = 11 → 6-bit shift value for full 64-bit word
+        // For WW = 00 3-bit shift fields per 8-bit lane
+        // For WW = 01 4-bit shift fields per 16-bit lane
+        // For WW = 10 5-bit shift fields per 32-bit lane
+        // For WW = 11 6-bit shift value for full 64-bit word
         //  - Sign bit (MSB of each field) is extended during shift
         //  - Results are packed into a single 64-bit value in field order
         // ===================================================================
 
-        // WW = 00 → 8-bit fields, arithmetic shift right
+        // WW = 00  8-bit fields, arithmetic shift right
         execute_vsra(
             64'h03aaaaaa01010301,
             64'h0000000000550ba1,
@@ -954,7 +974,7 @@ module tb;
             2'b00
         );
         
-        // WW = 01 → 16-bit fields, arithmetic shift right
+        // WW = 01 16-bit fields, arithmetic shift right
         execute_vsra(
             64'h0055000f00030055,
             64'h00000000000005b4,
@@ -962,7 +982,7 @@ module tb;
             2'b01
         );
         
-        // WW = 10 → 32-bit fields, arithmetic shift right
+        // WW = 10  32-bit fields, arithmetic shift right
         execute_vsra(
             64'h0000005500000001,
             64'h0000000000000130,
@@ -970,14 +990,61 @@ module tb;
             2'b10
         );
         
-        // WW = 11 → 64-bit field, arithmetic shift right
+        // WW = 11 64-bit field, arithmetic shift right
         execute_vsra(
             64'h00000000000000aa,
             64'h000000000000003a,
             64'h0000000000000000,
             2'b11
         );
-    
+        
+        // ===================================================================
+        //  VSQR Instruction Test Cases
+        // - does a square root based on the width and chunk
+        // ===================================================================
+        
+        // WW = 00  8-bit fields
+        // hex --- decimal
+        // 40  --- 64
+        // 10  --- 16
+        // 64  --- 100
+        execute_vsqrt(
+            64'h40_10_64_00_04_00_90_00,
+            64'h08_04_0a_00_02_00_0C_00,
+            2'b00
+        );
+        
+        // WW = 01 16-bit fields
+        // hex --- decimal - result
+        // 31 --- 49          (7)
+        // 09 ---  9          (3)
+        // 121 -  289         (17)
+        // 3931 -- 14,641     (121)
+         execute_vsqrt (
+            64'h0031_0009_0121_3931,
+            64'h0007_0003_0011_0079,
+            2'b01
+        );
+        
+        //// WW = 10  32-bit field
+        // hex -------- decimal -------- result
+        // 0259 A9E1 
+        // 075B C371 
+        execute_vsqrt(
+            64'h00CB4904_075BC371,
+            64'h00000E42_00002B67,
+            2'b10
+        );
+        
+        // WW = 11 64-bit field
+        // 123456789 * 123456789 == h003626229738A3B9
+        // result should be 75BCD15
+        execute_vsqrt(
+            64'h003626229738A3B9,
+            64'h00000000075BCD15,
+            2'b11
+        );
+        
         // Stop simulation
         $display("Test complete.");
         $finish;
