@@ -1,4 +1,4 @@
-`include "/usr/local/synopsys/Design_Compiler/K-2015.06-SP5-5/dw/sim_ver/DW_div.v"
+`include "/home/viterbi/05/evannguy/577B/project_alu/sim/design/DW_div.v"
 
 `timescale 1ps / 1ps
 
@@ -49,54 +49,80 @@ module alu (
         VNOP    = 6'b010111; // 23 - no op
 
     reg [0:63] compute; // for output
-    reg [0:63] quotient;
+    wire [0:63] quotient;
     
     reg [0:63] div_reg_a, div_reg_b;
+    wire [0:63] remainder;
 
     reg div_byte_mode;        
     reg div_half_word_mode;   
     reg div_word_mode    ; 
     reg div_double_word_mode;
+
+    reg rem_mode;
     
-    // if op is div, then bring the reg data to the div reg and do something with the dividers
+    reg mod_byte_mode;        
+    reg mod_half_word_mode;   
+    reg mod_word_mode    ; 
+    reg mod_double_word_mode;
+
+    // *******************
+    //  - VDIV/VMOD operation
+    // ******************
+    // - if op is div, then bring the reg data to the div reg and do something with the dividers
     // otherwise, divider input will be 0 and it will not do anything (hopefully)
-    always @(*) begin
-        if (alu_op == VDIV) begin
-            div_reg_a = reg_a_data;
-            div_reg_b = reg_b_data;
-            compute = quotient;
-        end else begin
-            div_reg_a = 0;
-            div_reg_b = 0;
-        end
-    
-    end
-    
+    //  - if we want the remainder, just pull compute to the remainder value as
+    // rem_mode = 0 (modulus mode)_
+//    always @(*) begin
+//	case (alu_op)
+//	    VDIV: begin
+//		div_reg_a = reg_a_data;
+//		div_reg_b = reg_b_data;
+//		compute   = quotient;
+//	    end
+//	    VMOD: begin
+//		div_reg_a = reg_a_data;
+//		div_reg_b = reg_b_data;
+//		compute   = remainder;
+//	    end
+//	    default: begin
+//		div_reg_a = 64'b0;
+//		div_reg_b = 64'b1;  // set to 1 to avoid divide-by-0
+//	    end
+//	endcase
+    //end
+ 
+
     // 8-bit (byte) mode: Instantiate eight dividers (one per 8-bit slice)
-    DW_div #(.a_width(8),  .b_width(8),  .tc_mode(0), .rem_mode(0)) DW_div_b_0 (.a(div_reg_a[0:7]),   .b(div_reg_b[0:7]),   .quotient(quotient[0:7]),   .remainder(), .divide_by_0());
-    DW_div #(.a_width(8),  .b_width(8),  .tc_mode(0), .rem_mode(0)) DW_div_b_1 (.a(div_reg_a[8:15]),  .b(div_reg_b[8:15]),  .quotient(quotient[8:15]),  .remainder(), .divide_by_0());
-    DW_div #(.a_width(8),  .b_width(8),  .tc_mode(0), .rem_mode(0)) DW_div_b_2 (.a(div_reg_a[16:23]), .b(div_reg_b[16:23]), .quotient(quotient[16:23]), .remainder(), .divide_by_0());
-    DW_div #(.a_width(8),  .b_width(8),  .tc_mode(0), .rem_mode(0)) DW_div_b_3 (.a(div_reg_a[24:31]), .b(div_reg_b[24:31]), .quotient(quotient[24:31]), .remainder(), .divide_by_0());
-    DW_div #(.a_width(8),  .b_width(8),  .tc_mode(0), .rem_mode(0)) DW_div_b_4 (.a(div_reg_a[32:39]), .b(div_reg_b[32:39]), .quotient(quotient[32:39]), .remainder(), .divide_by_0());
-    DW_div #(.a_width(8),  .b_width(8),  .tc_mode(0), .rem_mode(0)) DW_div_b_5 (.a(div_reg_a[40:47]), .b(div_reg_b[40:47]), .quotient(quotient[40:47]), .remainder(), .divide_by_0());
-    DW_div #(.a_width(8),  .b_width(8),  .tc_mode(0), .rem_mode(0)) DW_div_b_6 (.a(div_reg_a[48:55]), .b(div_reg_b[48:55]), .quotient(quotient[48:55]), .remainder(), .divide_by_0());
-    DW_div #(.a_width(8),  .b_width(8),  .tc_mode(0), .rem_mode(0)) DW_div_b_7 (.a(div_reg_a[56:63]), .b(div_reg_b[56:63]), .quotient(quotient[56:63]), .remainder(), .divide_by_0());
+    // rem_mode = 0 = modulus
+    // rem_mode = 1 = division remainder
+    // - keep at modulus mode and take the remainder when we need it (see
+    // above always case)
+    DW_div #(.a_width(8),  .b_width(8),  .tc_mode(0), .rem_mode(0)) DW_div_b_0 (.a(div_reg_a[0:7]),   .b(div_reg_b[0:7]),   .quotient(quotient[0:7]),   .remainder(remainder[0:7]), .divide_by_0());
+    DW_div #(.a_width(8),  .b_width(8),  .tc_mode(0), .rem_mode(0)) DW_div_b_1 (.a(div_reg_a[8:15]),  .b(div_reg_b[8:15]),  .quotient(quotient[8:15]),  .remainder(remainder[8:15]), .divide_by_0());
+    DW_div #(.a_width(8),  .b_width(8),  .tc_mode(0), .rem_mode(0)) DW_div_b_2 (.a(div_reg_a[16:23]), .b(div_reg_b[16:23]), .quotient(quotient[16:23]), .remainder(remainder[16:23]), .divide_by_0());
+    DW_div #(.a_width(8),  .b_width(8),  .tc_mode(0), .rem_mode(0)) DW_div_b_3 (.a(div_reg_a[24:31]), .b(div_reg_b[24:31]), .quotient(quotient[24:31]), .remainder(remainder[24:31]), .divide_by_0());
+    DW_div #(.a_width(8),  .b_width(8),  .tc_mode(0), .rem_mode(0)) DW_div_b_4 (.a(div_reg_a[32:39]), .b(div_reg_b[32:39]), .quotient(quotient[32:39]), .remainder(remainder[32:39]), .divide_by_0());
+    DW_div #(.a_width(8),  .b_width(8),  .tc_mode(0), .rem_mode(0)) DW_div_b_5 (.a(div_reg_a[40:47]), .b(div_reg_b[40:47]), .quotient(quotient[40:47]), .remainder(remainder[40:47]), .divide_by_0());
+    DW_div #(.a_width(8),  .b_width(8),  .tc_mode(0), .rem_mode(0)) DW_div_b_6 (.a(div_reg_a[48:55]), .b(div_reg_b[48:55]), .quotient(quotient[48:55]), .remainder(remainder[48:55]), .divide_by_0());
+    DW_div #(.a_width(8),  .b_width(8),  .tc_mode(0), .rem_mode(0)) DW_div_b_7 (.a(div_reg_a[56:63]), .b(div_reg_b[56:63]), .quotient(quotient[56:63]), .remainder(remainder[56:63]), .divide_by_0());
     
     // 16-bit (half-word) mode: Instantiate four dividers (one per 16-bit slice)
-    DW_div #(.a_width(16), .b_width(16), .tc_mode(0), .rem_mode(0)) DW_div_h_0 (.a(div_reg_a[0:15]),   .b(div_reg_b[0:15]),   .quotient(quotient[0:15]),   .remainder(),  .divide_by_0());
-    DW_div #(.a_width(16), .b_width(16), .tc_mode(0), .rem_mode(0)) DW_div_h_1 (.a(div_reg_a[16:31]),  .b(div_reg_b[16:31]),  .quotient(quotient[16:31]),  .remainder(),  .divide_by_0());
-    DW_div #(.a_width(16), .b_width(16), .tc_mode(0), .rem_mode(0)) DW_div_h_2 (.a(div_reg_a[32:47]),  .b(div_reg_b[32:47]),  .quotient(quotient[32:47]),  .remainder(),  .divide_by_0());
-    DW_div #(.a_width(16), .b_width(16), .tc_mode(0), .rem_mode(0)) DW_div_h_3 (.a(div_reg_a[48:63]),  .b(div_reg_b[48:63]),  .quotient(quotient[48:63]),  .remainder(),  .divide_by_0());
+    DW_div #(.a_width(16), .b_width(16), .tc_mode(0), .rem_mode(0)) DW_div_h_0 (.a(div_reg_a[0:15]),   .b(div_reg_b[0:15]),   .quotient(quotient[0:15]),   .remainder(remainder[0:15]),  .divide_by_0());
+    DW_div #(.a_width(16), .b_width(16), .tc_mode(0), .rem_mode(0)) DW_div_h_1 (.a(div_reg_a[16:31]),  .b(div_reg_b[16:31]),  .quotient(quotient[16:31]),  .remainder(remainder[16:31]),  .divide_by_0());
+    DW_div #(.a_width(16), .b_width(16), .tc_mode(0), .rem_mode(0)) DW_div_h_2 (.a(div_reg_a[32:47]),  .b(div_reg_b[32:47]),  .quotient(quotient[32:47]),  .remainder(remainder[32:47]),  .divide_by_0());
+    DW_div #(.a_width(16), .b_width(16), .tc_mode(0), .rem_mode(0)) DW_div_h_3 (.a(div_reg_a[48:63]),  .b(div_reg_b[48:63]),  .quotient(quotient[48:63]),  .remainder(remainder[48:63]),  .divide_by_0());
     
     // 32-bit (word) mode: Instantiate two dividers (one per 32-bit slice)
-    DW_div #(.a_width(32), .b_width(32), .tc_mode(0), .rem_mode(0)) DW_div_w_0 (.a(div_reg_a[0:31]),  .b(div_reg_b[0:31]),  .quotient(quotient[0:31]),  .remainder(),  .divide_by_0());
-    DW_div #(.a_width(32), .b_width(32), .tc_mode(0), .rem_mode(0)) DW_div_w_1 (.a(div_reg_a[32:63]), .b(div_reg_b[32:63]), .quotient(quotient[32:63]), .remainder(),  .divide_by_0());
+    DW_div #(.a_width(32), .b_width(32), .tc_mode(0), .rem_mode(0)) DW_div_w_0 (.a(div_reg_a[0:31]),  .b(div_reg_b[0:31]),  .quotient(quotient[0:31]),  .remainder(remainder[0:31]),  .divide_by_0());
+    DW_div #(.a_width(32), .b_width(32), .tc_mode(0), .rem_mode(0)) DW_div_w_1 (.a(div_reg_a[32:63]), .b(div_reg_b[32:63]), .quotient(quotient[32:63]), .remainder(remainder[32:63]),  .divide_by_0());
     
     // 64-bit (double-word) mode: Instantiate one divider (entire 64-bit value)
-    DW_div #(.a_width(64), .b_width(64), .tc_mode(0), .rem_mode(0)) DW_div_d_0 (.a(reg_a_data[0:63]),  .b(reg_b_data[0:63]),  .quotient(quotient[0:63]),  .remainder(),  .divide_by_0());
+    DW_div #(.a_width(64), .b_width(64), .tc_mode(0), .rem_mode(0)) DW_div_d_0 (.a(reg_a_data[0:63]),  .b(reg_b_data[0:63]),  .quotient(quotient[0:63]),  .remainder(remainder[0:63]),  .divide_by_0());
+    
     
 
-    // do math shit
+    // Do math shit
     always @(*) begin
         case (alu_op)
         
@@ -172,7 +198,18 @@ module alu (
                     default:   compute = 64'b0;  
                 endcase
             end
-            
+	    
+	    VDIV: begin
+		div_reg_a = reg_a_data;
+		div_reg_b = reg_b_data;
+		compute   = quotient;
+	    end
+	    VMOD: begin
+		div_reg_a = reg_a_data;
+		div_reg_b = reg_b_data;
+		compute   = remainder;
+	    end
+
             VMULEU: begin                     // Arithmetic EVEN index MUL (width-dependent)
                 case (width)
                     // 8b multiplication // take even indice { even, odd, even, odd, even, odd }
@@ -366,48 +403,7 @@ module alu (
                 endcase
             end
             
-            VDIV  : begin  
-                 // control for the division
-                 case (width)
-                    2'b00: div_byte_mode = 1;
-                    2'b01: div_half_word_mode = 1;
-                    2'b10: div_word_mode = 1;
-                    2'b11: div_double_word_mode = 1;
-                 endcase
-            end
-            
-            VMOD  : begin  
-                // just gets the least significant bit
-                case (width)
-                // 8b addition (byte)
-                    2'b00: compute = {
-                        reg_a_data[0:7]   % 2,
-                        reg_a_data[8:15]  % 2,
-                        reg_a_data[16:23] % 2,
-                        reg_a_data[24:31] % 2,
-                        reg_a_data[32:39] % 2,
-                        reg_a_data[40:47] % 2,
-                        reg_a_data[48:55] % 2,
-                        reg_a_data[56:63] % 2
-                    };
-                    // 16b addition (half-word)
-                    2'b01: compute = {  
-                        reg_a_data[0:15]  % 2,
-                        reg_a_data[16:31] % 2,
-                        reg_a_data[32:47] % 2,
-                        reg_a_data[48:63] % 2
-                    };
-                     // 32b addition (word)
-                    2'b10: compute = {
-                        reg_a_data[0:31]  % 2,
-                        reg_a_data[32:63] % 2
-                    };
-                    // 64b (double-word, keep the same)
-                    2'b11: compute = reg_a_data % 2;  
-                    default:   compute = 64'b0;  
-                endcase
-            end
-            
+                        
             VSQEU : begin  // Arithmetic EVEN index SQUARE (width-dependent)
                 case (width)
                     // 8b multiplication // take even indice { even, odd, even, odd, even, odd }
