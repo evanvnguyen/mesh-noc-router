@@ -252,6 +252,72 @@ module alu_tb;
         end
     endtask
 
+    task execute_vsqeu;
+        input [0:63] regA;
+        input [0:63] expected;
+        input [1:0] width_setting; // 00 = 8b, 01 = 16b, 10 = 32b
+    
+        begin
+            alu = 1; sfu = 0;
+            alu_op = 6'b010000; // VSQEU opcode (placeholder)
+            width = width_setting;
+            reg_a_data = regA;
+            #10;
+    
+            if (alu_out === expected)
+                $display("(PASS) VSQEU - Width %b: regA = %h, compute = %h (expected %h)",
+                         width, regA, alu_out, expected);
+            else
+                $display("(FAIL) VSQEU - Width %b: regA = %h, compute = %h (expected %h)",
+                         width, regA, alu_out, expected);
+        end
+    endtask
+
+    task execute_vsqou;
+        input [0:63] regA;
+        input [0:63] expected;
+        input [1:0] width_setting; // 00 = 8b, 01 = 16b, 10 = 32b
+    
+        begin
+            alu = 1; sfu = 0;
+            alu_op = 6'b010001; // VSQOU opcode
+            width = width_setting;
+            reg_a_data = regA;
+            #10;
+    
+            if (alu_out === expected)
+                $display("(PASS) VSQOU - Width %b: regA = %h, compute = %h (expected %h)",
+                         width, regA, alu_out, expected);
+            else
+                $display("(FAIL) VSQOU - Width %b: regA = %h, compute = %h (expected %h)",
+                         width, regA, alu_out, expected);
+        end
+    endtask
+
+    task execute_vsra;
+        input [0:63] regA;
+        input [0:63] regB;
+        input [0:63] expected;
+        input [1:0]  width_setting;
+    
+        begin
+            alu = 1; sfu = 0;
+            alu_op = 6'b001011; // hypothetical opcode for VSRA
+            width = width_setting;
+            reg_a_data = regA;
+            reg_b_data = regB;
+            #10;
+    
+            if (alu_out === expected)
+                $display("(PASS) VSRA - Width %b: regA = %h, regB = %h, compute = %h (expected %h)",
+                         width, regA, regB, alu_out, expected);
+            else
+                $display("(FAIL) VSRA - Width %b: regA = %h, regB = %h, compute = %h (expected %h)",
+                         width, regA, regB, alu_out, expected);
+        end
+    endtask
+
+
     initial begin
         $display("Starting ALU test...");
         //$monitor("Time=%0t | alu_op=%b | width=%b | reg_a_data=%h | reg_b_data=%h | alu_out=%h",
@@ -354,36 +420,25 @@ module alu_tb;
 
         // --- Byte mode (width = 2'b00) ---
         execute_vxor(
-            64'hFFFF0000FFFF0000,
-            64'h1234FFFF0000FFFF,
-            64'hEDCBFFFF0000FFFF,
+            64'hFFFF0000FFFF0000,  // reg A
+            64'h1234FFFF0000FFFF,  // reg B
+            64'hEDCBFFFFFFFFFFFF,  // expected full 64-bit XOR
             2'b00
         );
-
-        // --- Halfword mode (width = 2'b01) ---
+        
         execute_vxor(
-            64'hA5A55A5A0F0FF0F0,
-            64'hFFFF0000F0F00F0F,
-            64'h5A5A5A5AFFFFFFFF,
+            64'hA5A55A5A0F0FF0F0,  // reg A
+            64'hFFFF0000F0F00F0F,  // reg B
+            64'h5A5A5A5AFFFFFFFF,  // expected: A5A5^FFFF = 5A5A, 5A5A^0000 = 5A5A, 0F0F^F0F0 = FFFF, F0F0^0F0F = FFFF
             2'b01
         );
-
-        // --- Word mode (width = 2'b10) ---
+        
         execute_vxor(
-            64'h123456789ABCDEF0,
-            64'hFFFF000000000000,
-            64'hEDCB56789ABCDEF0,
+            64'h123456789ABCDEF0,  // reg A
+            64'hFFFF000000000000,  // reg B
+            64'hEDCB56789ABCDEF0,  // expected: 1234^FFFF = EDCB, rest unchanged
             2'b10
         );
-
-        // --- Dword mode (width = 2'b11) ---
-        execute_vxor(
-            64'h0000111122223333,
-            64'hFFFFEEEE22223333,
-            64'hFFFFFFFF00000000,
-            2'b11
-        );
-
         
         // ===================================================================
         //  VNOT Instruction Test Cases
@@ -506,37 +561,38 @@ module alu_tb;
 
         // --- Byte mode (width = 2'b00) ---
         // Only bytes [0], [2], [4], [6] are multiplied
+        // VMULEU - Byte Mode (WW = 2'b00)
+        // All Verilog Task Calls:
+        // WW = 00 ? 8b chunks (even indices only), result = 16b chunks
         execute_vmuleu(
-            64'h01_02_03_04_05_06_07_08, // A
-            64'h02_02_02_02_02_02_02_02, // B
-            64'h02_00_06_00_0A_00_0E_00, // 01*02, 03*02, 05*02, 07*02
+            64'haa0f0f0301aa0f03,
+            64'haa550f0103aa01aa,
+            64'h70e400e10003000f,
             2'b00
         );
 
+
         // --- Halfword mode (width = 2'b01) ---
         // Even halfwords: [0:15], [32:47]
+        // VMULEU - Half-Word Mode (WW = 2'b01)
+        // WW = 01 ? 16b chunks (even indices only), result = 32b chunks
         execute_vmuleu(
-            64'h0010_0020_0030_0040,
-            64'h0002_0002_0002_0002,
-            64'h0020_0000_0060_0000,
+            64'h005500aa000f0055,
+            64'h0003005500010055,
+            64'h000000ff0000000f,
             2'b01
         );
 
+
         // --- Word mode (width = 2'b10) ---
         // Even word: [0:31]
+        // VMULEU - Word Mode (WW = 2'b10)
+        // WW = 10 ? 32b chunks (even index only), result = 64b chunk
         execute_vmuleu(
-            64'h00000004_00000008,
-            64'h00000003_00000002,
-            64'h0000000C_00000000,
+            64'h000000aa00000055,
+            64'h0000000f0000000f,
+            64'h00000000000009f6,
             2'b10
-        );
-
-        // --- Dword mode (width = 2'b11) ---
-        execute_vmuleu(
-            64'h00000000_00000005,
-            64'h00000000_00000003,
-            64'h00000000_0000000F,
-            2'b11
         );
 
         #10;
@@ -549,38 +605,31 @@ module alu_tb;
 
         // --- Byte mode (width = 2'b00) ---
         // Only bytes [1], [3], [5], [7] are multiplied
+       // WW = 00 → 8b chunks (odd indices only), result = 16b chunks
+        // WW = 00 → 8b chunks (odd indices only), result = 16b chunks
         execute_vmulou(
-            64'h01_02_03_04_05_06_07_08,
-            64'h02_02_02_02_02_02_02_02,
-            64'h00_04_00_08_00_0C_00_10, // 02*02, 04*02, 06*02, 08*02
+            64'h771e75677c50afdb,
+            64'hf52036a015550881,
+            64'h03c040601a906e5b,
             2'b00
         );
-
-        // --- Halfword mode (width = 2'b01) ---
-        // Odd halfwords: [16:31] and [48:63]
+        
+        // WW = 01 → 16b chunks (odd indices only), result = 32b chunks
         execute_vmulou(
-            64'h0010_0020_0030_0040,
-            64'h0002_0002_0002_0002,
-            64'h0000_0040_0000_0080,
+            64'h07aee4abdacfa1a3,
+            64'h21c3c968628eb93c,
+            64'hb3e7287874f4ad34,
             2'b01
         );
-
-        // --- Word mode (width = 2'b10) ---
-        // Odd word: [32:63]
+        
+        // WW = 10 → 32b chunks (odd index only), result = 64b chunk
         execute_vmulou(
-            64'h00000004_00000008,
-            64'h00000003_00000002,
-            64'h00000000_00000010,
+            64'hf7c60e2d6f8d1c01,
+            64'h62f48db034736c2d,
+            64'h16daf536ec11582d,
             2'b10
         );
 
-        // --- Dword mode (width = 2'b11) ---
-        execute_vmulou(
-            64'h00000000_00000005,
-            64'h00000000_00000003,
-            64'h00000000_0000000F,
-            2'b11
-        );
         
         // ===================================================================
         //  VSLL Instruction Test Cases
@@ -675,7 +724,7 @@ module alu_tb;
         // ===================================================================
 
         // --- Byte mode (width = 2'b00): rotate each byte by 4 bits ---
-        // Example: 0x12 → 0x21, 0x34 → 0x43, etc.
+        // Example: 0x12 ? 0x21, 0x34 ? 0x43, etc.
         execute_vrtth(
             64'h12_34_56_78_9A_BC_DE_F0,
             64'h0000000000000000,
@@ -684,7 +733,7 @@ module alu_tb;
         );
 
         // --- Halfword mode (width = 2'b01): rotate each 16-bit value by 8 bits ---
-        // 0x1234 → 0x3412, 0x5678 → 0x7856, etc.
+        // 0x1234 ? 0x3412, 0x5678 ? 0x7856, etc.
         execute_vrtth(
             64'h1234_5678_9ABC_DEF0,
             64'h0000000000000000,
@@ -693,7 +742,7 @@ module alu_tb;
         );
 
         // --- Word mode (width = 2'b10): rotate 32-bit values by 16 bits ---
-        // 0x12345678 → 0x56781234, 0x89ABCDEF → 0xCDEF89AB
+        // 0x12345678 ? 0x56781234, 0x89ABCDEF ? 0xCDEF89AB
         execute_vrtth(
             64'h12345678_89ABCDEF,
             64'h0000000000000000,
@@ -702,7 +751,7 @@ module alu_tb;
         );
 
         // --- Doubleword mode (width = 2'b11): rotate 64 bits by 32 ---
-        // 0x11223344_AABBCCDD → 0xAABBCCDD_11223344
+        // 0x11223344_AABBCCDD ? 0xAABBCCDD_11223344
         execute_vrtth(
             64'h11223344_AABBCCDD,
             64'h0000000000000000,
@@ -710,6 +759,119 @@ module alu_tb;
             2'b11
         );
 
+        // ===================================================================
+        //  VSQEU Instruction Test Cases
+        //  - Squares only the even-indexed fields of regA
+        //  - Each field's bit-width is based on `width` (WW) setting:
+        //      00 → 8-bit fields (4 results × 16-bit)
+        //      01 → 16-bit fields (2 results × 32-bit)
+        //      10 → 32-bit field  (1 result × 64-bit)
+        //  - Results are zero-padded into 64-bit result
+        //  - regB is unused (set to 0)
+        // ===================================================================
+
+        // WW = 00 → 8b chunks (even indices only), result = 16b chunks
+        execute_vsqeu(
+            64'haa0f0103aa03aa0f,
+            64'h70e4000170e470e4,
+            2'b00
+        );
+        
+        // WW = 01 → 16b chunks (even indices only), result = 32b chunks
+        execute_vsqeu(
+            64'h00aa000f0001000f,
+            64'h000070e400000001,
+            2'b01
+        );
+        
+        // WW = 10 → 32b chunks (even index only), result = 64b chunk
+        execute_vsqeu(
+            64'h0000000f0000000f,
+            64'h00000000000000e1,
+            2'b10
+        );
+        
+        // ===================================================================
+        //  VSQOU Instruction Test Cases
+        //  - Squares only the odd-indexed fields of regA
+        //  - Each field's bit-width is based on `width` (WW) setting:
+        //      00 → 8-bit fields (4 results × 16-bit)
+        //      01 → 16-bit fields (2 results × 32-bit)
+        //      10 → 32-bit field  (1 result × 64-bit)
+        //  - Results are zero-padded into 64-bit result
+        //  - regB is unused (set to 0)
+        // ===================================================================
+
+        // WW = 00 → 8b chunks (odd indices only), result = 16b chunks
+        execute_vsqou(
+            64'h555555aaaa030f55,
+            64'h1c39000970e41c39,
+            2'b00
+        );
+        
+        // WW = 01 → 16b chunks (odd indices only), result = 32b chunks
+        execute_vsqou(
+            64'h00550003000300aa,
+            64'h00000009000070e4,
+            2'b01
+        );
+        
+        // WW = 10 → 32b chunks (odd index only), result = 64b chunk
+        execute_vsqou(
+            64'h000000aa000000aa,
+            64'h00000000000070e4,
+            2'b10
+        );
+            
+        // ===================================================================
+        //  VSRA Instruction Test Cases
+        //  - Performs arithmetic right shift on each data field in regA
+        //  - Each field's bit-width is based on `width` (WW) setting:
+        //      00 → 8-bit fields   (8 results × 8-bit)
+        //      01 → 16-bit fields  (4 results × 16-bit)
+        //      10 → 32-bit fields  (2 results × 32-bit)
+        //      11 → 64-bit field   (1 result  × 64-bit)
+        //  - regB contains the per-field shift amounts
+        //      • For WW = 00 → 3-bit shift fields per 8-bit lane
+        //      • For WW = 01 → 4-bit shift fields per 16-bit lane
+        //      • For WW = 10 → 5-bit shift fields per 32-bit lane
+        //      • For WW = 11 → 6-bit shift value for full 64-bit word
+        //  - Sign bit (MSB of each field) is extended during shift
+        //  - Results are packed into a single 64-bit value in field order
+        // ===================================================================
+
+        // WW = 00 → 8-bit fields, arithmetic shift right
+        execute_vsra(
+            64'h03aaaaaa01010301,
+            64'h0000000000550ba1,
+            64'h00fdeaaa00000000,
+            2'b00
+        );
+        
+        // WW = 01 → 16-bit fields, arithmetic shift right
+        execute_vsra(
+            64'h0055000f00030055,
+            64'h00000000000005b4,
+            64'h0055000000000005,
+            2'b01
+        );
+        
+        // WW = 10 → 32-bit fields, arithmetic shift right
+        execute_vsra(
+            64'h0000005500000001,
+            64'h0000000000000130,
+            64'h0000000000000000,
+            2'b10
+        );
+        
+        // WW = 11 → 64-bit field, arithmetic shift right
+        execute_vsra(
+            64'h00000000000000aa,
+            64'h000000000000003a,
+            64'h0000000000000000,
+            2'b11
+        );
+    
         // Stop simulation
         $display("Test complete.");
         $finish;

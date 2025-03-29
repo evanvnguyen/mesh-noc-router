@@ -163,10 +163,10 @@ module alu (
                 case (width)
                     // 8b multiplication // take odd indice { even, odd, even, odd, even, odd }
                     2'b00: begin
-                        compute[48:63] = reg_a_data[56:63] * reg_b_data[56:63]; // byte 7
-                        compute[32:47] = reg_a_data[40:47] * reg_b_data[40:47]; // byte 5
-                        compute[16:31] = reg_a_data[24:31] * reg_b_data[24:31]; // byte 3 
                         compute[0:15]  = reg_a_data[8:15]  * reg_b_data[8:15];  // byte 1
+                        compute[16:31] = reg_a_data[24:31] * reg_b_data[24:31]; // byte 3 
+                        compute[32:47] = reg_a_data[40:47] * reg_b_data[40:47]; // byte 5
+                        compute[48:63] = reg_a_data[56:63] * reg_b_data[56:63]; // byte 7
                     end
 
                     
@@ -218,14 +218,14 @@ module alu (
                 case (width)
                 // weird issue at 00
                     2'b00:  begin
-                        compute[56:63] = reg_a_data[56:63] << reg_b_data[62:63]; // byte 0 (MSB)
-                        compute[48:55] = reg_a_data[48:55] << reg_b_data[54:55]; // byte 1
-                        compute[40:47] = reg_a_data[40:47] << reg_b_data[46:47]; // byte 2
-                        compute[32:39] = reg_a_data[32:39] << reg_b_data[38:39]; // byte 3
-                        compute[24:31] = reg_a_data[24:31] << reg_b_data[30:31]; // byte 4
-                        compute[16:23] = reg_a_data[16:23] << reg_b_data[22:23]; // byte 5
-                        compute[8:15]  = reg_a_data[8:15]  << reg_b_data[14:15];  // byte 6
-                        compute[0:7]   = reg_a_data[0:7]   << reg_b_data[6:7];   // byte 7 (LSB)
+                        compute[56:63] = reg_a_data[56:63] << reg_b_data[61:63]; // byte 0 (MSB)
+                        compute[48:55] = reg_a_data[48:55] << reg_b_data[53:55]; // byte 1
+                        compute[40:47] = reg_a_data[40:47] << reg_b_data[45:47]; // byte 2
+                        compute[32:39] = reg_a_data[32:39] << reg_b_data[37:39]; // byte 3
+                        compute[24:31] = reg_a_data[24:31] << reg_b_data[29:31]; // byte 4
+                        compute[16:23] = reg_a_data[16:23] << reg_b_data[21:23]; // byte 5
+                        compute[8:15]  = reg_a_data[8:15]  << reg_b_data[13:15]; // byte 6
+                        compute[0:7]   = reg_a_data[0:7]   << reg_b_data[5:7];   // byte 7 (LSB)
                     end
             
                     2'b01: begin // Half-word (16b), shift = 4 bits
@@ -251,15 +251,17 @@ module alu (
                     // Byte mode (8-bit fields), shift = 3 bits
                     // weird issue at 00
                     2'b00: begin
-                        compute[56:63] = reg_a_data[56:63] >> reg_b_data[62:63]; // byte 0 (MSB)
-                        compute[48:55] = reg_a_data[48:55] >> reg_b_data[54:55]; // byte 1
-                        compute[40:47] = reg_a_data[40:47] >> reg_b_data[46:47]; // byte 2
-                        compute[32:39] = reg_a_data[32:39] >> reg_b_data[38:39]; // byte 3
-                        compute[24:31] = reg_a_data[24:31] >> reg_b_data[30:31]; // byte 4
-                        compute[16:23] = reg_a_data[16:23] >> reg_b_data[22:23]; // byte 5
-                        compute[8:15]  = reg_a_data[8:15]  >> reg_b_data[14:15];  // byte 6
-                        compute[0:7]   = reg_a_data[0:7]   >> reg_b_data[6:7];   // byte 7 (LSB)
+                        // For an 8-bit field, the shift amount s is taken from bits (i+8-3) to (i+8-1).
+                        compute[56:63] = reg_a_data[56:63] >> reg_b_data[61:63]; // byte 0 (MSB)
+                        compute[48:55] = reg_a_data[48:55] >> reg_b_data[53:55]; // byte 1
+                        compute[40:47] = reg_a_data[40:47] >> reg_b_data[45:47]; // byte 2
+                        compute[32:39] = reg_a_data[32:39] >> reg_b_data[37:39]; // byte 3
+                        compute[24:31] = reg_a_data[24:31] >> reg_b_data[29:31]; // byte 4
+                        compute[16:23] = reg_a_data[16:23] >> reg_b_data[21:23]; // byte 5
+                        compute[8:15]  = reg_a_data[8:15]  >> reg_b_data[13:15]; // byte 6
+                        compute[0:7]   = reg_a_data[0:7]   >> reg_b_data[5:7];   // byte 7 (LSB)
                     end
+
             
                     // Half-word mode (16-bit), shift = 4 bits
                     2'b01: begin
@@ -274,7 +276,6 @@ module alu (
                         compute[32:63]  = reg_a_data[32:63] >> reg_b_data[59:63];   // LSB word
                         compute[0:31]   = reg_a_data[0:31]  >> reg_b_data[27:31]; // MSB word
                     end
-
             
                     // Double-word (64-bit), shift = 6 bits
                     2'b11: begin
@@ -284,7 +285,7 @@ module alu (
             end
 
             VSRA  : begin  
-            
+
             end
             
             VRTTH : begin  
@@ -334,12 +335,55 @@ module alu (
             
             end
             
-            VSQEU : begin  
-            
+            VSQEU : begin  // Arithmetic EVEN index SQUARE (width-dependent)
+                case (width)
+                    // 8b multiplication // take even indice { even, odd, even, odd, even, odd }
+                    2'b00: begin
+                        compute[48:63] = reg_a_data[48:55] * reg_a_data[48:55]; // byte 6
+                        compute[32:47] = reg_a_data[32:39] * reg_a_data[32:39]; // byte 4
+                        compute[16:31] = reg_a_data[16:23] * reg_a_data[16:23]; // byte 2
+                        compute[0:15]  = reg_a_data[0:7]   * reg_a_data[0:7];     // byte 0
+                    end
+                    
+                    // 16b multiplication (16b × 16b = 32b × 2 lanes)
+                    2'b01: begin
+                        compute[0:31]   = reg_a_data[0:15]   * reg_a_data[0:15];    
+                        compute[32:63]  = reg_a_data[32:47]  * reg_a_data[32:47];   
+                    end
+                    
+                    // 32b multiplication (32b × 32b = 64b result)
+                    2'b10: begin
+                        compute[0:63] = reg_a_data[0:31] * reg_a_data[0:31];
+                    end
+                    // 2'b11 not possible
+                    default: compute = 64'b0;
+                endcase
             end
             
             VSQOU : begin  
-            
+                case (width)
+                    // 8b multiplication // take odd indice { even, odd, even, odd, even, odd }
+                    2'b00: begin
+                        compute[48:63] = reg_a_data[56:63] * reg_a_data[56:63]; // byte 7
+                        compute[32:47] = reg_a_data[40:47] * reg_a_data[40:47]; // byte 5
+                        compute[16:31] = reg_a_data[24:31] * reg_a_data[24:31]; // byte 3 
+                        compute[0:15]  = reg_a_data[8:15]  * reg_a_data[8:15];  // byte 1
+                    end
+
+                    
+                    // 16b multiplication (16b × 16b = 32b × 2 lanes) { even, odd, even, odd)
+                    2'b01: begin
+                        compute[0:31]   = reg_a_data[16:31]  * reg_a_data[16:31];    
+                        compute[32:63]  = reg_a_data[48:63]  * reg_a_data[48:63];   
+                    end
+                    
+                    // 32b multiplication (32b × 32b = 64b result) { even , odd }
+                    2'b10: begin
+                        compute[0:63] = reg_a_data[32:63] * reg_a_data[32:63];
+                    end
+                    // 2'b11 not possible
+                    default: compute = 64'b0;
+                endcase
             end
             
             VSQRT : begin 
