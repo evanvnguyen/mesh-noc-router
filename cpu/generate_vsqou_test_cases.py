@@ -55,15 +55,18 @@ def build_64bit_result_WW00_odd(a_chunks, b_chunks):
         if i % 2 == 1:
             if used_pairs == 4:
                 break
-            product = (a_chunks[i] ** 2 ) & 0xFFFF
+            product = (a_chunks[i] ** 2) & 0xFFFF
             result_chunks.append(product)
             used_pairs += 1
     while len(result_chunks) < 4:
         result_chunks.append(0)
+    # Reverse the order of the 16-bit chunks bc to match golden RTL
+    result_chunks.reverse()
     result_val = 0
     for i in range(len(result_chunks)):
         result_val |= (result_chunks[i] << (i * 16))  # LSB-first packing
     return result_val, result_chunks
+
 
 def run_vsqou_for_ww(WW, text_widget, simple=False, verbose=False, verilog_calls=None):
     log = lambda msg: text_widget.insert(tk.END, msg + '\n')

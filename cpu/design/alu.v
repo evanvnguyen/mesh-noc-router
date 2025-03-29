@@ -332,7 +332,35 @@ module alu (
             end
             
             VMOD  : begin  
-            
+                // just gets the least significant bit
+                case (width)
+                // 8b addition (byte)
+                    2'b00: compute = {
+                        reg_a_data[0:7]   % 2,
+                        reg_a_data[8:15]  % 2,
+                        reg_a_data[16:23] % 2,
+                        reg_a_data[24:31] % 2,
+                        reg_a_data[32:39] % 2,
+                        reg_a_data[40:47] % 2,
+                        reg_a_data[48:55] % 2,
+                        reg_a_data[56:63] % 2
+                    };
+                    // 16b addition (half-word)
+                    2'b01: compute = {  
+                        reg_a_data[0:15]  % 2,
+                        reg_a_data[16:31] % 2,
+                        reg_a_data[32:47] % 2,
+                        reg_a_data[48:63] % 2
+                    };
+                     // 32b addition (word)
+                    2'b10: compute = {
+                        reg_a_data[0:31]  % 2,
+                        reg_a_data[32:63] % 2
+                    };
+                    // 64b (double-word, keep the same)
+                    2'b11: compute = reg_a_data % 2;  
+                    default:   compute = 64'b0;  
+                endcase
             end
             
             VSQEU : begin  // Arithmetic EVEN index SQUARE (width-dependent)

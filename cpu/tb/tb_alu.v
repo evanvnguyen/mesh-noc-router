@@ -259,7 +259,7 @@ module alu_tb;
     
         begin
             alu = 1; sfu = 0;
-            alu_op = 6'b010000; // VSQEU opcode (placeholder)
+            alu_op = 6'b010000; // VSQEU opcode 
             width = width_setting;
             reg_a_data = regA;
             #10;
@@ -804,22 +804,22 @@ module alu_tb;
 
         // WW = 00 → 8b chunks (odd indices only), result = 16b chunks
         execute_vsqou(
-            64'h555555aaaa030f55,
-            64'h1c39000970e41c39,
+            64'hdc568eac28cba0ff,
+            64'h1ce47390a0f9fe01,
             2'b00
         );
         
         // WW = 01 → 16b chunks (odd indices only), result = 32b chunks
         execute_vsqou(
-            64'h00550003000300aa,
-            64'h00000009000070e4,
+            64'h4f392493b2ed5518,
+            64'h0539ac691c48f240,
             2'b01
         );
         
         // WW = 10 → 32b chunks (odd index only), result = 64b chunk
         execute_vsqou(
-            64'h000000aa000000aa,
-            64'h00000000000070e4,
+            64'h130d325bc2aa466d,
+            64'h940683fed023ca69,
             2'b10
         );
             
