@@ -1,4 +1,4 @@
-`include "/home/viterbi/05/evannguy/577B/project_alu/sim/design/DW_div.v"
+`include "/usr/local/synopsys/Design_Compiler/K-2015.06-SP5-5/dw/sim_ver/DW_div.v"
 
 `timescale 1ps / 1ps
 
@@ -49,7 +49,7 @@ module alu (
         VNOP    = 6'b010111; // 23 - no op
 
     reg [0:63] compute; // for output
-    wire [0:63] quotient;
+    reg [0:63] quotient;
     
     reg [0:63] div_reg_a, div_reg_b;
 
