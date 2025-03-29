@@ -38,7 +38,7 @@ reg id_stage_nop;
 // ID stage interconnects
 // Instruction Decoder wires
 wire [0:4] id_out_rA_address;
-wire [0:4] id_out_rB_address;
+reg [0:4] id_out_rB_address;
 wire [0:4] id_out_rD_address;
 wire [0:5] id_out_alu_operation;
 wire [0:15] id_out_immediate_address;
@@ -51,14 +51,36 @@ wire id_out_sd;
 wire id_out_bez;
 wire id_out_bnez;
 wire id_out_nop;
-
+wire hdu_out_is_hazard;
 wire nop_mux_out;
 
 // Register File wires
 wire [0:63] rf_out_rA_data;
-wire [0:63] rf_out_rB_data;
-wire [0:63] wb_rD_data;
-wire wb_write_enable;
+reg [0:63] rf_out_rB_data;
+reg [0:63] wb_rD_data;
+reg wb_write_enable;
+reg [0:2] wb_ppp;
+
+// EX/WB stage pipeline registers
+reg ex_stage_ld;
+reg ex_stage_sd;
+reg [0:4] ex_stage_rD_address;
+reg [0:4] ex_stage_rA_address;
+reg [0:4] ex_stage_rB_address;
+reg [0:63] ex_stage_alu_out;
+reg ex_stage_alu_or_sfu;
+reg ex_stage_ppp;
+
+// EX/WB stage interconnects
+// ALU, rA_mux, rB_mux, fdu wires
+wire fdu_forward_rA;
+wire fdu_forward_rB;
+wire [0:63] ex_rA_mux_out;
+wire [0:63] ex_rB_mux_out;
+wire ex_alu_output;
+
+wire wb_result_mux_out;
+
 
 program_counter pc(
   .clk(clk),
@@ -79,8 +101,9 @@ register_file rf(
   .writeEnable(wb_write_enable),
   .rA_address(id_out_rA_address),
   .rB_address(id_out_rB_address),
-  .rD_address(id_out_rD_address),
+  .rD_address(ex_stage_rD_address),
   .rD_data(wb_rD_data), // I might changed this
+  .ppp(wb_ppp),
   .rA_data(rf_out_rA_data),
   .rB_data(rf_out_rB_data)
 );
@@ -106,10 +129,62 @@ instruction_decoder id(
 );
 
 mux #(.WIDTH(32)) nop_mux (
-  .value_if_low(if_stage_instruction_in),
+  .value_if_low(inst_in),
   .value_if_high({4'b1, 28'b0}),
-  .control_signal(id_out_bez | id_out_bnez),
+  .control_signal(id_out_bez | id_out_bnez | hdu_out_is_hazard | id_stage_ld),
   .selection(nop_mux_out)
+);
+
+hazard_detection_unit hdu(
+  .is_loading(id_stage_ld),
+  .is_move(id_stage_alu & id_stage_alu_operation == 6'b000101), // Move op
+  .rA_address(id_out_rA_address),
+  .rB_address(id_out_rB_address),
+  .id_rD_address(id_stage_rD_address),
+  .is_hazard(hdu_out_is_hazard)
+);
+
+// EX Stage modules
+alu alu(
+  .ld(),
+  .sd(),
+  .alu_op(id_stage_alu_operation),
+  .width(id_stage_ww),
+  .immediate_address(id_stage_immediate_address),
+  .reg_a_data(ex_rA_mux_out),
+  .reg_b_data(ex_rB_mux_out),
+  .instruction(),
+  .alu_out(ex_alu_output)
+);
+
+forwarding_unit fdu(
+  .id_rA_address(id_stage_rA_address),
+  .id_rB_address(id_stage_rB_address),
+  .ex_rA_address(ex_stage_rA_address),
+  .ex_rB_address(ex_stage_rB_address),
+  .forward_rA(fdu_forward_rA),
+  .forward_rB(fdu_forward_rB)
+);
+
+mux ex_rA_mux(
+  .value_if_low(id_stage_rA_data),
+  .value_if_high(wb_result_mux_out),
+  .control_signal(fdu_forward_rA),
+  .selection(ex_rA_mux_out)
+);
+
+mux ex_rB_mux(
+  .value_if_low(id_stage_rB_data),
+  .value_if_high(wb_result_mux_out),
+  .control_signal(fdu_forward_rB),
+  .selection(ex_rB_mux_out)
+);
+
+mux wb_result_mux(
+  .value_if_low(ex_stage_alu_out),
+  .value_if_high(d_in),
+  .control_signal(ex_stage_ld | ex_stage_alu_or_sfu),
+  .selection(wb_result_mux_out)
 );
 
 // Check if we need to branch or not
@@ -142,25 +217,44 @@ always @(posedge clk) begin
   end else begin
     // load the pipeline registers from the intermediate values
     // IF stage
-    if_stage_instruction_in <= inst_in;
+    if_stage_instruction_in <= nop_mux_out;
 
     // ID stage
-    id_stage_rA_address <= id_out_rA_address;
-    id_stage_rB_address <= id_out_rB_address;
-    id_stage_rD_address <= id_out_rD_address;
-    id_stage_alu_operation <= id_out_alu_operation;
-    id_stage_immediate_address <= id_out_immediate_address;
-    id_stage_ppp <= id_out_ppp;
-    id_stage_ww <= id_out_ww;
-    id_stage_rA_data <= rf_out_rA_data;
-    id_stage_rB_data <= rf_out_rB_data;
-    id_stage_alu <= id_out_alu;
-    id_stage_sfu <= id_out_sfu;
-    id_stage_ld <= id_out_ld;
-    id_stage_sd <= id_out_sd;
-    id_stage_bez <= id_out_bez;
-    id_stage_bnez <= id_out_bnez;
-    id_stage_nop <= id_out_nop;
+    if (hdu_out_is_hazard) begin
+      id_stage_rA_address <= 5'b0;
+      id_stage_rB_address <= 5'b0;
+      id_stage_rD_address <= 5'b0;
+      id_stage_alu_operation <= 6'b0;
+      id_stage_immediate_address <= 16'b0;
+      id_stage_ppp <= 3'b0;
+      id_stage_ww <= 2'b0;
+      id_stage_rA_data <= 64'b0;
+      id_stage_rB_data <= 64'b0;
+      id_stage_alu <= 1'b0;
+      id_stage_sfu <= 1'b0;
+      id_stage_ld <= 1'b0;
+      id_stage_sd <= 1'b0;
+      id_stage_bez <= 1'b0;
+      id_stage_bnez <= 1'b0;
+      id_stage_nop <= 1'b1;
+    end else begin
+      id_stage_rA_address <= id_out_rA_address;
+      id_stage_rB_address <= id_out_rB_address;
+      id_stage_rD_address <= id_out_rD_address;
+      id_stage_alu_operation <= id_out_alu_operation;
+      id_stage_immediate_address <= id_out_immediate_address;
+      id_stage_ppp <= id_out_ppp;
+      id_stage_ww <= id_out_ww;
+      id_stage_rA_data <= rf_out_rA_data;
+      id_stage_rB_data <= rf_out_rB_data;
+      id_stage_alu <= id_out_alu;
+      id_stage_sfu <= id_out_sfu;
+      id_stage_ld <= id_out_ld;
+      id_stage_sd <= id_out_sd;
+      id_stage_bez <= id_out_bez;
+      id_stage_bnez <= id_out_bnez;
+      id_stage_nop <= id_out_nop;
+    end
 
     // We should be loading data from the data memory
     // Loading takes 2 cycles and needs to start in the ID stage.
@@ -175,8 +269,38 @@ always @(posedge clk) begin
     end
 
     // EX/MEM stage
+    ex_stage_ld <= id_stage_ld;
+    ex_stage_sd <= id_stage_sd;
+    ex_stage_rD_address <= id_stage_rD_address;
+    ex_stage_rA_address <= id_stage_rA_address;
+    ex_stage_rB_address <= id_stage_rB_address;
+    ex_stage_alu_out <= ex_alu_output;
+    ex_stage_alu_or_sfu <= (id_stage_alu | id_stage_sfu);
+    ex_stage_ppp <= id_stage_ppp;
 
     // WB stage
+
+    if (ex_stage_ld | ex_stage_alu_or_sfu) begin
+      wb_write_enable <= 1'b1;
+      wb_rD_data <= wb_result_mux_out;
+      wb_ppp <= ex_stage_ppp;
+    end else begin
+      wb_write_enable <= 1'b0;
+      wb_rD_data <= 64'b0;
+      wb_ppp <= 3'b0;
+    end
+    
+    if (ex_stage_sd) begin
+      memEn <= 1'b1;
+      memWrEn <= 1'b1;
+      d_out <= ex_stage_alu_out;
+      addr_out <= ex_stage_rD_address;
+    end else begin
+      memEn <= 1'b0;
+      memWrEn <= 1'b0;
+      d_out <= 64'b0;
+      addr_out <= 5'b0;
+    end
 
   end
 end
@@ -200,6 +324,15 @@ task reset_clocked_values();
     id_stage_bez <= 1'b0;
     id_stage_bnez <= 1'b0;
     id_stage_nop <= 1'b0;
+
+    ex_stage_ld <= 1'b0;
+    ex_stage_sd <= 1'b0;
+    ex_stage_rD_address <= 5'b0;
+    ex_stage_rA_address <= 5'b0;
+    ex_stage_rB_address <= 5'b0;
+    ex_stage_alu_out <= 64'b0;
+    ex_stage_alu_or_sfu <= 1'b0;
+    ex_stage_ppp <= 3'b0;
   end
 endtask
 

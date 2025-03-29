@@ -28,7 +28,7 @@ module alu (
         VOR     = 6'b000010, // 2  - or - done
         VXOR    = 6'b000011, // 3  - xor - done
         VNOT    = 6'b000100, // 4  - not - done
-        //VMOV    = 6'b000101, // 5  - move - done
+        VMOV    = 6'b000101, // 5  - move - done
         VADD    = 6'b000110, // 6  - add - done
         VSUB    = 6'b000111, // 7  - sub - done
         VMULEU  = 6'b001000, // 8  - multiply even unsigned - done
@@ -134,7 +134,35 @@ module alu (
 
             // just take the the incoming reg_A data to be written back in the WB stage
             // maybe check PPP field?
-            //VMOV: compute = reg_a_data;
+            VMOV: begin
+               case (width)
+                    2'b00: compute = {
+                        reg_a_data[0:7],
+                        reg_a_data[8:15],
+                        reg_a_data[16:23],
+                        reg_a_data[24:31],
+                        reg_a_data[32:39],
+                        reg_a_data[40:47],
+                        reg_a_data[48:55],
+                        reg_a_data[55:63]
+                    };
+
+                    2'b01: compute = {
+                        reg_a_data[0:15],
+                        reg_a_data[16:31],
+                        reg_a_data[32:47],
+                        reg_a_data[48:63]
+                    };
+
+                    2'b10: compute = {
+                        reg_a_data[0:31],
+                        reg_a_data[32:63]
+                    };
+
+                    2'b11: compute = reg_a_data;
+                    default:   compute = 64'b0;  
+                endcase
+            end
 
             // Arithmetic ops
             VADD: begin                     // Arithmetic ADD (width-dependent)
