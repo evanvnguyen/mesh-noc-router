@@ -47,7 +47,7 @@ module tb_four_stage_processor;
     #8
     reset = 1'b0;
     $readmemh("rf_random_values.txt", uut.rf.registerFile);
-    $readmemh("cpu_test_instructions.txt", instruc_mem.MEM);
+    $readmemh("cpu_test_instructions2.txt", instruc_mem.MEM);
     $readmemh("dmem.fill", data_mem.MEM);
   end
   
@@ -55,7 +55,7 @@ module tb_four_stage_processor;
     if (!reset) begin        
        clock_cycle <= clock_cycle + 1;
        
-       if (clock_cycle == 10) 
+       if (clock_cycle >= 30) 
         $finish;
     end
   end

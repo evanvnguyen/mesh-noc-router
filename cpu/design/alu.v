@@ -1,5 +1,5 @@
-`include "C:\Users\nguye\OneDrive\USC\EE 577B\project\part2\local\mesh-noc-router-main\cpu\design\DW_div.v"
-`include "C:\Users\nguye\OneDrive\USC\EE 577B\project\part2\local\mesh-noc-router-main\cpu\design\DW_sqrt.v"
+`include "DW_div.v"
+`include "DW_sqrt.v"
 
 `timescale 1ps / 1ps
 
@@ -44,7 +44,7 @@ module alu (
         VSQOU   = 6'b010001, // 17 - square odd unsigned
         VSQRT   = 6'b010010, // 18 - square root integer unsigned
         //VLD     = 6'b010011, // 19 - load
-        //VSD     = 6'b010100, // 20 - store
+        VSD     = 6'b010100, // 20 - store
         //VBEZ    = 6'b010101, // 21 - branch if equal to zero
         //VBNEZ   = 6'b010110, // 22 - branch if not equal to zero
         VNOP    = 6'b010111; // 23 - no op
@@ -188,6 +188,7 @@ module alu (
             // just take the the incoming reg_A data to be written back in the WB stage
             // maybe check PPP field?
             VMOV: compute = reg_a_data;
+            VSD: compute = reg_b_data;
 
             // Arithmetic ops
             VADD: begin                     // Arithmetic ADD (width-dependent)

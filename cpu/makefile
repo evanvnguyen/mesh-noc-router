@@ -42,8 +42,9 @@
 TOP = tb_cmp
 
 # List of the design files
-DESIGN_FILES = ./netlist/cardinal_cmp.syn.v
+#DESIGN_FILES = ./netlist/cardinal_cmp.syn.v
 #DESIGN_FILES = ./netlist/cardinal_cmp.vo.v
+DESIGN_FILES = ./design/*.v
 
 # List of the testbench files
 TB_FILES = ./tb/*.v

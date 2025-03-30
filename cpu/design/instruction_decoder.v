@@ -100,6 +100,8 @@ always @(instruction) begin
         sd = 1'b1;
         rD_address = instruction[RD_MSB:RD_LSB];
         rA_address = 5'b0;
+        // We set this so that we have access to the data.
+        rB_address = instruction[RD_MSB:RD_LSB];
         immediate_address = instruction[IM_MSB:IM_LSB];
       end
 

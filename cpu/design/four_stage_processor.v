@@ -84,20 +84,22 @@ program_counter pc(
   .clk(clk),
   .reset(reset),
   .stall(hdu_out_is_hazard),
+  .branch(if_branch),
+  .branch_address({16'b0, id_out_immediate_address}),
   .pc_out(pc_out_pc_out)
 );
 
 mux #(.WIDTH(32)) branch_mux (
   .value_if_low(pc_out_pc_out), 
   .value_if_high({16'b0, id_out_immediate_address}),
-  .control_signal(id_out_bez | id_out_bnez),
+  .control_signal(if_branch),
   .selection(pc_out)
   );
 
 register_file rf(
   .clk(clk),
   .reset(reset),
-  .writeEnable(ex_stage_ld | ex_stage_alu_or_sfu),
+  .writeEnable((ex_stage_ld | ex_stage_alu_or_sfu) & !ex_stage_sd),
   .rA_address(id_out_rA_address),
   .rB_address(id_out_rB_address),
   .rD_address(ex_stage_rD_address),
@@ -130,7 +132,7 @@ instruction_decoder id(
 mux #(.WIDTH(32)) nop_mux (
   .value_if_low(inst_in),
   .value_if_high({4'b1, 28'b0}),
-  .control_signal(id_out_bez | id_out_bnez),
+  .control_signal(if_branch),
   .selection(nop_mux_out)
 );
 
@@ -150,8 +152,8 @@ alu alu(
   .alu_op(id_stage_alu_operation),
   .width(id_stage_ww),
   .immediate_address(id_stage_immediate_address),
-  .reg_a_data(ex_rA_mux_out),
-  .reg_b_data(ex_rB_mux_out),
+  .reg_a_data(id_stage_rA_data),
+  .reg_b_data(id_stage_rB_data),
   .instruction(),
   .alu_out(ex_alu_output)
 );
@@ -183,12 +185,12 @@ mux ex_rB_mux(
 mux wb_result_mux(
   .value_if_low(ex_stage_alu_out),
   .value_if_high(d_in),
-  .control_signal(ex_stage_ld | ex_stage_alu_or_sfu),
+  .control_signal(ex_stage_ld & !ex_stage_alu_or_sfu),
   .selection(wb_result_mux_out)
 );
 
 // Check if we need to branch or not
-always @(id_out_bez or id_out_bnez) begin
+always @(id_out_bez or id_out_bnez or rf_out_rB_data) begin
     if_branch = 1'b0;
     
   // We use rB_data to access rD data.
@@ -225,7 +227,7 @@ always @(id_stage_ld or id_stage_sd or ex_stage_ld or ex_stage_sd) begin
       memEn = 1'b1;
     end
 
-    if (ex_stage_sd) begin
+    if (id_stage_sd) begin
       memEn = 1'b1;
       memWrEn = 1'b1;
       d_out = ex_stage_alu_out;
@@ -269,8 +271,8 @@ always @(posedge clk) begin
       id_stage_immediate_address <= id_out_immediate_address;
       id_stage_ppp <= id_out_ppp;
       id_stage_ww <= id_out_ww;
-      id_stage_rA_data <= rf_out_rA_data;
-      id_stage_rB_data <= rf_out_rB_data;
+      id_stage_rA_data <= (fdu_forward_rA ? ex_rA_mux_out : rf_out_rA_data);
+      id_stage_rB_data <= (fdu_forward_rB ? ex_rB_mux_out : rf_out_rB_data);
       id_stage_alu <= id_out_alu;
       id_stage_sfu <= id_out_sfu;
       id_stage_ld <= id_out_ld;
@@ -299,6 +301,11 @@ end
 // This resets all clocked values
 task reset_clocked_values();
   begin
+    addr_out = 31'b0;
+    d_out = 64'b0;
+    memEn = 1'b0;
+    memWrEn = 1'b0;
+
     id_stage_rA_address <= 5'b0;
     id_stage_rB_address <= 5'b0;
     id_stage_rD_address <= 5'b0;
