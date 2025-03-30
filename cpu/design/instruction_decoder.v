@@ -129,6 +129,8 @@ always @(instruction) begin
         rD_address = 1'b0;
         alu_operation = 1'b0;
         immediate_address = 1'b0;
+        ppp = 3'b0;
+        ww = 2'b0;
         alu = 1'b0;
         sfu = 1'b0;
         ld = 1'b0;

@@ -1,5 +1,5 @@
-`include "C:\Users\nguye\OneDrive\USC\EE 577B\project\part2\local\mesh-noc-router-main\cpu\design\DW_div.v"
-`include "C:\Users\nguye\OneDrive\USC\EE 577B\project\part2\local\mesh-noc-router-main\cpu\design\DW_sqrt.v"
+`include "DW_div.v"
+`include "DW_sqrt.v"
 
 `timescale 1ps / 1ps
 

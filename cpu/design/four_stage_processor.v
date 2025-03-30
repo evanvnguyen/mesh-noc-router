@@ -57,9 +57,6 @@ wire [0:31] nop_mux_out;
 // Register File wires
 wire [0:63] rf_out_rA_data;
 wire [0:63] rf_out_rB_data;
-reg [0:63] wb_rD_data;
-reg wb_write_enable;
-reg [0:2] wb_ppp;
 
 // EX/WB stage pipeline registers
 reg ex_stage_ld;
@@ -68,8 +65,9 @@ reg [0:4] ex_stage_rD_address;
 reg [0:4] ex_stage_rA_address;
 reg [0:4] ex_stage_rB_address;
 reg [0:63] ex_stage_alu_out;
+reg [0:15] ex_stage_immediate_address;
 reg ex_stage_alu_or_sfu;
-reg ex_stage_ppp;
+reg [0:2] ex_stage_ppp;
 
 // EX/WB stage interconnects
 // ALU, rA_mux, rB_mux, fdu wires
@@ -99,12 +97,12 @@ mux #(.WIDTH(32)) branch_mux (
 register_file rf(
   .clk(clk),
   .reset(reset),
-  .writeEnable(wb_write_enable),
+  .writeEnable(ex_stage_ld | ex_stage_alu_or_sfu),
   .rA_address(id_out_rA_address),
   .rB_address(id_out_rB_address),
   .rD_address(ex_stage_rD_address),
-  .rD_data(wb_rD_data), // I might changed this
-  .ppp(wb_ppp),
+  .rD_data(wb_result_mux_out), // I might changed this
+  .ppp(ex_stage_ppp),
   .rA_data(rf_out_rA_data),
   .rB_data(rf_out_rB_data)
 );
@@ -159,10 +157,11 @@ alu alu(
 );
 
 forwarding_unit fdu(
-  .id_rA_address(id_stage_rA_address),
-  .id_rB_address(id_stage_rB_address),
+  .id_rA_address(id_out_rA_address),
+  .id_rB_address(id_out_rB_address),
   .ex_rA_address(ex_stage_rA_address),
   .ex_rB_address(ex_stage_rB_address),
+  .ex_rD_address(ex_stage_rD_address),
   .forward_rA(fdu_forward_rA),
   .forward_rB(fdu_forward_rB)
 );
@@ -206,14 +205,39 @@ always @(id_out_bez or id_out_bnez) begin
   end
 end
 
+always @(id_stage_ld or id_stage_sd or ex_stage_ld or ex_stage_sd) begin
+  if (!reset) begin
+    memEn = 1'b0;
+    memWrEn = 1'b0;
+    d_out = 64'b0;
+    addr_out = 5'b0;
+    // We should be loading data from the data memory
+    // Loading takes 2 cycles and needs to start in the ID stage.
+    // This will allow us to write the loaded value into the 
+    // RF in the WB stage.
+    if (id_stage_ld | id_stage_sd) begin
+      addr_out = {16'b0, id_out_immediate_address};
+      memEn = 1'b1;
+    end
+    
+    if (ex_stage_ld) begin
+      addr_out = {16'b0, id_stage_immediate_address};
+      memEn = 1'b1;
+    end
+
+    if (ex_stage_sd) begin
+      memEn = 1'b1;
+      memWrEn = 1'b1;
+      d_out = ex_stage_alu_out;
+      addr_out = ex_stage_rD_address;
+    end
+  end
+end
+
 always @(posedge clk) begin
   if (reset) begin
     reset_clocked_values;
   end else begin
-    memEn <= 1'b0;
-    memWrEn <= 1'b0;
-    d_out <= 64'b0;
-    addr_out <= 5'b0;
     // load the pipeline registers from the intermediate values
     // IF stage
     if (!hdu_out_is_hazard)
@@ -256,43 +280,18 @@ always @(posedge clk) begin
       id_stage_nop <= id_out_nop;
     end
 
-    // We should be loading data from the data memory
-    // Loading takes 2 cycles and needs to start in the ID stage.
-    // This will allow us to write the loaded value into the 
-    // RF in the WB stage.
-    if (id_stage_ld) begin
-      addr_out <= {16'b0, id_stage_immediate_address};
-      memEn <= 1'b1;
-    end
-
     // EX/MEM stage
     ex_stage_ld <= id_stage_ld;
     ex_stage_sd <= id_stage_sd;
     ex_stage_rD_address <= id_stage_rD_address;
     ex_stage_rA_address <= id_stage_rA_address;
     ex_stage_rB_address <= id_stage_rB_address;
+    ex_stage_immediate_address <= id_stage_immediate_address;
     ex_stage_alu_out <= ex_alu_output;
     ex_stage_alu_or_sfu <= (id_stage_alu | id_stage_sfu);
     ex_stage_ppp <= id_stage_ppp;
 
     // WB stage
-
-    if (ex_stage_ld | ex_stage_alu_or_sfu) begin
-      wb_write_enable <= 1'b1;
-      wb_rD_data <= wb_result_mux_out;
-      wb_ppp <= ex_stage_ppp;
-    end else begin
-      wb_write_enable <= 1'b0;
-      wb_rD_data <= 64'b0;
-      wb_ppp <= 3'b0;
-    end
-    
-    if (ex_stage_sd) begin
-      memEn <= 1'b1;
-      memWrEn <= 1'b1;
-      d_out <= ex_stage_alu_out;
-      addr_out <= ex_stage_rD_address;
-    end
 
   end
 end
@@ -324,6 +323,7 @@ task reset_clocked_values();
     ex_stage_rB_address <= 5'b0;
     ex_stage_alu_out <= 64'b0;
     ex_stage_alu_or_sfu <= 1'b0;
+    ex_stage_immediate_address <= 16'b0;
     ex_stage_ppp <= 3'b0;
   end
 endtask

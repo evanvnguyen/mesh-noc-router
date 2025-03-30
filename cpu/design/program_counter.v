@@ -10,7 +10,7 @@ module program_counter (
       pc_out <= 64'b0;
     else 
       if (!stall)
-        pc_out <= pc_out + 4;
+        pc_out <= pc_out + 1;
   end
 
 endmodule

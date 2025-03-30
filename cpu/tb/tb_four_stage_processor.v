@@ -1,8 +1,8 @@
 module tb_four_stage_processor;
 
   reg clk, reset;
-  reg [0:31] inst_in;
-  reg [0:63] d_in;
+  wire [0:31] inst_in;
+  wire [0:63] d_in;
   wire [0:31] pc_out;
   wire [0:63] d_out;
   wire [0:31] addr_out;
@@ -11,8 +11,19 @@ module tb_four_stage_processor;
   
   integer clock_cycle;
 
-  reg [0:31] instuc_mem [0:6];
-  reg [0:63] mem [0:5];
+  imem instruc_mem(
+    .memAddr(pc_out),
+    .dataOut(inst_in)
+  );
+
+  dmem data_mem(
+    .clk(clk),
+    .memEn(memEn),
+    .memWrEn(memWrEn),
+    .memAddr(addr_out),
+    .dataIn(d_out),
+    .dataOut(d_in)
+  );
 
   four_stage_processor uut(
     .clk(clk),
@@ -26,42 +37,22 @@ module tb_four_stage_processor;
     .memEn(memEn)
   );
 
-  initial clk = 1;
-  always #2 clk = ~clk;
+  initial clk = 0;
+  always #2 clk <= ~clk;
 
   initial begin
-    inst_in = 32'b0;
-    d_in = 64'b0;
     clock_cycle = 0;
-
-    mem[0] = 64'b0;
-    mem[1] = {61'b0, 3'b101};
-    mem[2] = {61'b0, 3'b010};
-    mem[3] = 64'b0;
-    mem[4] = 64'b0;
-
-    instuc_mem[0] = 32'h80200001;
-    instuc_mem[1] = 32'h80400002;
-    instuc_mem[2] = 32'hA8611001;
-    instuc_mem[3] = 32'hF0000000;
-    instuc_mem[4] = 32'hF0000000;
-    instuc_mem[5] = 32'hF0000000;
-    instuc_mem[6] = 32'hF0000000;
 
     reset = 1'b1;
     #8
     reset = 1'b0;
     $readmemh("rf_random_values.txt", uut.rf.registerFile);
+    $readmemh("cpu_test_instructions.txt", instruc_mem.MEM);
+    $readmemh("dmem.fill", data_mem.MEM);
   end
   
   always @(posedge clk) begin
-    if (!reset) begin
-        inst_in = instuc_mem[pc_out / 4];
-        
-        if (memEn) begin
-            d_in = mem[addr_out];
-        end
-       
+    if (!reset) begin        
        clock_cycle <= clock_cycle + 1;
        
        if (clock_cycle == 10) 

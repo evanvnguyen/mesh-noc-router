@@ -27,41 +27,7 @@ always @(*) begin
 end
 
 always @(posedge clk) begin
-  if (reset) begin
-    registerFile[0] = 64'b0;
-    registerFile[1] = 64'b0;
-    registerFile[2] = 64'b0;
-    registerFile[3] = 64'b0;
-    registerFile[4] = 64'b0;
-    registerFile[5] = 64'b0;
-    registerFile[6] = 64'b0;
-    registerFile[7] = 64'b0;
-    registerFile[8] = 64'b0;
-    registerFile[9] = 64'b0;
-    registerFile[11] = 64'b0;
-    registerFile[10] = 64'b0;
-    registerFile[12] = 64'b0;
-    registerFile[13] = 64'b0;
-    registerFile[14] = 64'b0;
-    registerFile[15] = 64'b0;
-    registerFile[16] = 64'b0;
-    registerFile[17] = 64'b0;
-    registerFile[18] = 64'b0;
-    registerFile[19] = 64'b0;
-    registerFile[20] = 64'b0;
-    registerFile[21] = 64'b0;
-    registerFile[22] = 64'b0;
-    registerFile[23] = 64'b0;
-    registerFile[24] = 64'b0;
-    registerFile[25] = 64'b0;
-    registerFile[26] = 64'b0;
-    registerFile[27] = 64'b0;
-    registerFile[28] = 64'b0;
-    registerFile[29] = 64'b0;
-    registerFile[30] = 64'b0;
-    registerFile[31] = 64'b0;
-    writeEn = 1'b0;
-  end else begin
+  if (!reset) begin
     writeEn = writeEnable;
     if (writeEn) begin
       if (rD_address != 5'b0) begin
