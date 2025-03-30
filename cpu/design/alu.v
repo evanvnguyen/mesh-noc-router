@@ -252,32 +252,32 @@ module alu (
                 endcase
             end
 	    
-	    VDIV: begin
-            case (width)
-                // 8b addition (byte)
-                2'b00: compute = byte_quotient; 
-                // 16b addition (half-word)
-                2'b01: compute = half_word_quotient;
-                // 32b addition (word)
-                2'b10: compute = word_quotient;
-                // 64b (double-word, keep the same)
-                2'b11: compute = double_word_quotient; 
-                default:   compute = 64'b0;  
-            endcase
-        end
-	    VMOD: begin
-            case (width)
-                        // 8b addition (byte)
-                        2'b00: compute = byte_remainder; 
-                // 16b addition (half-word)
-                        2'b01: compute = half_word_remainder;
-                // 32b addition (word)
-                        2'b10: compute = word_remainder;
-                        // 64b (double-word, keep the same)
-                        2'b11: compute = double_word_remainder; 
-                        default:   compute = 64'b0;  
-                    endcase
+            VDIV: begin
+                case (width)
+                    // 8b addition (byte)
+                    2'b00: compute = byte_quotient; 
+                    // 16b addition (half-word)
+                    2'b01: compute = half_word_quotient;
+                    // 32b addition (word)
+                    2'b10: compute = word_quotient;
+                    // 64b (double-word, keep the same)
+                    2'b11: compute = double_word_quotient; 
+                    default:   compute = 64'b0;  
+                endcase
             end
+            VMOD: begin
+                case (width)
+                            // 8b addition (byte)
+                            2'b00: compute = byte_remainder; 
+                    // 16b addition (half-word)
+                            2'b01: compute = half_word_remainder;
+                    // 32b addition (word)
+                            2'b10: compute = word_remainder;
+                            // 64b (double-word, keep the same)
+                            2'b11: compute = double_word_remainder; 
+                            default:   compute = 64'b0;  
+                        endcase
+                end
 
             VMULEU: begin                     // Arithmetic EVEN index MUL (width-dependent)
                 case (width)
@@ -289,13 +289,13 @@ module alu (
                         compute[0:15]   = reg_a_data[0:7] * reg_b_data[0:7];     // byte 0
                     end
                     
-                    // 16b multiplication (16b × 16b = 32b × 2 lanes)
+                    // 16b multiplication (16b Ã— 16b = 32b Ã— 2 lanes)
                     2'b01: begin
                         compute[0:31]   = reg_a_data[0:15]   * reg_b_data[0:15];    
                         compute[32:63]  = reg_a_data[32:47]  * reg_b_data[32:47];   
                     end
                     
-                    // 32b multiplication (32b × 32b = 64b result)
+                    // 32b multiplication (32b Ã— 32b = 64b result)
                     2'b10: begin
                         compute[0:63] = reg_a_data[0:31] * reg_b_data[0:31];
                     end
@@ -315,13 +315,13 @@ module alu (
                     end
 
                     
-                    // 16b multiplication (16b × 16b = 32b × 2 lanes)
+                    // 16b multiplication (16b Ã— 16b = 32b Ã— 2 lanes)
                     2'b01: begin
                         compute[0:31]   = reg_a_data[16:31]   * reg_b_data[16:31];    
                         compute[32:63]  = reg_a_data[48:63]  * reg_b_data[48:63];   
                     end
                     
-                    // 32b multiplication (32b × 32b = 64b result)
+                    // 32b multiplication (32b Ã— 32b = 64b result)
                     2'b10: begin
                         compute[0:63] = reg_a_data[32:63] * reg_b_data[32:63];
                     end
@@ -430,7 +430,37 @@ module alu (
             end
 
             VSRA  : begin  
+                case (width)
+                    2'b00: begin
+                         // For an 8-bit field, the shift amount s is taken from bits (i+8-3) to (i+8-1).
+                        compute[0:7]   = (reg_a_data[0]  == 1'b1) ? ((reg_a_data[0:7]   >> reg_b_data[5:7])   | ~(8'hFF >> reg_b_data[5:7]))   : (reg_a_data[0:7]   >> reg_b_data[5:7]);   // byte 0 (MSB)
+                        compute[8:15]  = (reg_a_data[8]  == 1'b1) ? ((reg_a_data[8:15]  >> reg_b_data[13:15]) | ~(8'hFF >> reg_b_data[13:15])) : (reg_a_data[8:15]  >> reg_b_data[13:15]); // byte 1
+                        compute[16:23] = (reg_a_data[16] == 1'b1) ? ((reg_a_data[16:23] >> reg_b_data[21:23]) | ~(8'hFF >> reg_b_data[21:23])) : (reg_a_data[16:23] >> reg_b_data[21:23]); // byte 2
+                        compute[24:31] = (reg_a_data[24] == 1'b1) ? ((reg_a_data[24:31] >> reg_b_data[29:31]) | ~(8'hFF >> reg_b_data[29:31])) : (reg_a_data[24:31] >> reg_b_data[29:31]); // byte 3
+                        compute[32:39] = (reg_a_data[32] == 1'b1) ? ((reg_a_data[32:39] >> reg_b_data[37:39]) | ~(8'hFF >> reg_b_data[37:39])) : (reg_a_data[32:39] >> reg_b_data[37:39]); // byte 4
+                        compute[40:47] = (reg_a_data[40] == 1'b1) ? ((reg_a_data[40:47] >> reg_b_data[45:47]) | ~(8'hFF >> reg_b_data[45:47])) : (reg_a_data[40:47] >> reg_b_data[45:47]); // byte 5
+                        compute[48:55] = (reg_a_data[48] == 1'b1) ? ((reg_a_data[48:55] >> reg_b_data[53:55]) | ~(8'hFF >> reg_b_data[53:55])) : (reg_a_data[48:55] >> reg_b_data[53:55]); // byte 6
+                        compute[56:63] = (reg_a_data[56] == 1'b1) ? ((reg_a_data[56:63] >> reg_b_data[61:63]) | ~(8'hFF >> reg_b_data[61:63])) : (reg_a_data[56:63] >> reg_b_data[61:63]); // byte 7 (LSB)               
+                    end
+                    2'b01: begin
+                        // Each 16-bit field's shift amount is taken from the top 4 bits of its corresponding halfword in reg_b_data
+                        compute[0:15]   = (reg_a_data[0]  == 1'b1) ? ((reg_a_data[0:15]   >> reg_b_data[12:15])  | ~(16'hFFFF >> reg_b_data[12:15]))  : (reg_a_data[0:15]   >> reg_b_data[12:15]);  // halfword 0 (MSB)
+                        compute[16:31]  = (reg_a_data[16] == 1'b1) ? ((reg_a_data[16:31]  >> reg_b_data[28:31])  | ~(16'hFFFF >> reg_b_data[28:31])) : (reg_a_data[16:31]  >> reg_b_data[28:31]); // halfword 1
+                        compute[32:47]  = (reg_a_data[32] == 1'b1) ? ((reg_a_data[32:47]  >> reg_b_data[44:47])  | ~(16'hFFFF >> reg_b_data[44:47])) : (reg_a_data[32:47]  >> reg_b_data[44:47]); // halfword 2
+                        compute[48:63]  = (reg_a_data[48] == 1'b1) ? ((reg_a_data[48:63]  >> reg_b_data[60:63])  | ~(16'hFFFF >> reg_b_data[60:63])) : (reg_a_data[48:63]  >> reg_b_data[60:63]); // halfword 3 (LSB)
+                    end
+                    2'b10: begin // Word mode (32-bit), shift = 5 bits
+                        compute[0:31]   = (reg_a_data[0]  == 1'b1) ? ((reg_a_data[0:31]   >> reg_b_data[27:31]) | ~(32'hFFFFFFFF >> reg_b_data[27:31])) : (reg_a_data[0:31]   >> reg_b_data[27:31]);  // MSB word
+                        compute[32:63]  = (reg_a_data[32] == 1'b1) ? ((reg_a_data[32:63]  >> reg_b_data[59:63]) | ~(32'hFFFFFFFF >> reg_b_data[59:63])) : (reg_a_data[32:63]  >> reg_b_data[59:63]);  // LSB word
+                    end
 
+                    2'b11: begin // Double-word (64-bit), shift = 6 bits
+                        compute[0:63] = (reg_a_data[0] == 1'b1) ?
+                                        ((reg_a_data[0:63] >> reg_b_data[58:63]) | ~(64'hFFFFFFFFFFFFFFFF >> reg_b_data[58:63])) :
+                                        (reg_a_data[0:63] >> reg_b_data[58:63]);
+                    end
+
+                endcase                 
             end
             
             VRTTH : begin  
@@ -483,13 +513,13 @@ module alu (
                         compute[0:15]  = reg_a_data[0:7]   * reg_a_data[0:7];     // byte 0
                     end
                     
-                    // 16b multiplication (16b × 16b = 32b × 2 lanes)
+                    // 16b multiplication (16b Ã— 16b = 32b Ã— 2 lanes)
                     2'b01: begin
                         compute[0:31]   = reg_a_data[0:15]   * reg_a_data[0:15];    
                         compute[32:63]  = reg_a_data[32:47]  * reg_a_data[32:47];   
                     end
                     
-                    // 32b multiplication (32b × 32b = 64b result)
+                    // 32b multiplication (32b Ã— 32b = 64b result)
                     2'b10: begin
                         compute[0:63] = reg_a_data[0:31] * reg_a_data[0:31];
                     end
@@ -509,13 +539,13 @@ module alu (
                     end
 
                     
-                    // 16b multiplication (16b × 16b = 32b × 2 lanes) { even, odd, even, odd)
+                    // 16b multiplication (16b Ã— 16b = 32b Ã— 2 lanes) { even, odd, even, odd)
                     2'b01: begin
                         compute[0:31]   = reg_a_data[16:31]  * reg_a_data[16:31];    
                         compute[32:63]  = reg_a_data[48:63]  * reg_a_data[48:63];   
                     end
                     
-                    // 32b multiplication (32b × 32b = 64b result) { even , odd }
+                    // 32b multiplication (32b Ã— 32b = 64b result) { even , odd }
                     2'b10: begin
                         compute[0:63] = reg_a_data[32:63] * reg_a_data[32:63];
                     end
