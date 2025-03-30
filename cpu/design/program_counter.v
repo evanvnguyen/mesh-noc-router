@@ -11,11 +11,12 @@ module program_counter (
     if (reset)
       pc_out <= 64'b0;
     else 
-      if (!stall)
-        pc_out <= pc_out + 1;
+      if (!stall) begin
+        if (branch)
+          pc_out <= branch_address;
+        else
+          pc_out <= pc_out + 1;
 
-      if (branch) begin
-        pc_out <= branch_address;
       end
   end
 

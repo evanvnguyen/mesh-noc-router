@@ -30,7 +30,7 @@ instruction_set = {
 
 def to_binary(value, bits=5):
     try:
-        int_value = int(value, 2) if all(c in '01' for c in value) else int(value)
+        int_value = int(value) #int(value, 2) if all(c in '01' for c in value) else int(value)
         if not (0 <= int_value <= 31):
             raise ValueError("Register values must be between 0 and 31")
         return format(int_value, f'0{bits}b')
@@ -172,8 +172,8 @@ def create_gui():
                 field5_var.set("")
                 field6_var.set("")
 
-                www_label.delete(0, tk.END)
-                pp_label.delete(0, tk.END)
+                #www_label.delete(0, tk.END)
+                #pp_label.delete(0, tk.END)
 
             else:
                 # ALU type

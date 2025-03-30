@@ -94,7 +94,7 @@ mux #(.WIDTH(32)) branch_mux (
   .value_if_high({16'b0, id_out_immediate_address}),
   .control_signal(if_branch),
   .selection(pc_out)
-  );
+);
 
 register_file rf(
   .clk(clk),
@@ -196,18 +196,18 @@ always @(id_out_bez or id_out_bnez or rf_out_rB_data) begin
   // We use rB_data to access rD data.
   if (id_out_bez) begin
     if (rf_out_rB_data == 64'b0) begin // if rf[rD] == 0
-      if_branch = 1'b1;
+      if_branch = !hdu_out_is_hazard;
     end
   end
 
   if (id_out_bnez) begin
     if (rf_out_rB_data != 64'b0) begin // if rf[rD] != 0
-      if_branch = 1'b1;
+      if_branch = !hdu_out_is_hazard;
     end
   end
 end
 
-always @(id_stage_ld or id_stage_sd or ex_stage_ld or ex_stage_sd) begin
+always @(id_stage_ld or id_stage_sd or ex_stage_ld or ex_stage_sd or id_out_sd) begin
   if (!reset) begin
     memEn = 1'b0;
     memWrEn = 1'b0;
@@ -227,12 +227,19 @@ always @(id_stage_ld or id_stage_sd or ex_stage_ld or ex_stage_sd) begin
       memEn = 1'b1;
     end
 
-    if (id_stage_sd) begin
+    if (id_out_sd) begin
       memEn = 1'b1;
       memWrEn = 1'b1;
-      d_out = ex_stage_alu_out;
-      addr_out = ex_stage_rD_address;
+      d_out = rf_out_rB_data;
+      addr_out = {16'b0, id_stage_immediate_address};
     end
+
+    // if (id_stage_sd) begin
+    //   memEn = 1'b1;
+    //   memWrEn = 1'b1;
+    //   d_out = ex_stage_alu_out;
+    //   addr_out = ex_stage_rD_address;
+    // end
   end
 end
 

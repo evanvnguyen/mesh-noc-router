@@ -9,7 +9,7 @@ module tb_four_stage_processor;
   wire memWrEn;
   wire memEn;
   
-  integer clock_cycle;
+  integer clock_cycle, i, dmem0_dump_file;
 
   imem instruc_mem(
     .memAddr(pc_out),
@@ -44,20 +44,37 @@ module tb_four_stage_processor;
     clock_cycle = 0;
 
     reset = 1'b1;
-    #8
+    repeat(5) @(negedge clk); 
     reset = 1'b0;
-    $readmemh("rf_random_values.txt", uut.rf.registerFile);
-    $readmemh("cpu_test_instructions2.txt", instruc_mem.MEM);
+
+    $readmemh("imem_1.fill", instruc_mem.MEM);
     $readmemh("dmem.fill", data_mem.MEM);
+
+    wait (inst_in == 32'h00000000);
+    $display("The program completed in %d cycles", clock_cycle);
+    // Let us now flush the pipe line
+    repeat(5) @(negedge clk); 
+    // Open file for output
+    dmem0_dump_file = $fopen("cmp_test.dmem0.dump"); // assigning the channel descriptor for output file
+
+    // Let us now dump all the locations of the data memory now
+    for (i=0; i<128; i=i+1) 
+    begin
+      $fdisplay(dmem0_dump_file, "Memory location #%d : %h ", i, data_mem.MEM[i]);
+    end
+    $fclose(dmem0_dump_file);
+    $finish;
+    //
+    //$readmemh("rf_random_values.txt", uut.rf.registerFile);
+    //$readmemh("cpu_test_instructions2.txt", instruc_mem.MEM);
+    //$readmemh("dmem.fill", data_mem.MEM);
   end
   
   always @(posedge clk) begin
-    if (!reset) begin        
+    if (reset)
+       clock_cycle <= 0;
+    else  
        clock_cycle <= clock_cycle + 1;
-       
-       if (clock_cycle >= 30) 
-        $finish;
-    end
   end
 
 endmodule
