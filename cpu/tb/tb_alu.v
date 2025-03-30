@@ -966,37 +966,38 @@ module tb;
         //  - Results are packed into a single 64-bit value in field order
         // ===================================================================
 
-        // WW = 00  8-bit fields, arithmetic shift right
-        execute_vsra(
-            64'h03aaaaaa01010301,
-            64'h0000000000550ba1,
-            64'h00fdeaaa00000000,
-            2'b00
-        );
-        
-        // WW = 01 16-bit fields, arithmetic shift right
-        execute_vsra(
-            64'h0055000f00030055,
-            64'h00000000000005b4,
-            64'h0055000000000005,
-            2'b01
-        );
-        
-        // WW = 10  32-bit fields, arithmetic shift right
-        execute_vsra(
-            64'h0000005500000001,
-            64'h0000000000000130,
-            64'h0000000000000000,
-            2'b10
-        );
-        
-        // WW = 11 64-bit field, arithmetic shift right
-        execute_vsra(
-            64'h00000000000000aa,
-            64'h000000000000003a,
-            64'h0000000000000000,
-            2'b11
-        );
+// WW = 00 ? Byte Mode (8b chunks)
+execute_vsra(
+    64'h7e05b3ad4f9c5d97,
+    64'h1c2be3db083a8948,
+    64'h0001b3fe13fe17e5,
+    2'b00
+);
+
+// WW = 01 ? Halfword Mode (16b chunks)
+execute_vsra(
+    64'hdcd624ee026f47aa,
+    64'h74cc8afa4fcc199b,
+    64'hee6b024e0002008f,
+    2'b01
+);
+
+// WW = 10 ? Word Mode (32b chunks)
+execute_vsra(
+    64'hdcd624ee026f47aa,
+    64'h74cc8afa4fcc199b,
+    64'hffee6b12000009bd,
+    2'b10
+);
+
+
+// WW = 11 ? Doubleword Mode (64b)
+execute_vsra(
+    64'ha2b7d28ea6a7136c,
+    64'h03ed2b94f6cb6d63,
+    64'ha2b7d28ea6a7136c,
+    2'b11
+);
         
         // ===================================================================
         //  VSQR Instruction Test Cases
