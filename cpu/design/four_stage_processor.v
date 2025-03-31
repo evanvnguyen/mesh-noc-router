@@ -71,8 +71,8 @@ reg [0:2] ex_stage_ppp;
 
 // EX/WB stage interconnects
 // ALU, rA_mux, rB_mux, fdu wires
-wire fdu_forward_rA;
-wire fdu_forward_rB;
+wire [0:1] fdu_forward_rA;
+wire [0:1] fdu_forward_rB;
 wire [0:63] ex_rA_mux_out;
 wire [0:63] ex_rB_mux_out;
 wire [0:63] ex_alu_output;
@@ -152,8 +152,8 @@ alu alu(
   .alu_op(id_stage_alu_operation),
   .width(id_stage_ww),
   .immediate_address(id_stage_immediate_address),
-  .reg_a_data(id_stage_rA_data),
-  .reg_b_data(id_stage_rB_data),
+  .reg_a_data((fdu_forward_rA == 2'b11 ? ex_rA_mux_out : id_stage_rA_data)),
+  .reg_b_data((fdu_forward_rB == 2'b11 ? ex_rB_mux_out : id_stage_rB_data)),
   .instruction(),
   .alu_out(ex_alu_output)
 );
@@ -161,11 +161,12 @@ alu alu(
 // When loading we can use id_out
 // When not loading can use id_stage?
 forwarding_unit fdu(
-  .id_rA_address((id_stage_sd ? id_stage_rA_address : id_out_rA_address)),
-  .id_rB_address((id_stage_sd ? id_stage_rB_address : id_out_rB_address)),
-  .ex_rA_address(ex_stage_rA_address),
-  .ex_rB_address(ex_stage_rB_address),
+  .id_out_rA_address(id_out_rA_address),
+  .id_out_rB_address(id_out_rB_address),
+  .id_stage_rA_address(id_stage_rA_address),
+  .id_stage_rB_address(id_stage_rB_address),
   .ex_rD_address(ex_stage_rD_address),
+  .storing(id_stage_sd),
   .forward_rA(fdu_forward_rA),
   .forward_rB(fdu_forward_rB)
 );
@@ -173,14 +174,14 @@ forwarding_unit fdu(
 mux ex_rA_mux(
   .value_if_low(id_stage_rA_data),
   .value_if_high(wb_result_mux_out),
-  .control_signal(fdu_forward_rA),
+  .control_signal(fdu_forward_rA > 0),
   .selection(ex_rA_mux_out)
 );
 
 mux ex_rB_mux(
   .value_if_low(id_stage_rB_data),
   .value_if_high(wb_result_mux_out),
-  .control_signal(fdu_forward_rB),
+  .control_signal(fdu_forward_rB > 0),
   .selection(ex_rB_mux_out)
 );
 
@@ -280,8 +281,8 @@ always @(posedge clk) begin
       id_stage_immediate_address <= id_out_immediate_address;
       id_stage_ppp <= id_out_ppp;
       id_stage_ww <= id_out_ww;
-      id_stage_rA_data <= (fdu_forward_rA ? ex_rA_mux_out : rf_out_rA_data);
-      id_stage_rB_data <= (fdu_forward_rB ? ex_rB_mux_out : rf_out_rB_data);
+      id_stage_rA_data <= ((fdu_forward_rA == 2'b01 | fdu_forward_rA == 2'b10) ? ex_rA_mux_out : rf_out_rA_data);
+      id_stage_rB_data <= ((fdu_forward_rB == 2'b01 | fdu_forward_rB == 2'b10) ? ex_rB_mux_out : rf_out_rB_data);
       id_stage_alu <= id_out_alu;
       id_stage_sfu <= id_out_sfu;
       id_stage_ld <= id_out_ld;
