@@ -158,9 +158,11 @@ alu alu(
   .alu_out(ex_alu_output)
 );
 
+// When loading we can use id_out
+// When not loading can use id_stage?
 forwarding_unit fdu(
-  .id_rA_address(id_out_rA_address),
-  .id_rB_address(id_out_rB_address),
+  .id_rA_address((!id_stage_sd ? id_out_rA_address : id_stage_rA_address)),
+  .id_rB_address((!id_stage_sd ? id_out_rB_address : id_stage_rB_address)),
   .ex_rA_address(ex_stage_rA_address),
   .ex_rB_address(ex_stage_rB_address),
   .ex_rD_address(ex_stage_rD_address),
@@ -207,7 +209,7 @@ always @(id_out_bez or id_out_bnez or rf_out_rB_data) begin
   end
 end
 
-always @(id_stage_ld or id_stage_sd or ex_stage_ld or ex_stage_sd or id_out_sd) begin
+always @(id_stage_ld or ex_stage_ld or id_stage_sd or id_stage_immediate_address or id_stage_rB_data) begin
   if (!reset) begin
     memEn = 1'b0;
     memWrEn = 1'b0;
@@ -227,10 +229,10 @@ always @(id_stage_ld or id_stage_sd or ex_stage_ld or ex_stage_sd or id_out_sd) 
       memEn = 1'b1;
     end
 
-    if (id_out_sd) begin
+    if (id_stage_sd) begin
       memEn = 1'b1;
       memWrEn = 1'b1;
-      d_out = rf_out_rB_data;
+      d_out = (fdu_forward_rB ? ex_rB_mux_out : id_stage_rB_data);
       addr_out = {16'b0, id_stage_immediate_address};
     end
 
