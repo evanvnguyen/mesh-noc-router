@@ -46,9 +46,15 @@ module tb_four_stage_processor;
     reset = 1'b1;
     repeat(5) @(negedge clk); 
     reset = 1'b0;
+    
+    //$readmemh("cpu_test_instructions2.txt", instruc_mem.MEM);
+    //$readmemh("dmem copy.fill", data_mem.MEM);
 
-    $readmemh("imem_0.0.fill", instruc_mem.MEM);
-    $readmemh("dmem_0.0.fill", data_mem.MEM);
+    //$readmemh("imem_0.0.fill", instruc_mem.MEM);
+    //$readmemh("dmem_0.0.fill", data_mem.MEM);
+
+    $readmemh("imem_3.fill", instruc_mem.MEM);
+    $readmemh("dmem.fill", data_mem.MEM);
 
     wait (inst_in == 32'h00000000);
     $display("The program completed in %d cycles", clock_cycle);

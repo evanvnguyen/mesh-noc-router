@@ -161,8 +161,8 @@ alu alu(
 // When loading we can use id_out
 // When not loading can use id_stage?
 forwarding_unit fdu(
-  .id_rA_address((!id_stage_sd ? id_out_rA_address : id_stage_rA_address)),
-  .id_rB_address((!id_stage_sd ? id_out_rB_address : id_stage_rB_address)),
+  .id_rA_address((id_stage_sd ? id_stage_rA_address : id_out_rA_address)),
+  .id_rB_address((id_stage_sd ? id_stage_rB_address : id_out_rB_address)),
   .ex_rA_address(ex_stage_rA_address),
   .ex_rB_address(ex_stage_rB_address),
   .ex_rD_address(ex_stage_rD_address),
