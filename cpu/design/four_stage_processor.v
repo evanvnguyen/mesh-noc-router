@@ -210,7 +210,7 @@ always @(id_out_bez or id_out_bnez or rf_out_rB_data) begin
   end
 end
 
-always @(id_stage_ld or ex_stage_ld or id_stage_sd or id_stage_immediate_address or id_stage_rB_data) begin
+always @(id_stage_ld or ex_stage_ld or id_stage_sd or id_stage_immediate_address) begin
   if (!reset) begin
     memEn = 1'b0;
     memWrEn = 1'b0;
@@ -233,7 +233,7 @@ always @(id_stage_ld or ex_stage_ld or id_stage_sd or id_stage_immediate_address
     if (id_stage_sd) begin
       memEn = 1'b1;
       memWrEn = 1'b1;
-      d_out = (fdu_forward_rB ? ex_rB_mux_out : id_stage_rB_data);
+      d_out = (fdu_forward_rB == 2'b10 || fdu_forward_rB == 2'b01 ? ex_rB_mux_out : id_stage_rB_data);
       addr_out = {16'b0, id_stage_immediate_address};
     end
 

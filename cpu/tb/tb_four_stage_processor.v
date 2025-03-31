@@ -50,7 +50,7 @@ module tb_four_stage_processor;
     //$readmemh("imem_0.0.fill", instruc_mem.MEM);
     //$readmemh("dmem_0.0.fill", data_mem.MEM);
     
-    for (j=9; j < 10; j = j + 1) begin
+    for (j=1; j < 10; j = j + 1) begin
         reset = 1'b1;
         repeat(5) @(negedge clk); 
         reset = 1'b0;
