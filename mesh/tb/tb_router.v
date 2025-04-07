@@ -52,8 +52,8 @@ module tb_router();
   );
 
   initial begin
-    $dumpfile("iverilog-out/dump.vcd");
-    $dumpvars(0, tb_router);
+    //$dumpfile("iverilog-out/dump.vcd");
+    //$dumpvars(0, tb_router);
     data_array[0] = 64'h200200000000FA50; // CW -> cw 2 hops
     data_array[1] = 64'h0002000000006840; // CCW -> CCW 2 hops
     data_array[2] = 64'h401200000000ffff; // PE -> CCW 1 hop
@@ -110,21 +110,21 @@ module tb_router();
     $finish;
   end
 
-  always @(negedge clk) begin
-    if (cycle_count == 20) begin
-      if (peri) begin
-        pesi <= 1;
-        pedi <= data_array[5];
-      end
-      if (ccwri) begin
-        ccwsi <= 1;
-        ccwdi <= data_array[6];
-      end
-    end
-  end
+  // always @(negedge clk) begin
+  //   if (cycle_count == 20) begin
+  //     if (peri) begin
+  //       pesi <= 1;
+  //       pedi <= data_array[5];
+  //     end
+  //     if (ccwri) begin
+  //       ccwsi <= 1;
+  //       ccwdi <= data_array[6];
+  //     end
+  //   end
+  // end
     
 	always @(posedge clk) begin
-		if (!reset) begin
+	if (!reset) begin
       cwsi <= 0;
       ccwsi <= 0;
       pesi <= 0;
@@ -136,6 +136,30 @@ module tb_router();
       nsdi <= 0;
       sndi <= 0;
 
+      run_tests();
+/*       if (cycle_count == 3) begin
+        // test case 2 tests loading data into the ccwsi virtual channel
+        if (ccwri) begin
+          ccwsi <= 1;
+          ccwdi <= data_array[1];
+        end  
+      end
+
+      if (cycle_count == 4) begin
+        // test case 3 tests loading data into the pesi virtual channel
+        if (peri) begin
+          pesi <= 1;
+          pedi <= data_array[2];
+        end  
+      end */
+
+		end
+
+    cycle_count <= cycle_count + 1;
+	end
+
+  task run_tests();
+    begin
       case (cycle_count)
         3: begin // test case 1 tests loading data into the cwsi virtual channel
           if (cwri) begin
@@ -310,9 +334,6 @@ module tb_router();
           end
         end
       endcase
-
-		end
-
-    cycle_count <= cycle_count + 1;
-	end
+    end
+  endtask
 endmodule

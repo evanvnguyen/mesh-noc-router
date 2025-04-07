@@ -31,11 +31,15 @@ module router_output_channel (
       // Low polarity means that the virtual channel 2 is the input channel
       if (polarity) begin
         // If the virtual channel is empty, we can accept new data
-        if (vc_1_sent || virtual_channel_1 == 64'b0)
+        if (vc_1_sent || virtual_channel_1 == 64'b0) begin
           virtual_channel_1 = data_in;
+          vc_1_sent = 1'b0;
+        end
       end else begin
-        if (vc_2_sent || virtual_channel_2 == 64'b0)
+        if (vc_2_sent || virtual_channel_2 == 64'b0) begin
           virtual_channel_2 = data_in;
+          vc_2_sent = 1'b0;
+        end
       end
 
             // If the virtual channel is not empty and the receiver is not ready, we are blocked
@@ -44,7 +48,7 @@ module router_output_channel (
     end
   end
 
-  always @(*) begin
+  always @(polarity) begin
     if (reset) begin
       send = 1'b0;
       data_out = 64'b0;
@@ -53,14 +57,12 @@ module router_output_channel (
     end else begin
       send = 1'b0;
       data_out = 64'b0;
-      vc_1_sent = 1'b0;
-      vc_2_sent = 1'b0;
 
       // High polarity means that the virtual channel 2 is the output channel
       // Low polarity means that the virtual channel 1 is the output channel
-      if (!polarity) begin
+      if (polarity) begin
         // Are we ready to receive data?
-        if (ready && virtual_channel_2 != 0) begin
+        if (ready && virtual_channel_2 != 0 && !vc_2_sent) begin
           data_out <= virtual_channel_2;
           send <= 1'b1;
 
@@ -69,7 +71,7 @@ module router_output_channel (
         end
       end else begin
         // Are we ready to receive data?
-        if (ready && virtual_channel_1 != 0) begin
+        if (ready && virtual_channel_1 != 0 && !vc_2_sent) begin
           data_out <= virtual_channel_1;
           send <= 1'b1;
 

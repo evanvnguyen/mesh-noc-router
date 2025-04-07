@@ -305,7 +305,27 @@ module router (
       reset_clocked_values;
       polarity <= 1'b0;
     end else begin
-      reset_clocked_values;
+      block_channels;
+
+      polarity <= ~polarity;
+    end
+  end
+
+  always @(*) begin
+    reset_values;
+    if (!reset) begin
+      // We need to look at the direction of the data and figure out where to 
+      // send it. We will use an arbiter to determine who has priority if
+      // multiple channels are trying to send data to the same output channel.
+      check_cw_data;
+
+      check_ccw_data;
+
+      check_ns_data;
+
+      check_sn_data;
+
+      check_pe_data;      
 
       // more the data from the input channels to the output channels
       if (cw_requests > 0) begin
@@ -377,28 +397,6 @@ module router (
           end
         endcase
       end
-
-      block_channels;
-
-      polarity <= ~polarity;
-    end
-  end
-
-  always @(*) begin
-    reset_values;
-    if (!reset) begin
-      // We need to look at the direction of the data and figure out where to 
-      // send it. We will use an arbiter to determine who has priority if
-      // multiple channels are trying to send data to the same output channel.
-      check_cw_data;
-
-      check_ccw_data;
-
-      check_ns_data;
-
-      check_sn_data;
-
-      check_pe_data;      
     end            
 
     polarity_out = polarity;
@@ -406,12 +404,6 @@ module router (
 
   task reset_clocked_values();
     begin
-        cw_output_channel_data_in <= 64'b0;
-        ccw_output_channel_data_in <= 64'b0;
-        pe_output_channel_data_in <= 64'b0;
-        ns_output_channel_data_in <= 64'b0;
-        sn_output_channel_data_in <= 64'b0;
-
       if (reset) begin
         block_cw_input_channel = 1'b0;
         block_ccw_input_channel = 1'b0;
@@ -429,6 +421,12 @@ module router (
       pe_requests = 4'b0; 
       ns_requests = 4'b0; 
       sn_requests = 4'b0;
+
+      cw_output_channel_data_in = 64'b0;
+      ccw_output_channel_data_in = 64'b0;
+      pe_output_channel_data_in = 64'b0;
+      ns_output_channel_data_in = 64'b0;
+      sn_output_channel_data_in = 64'b0;
     end
   endtask
 
