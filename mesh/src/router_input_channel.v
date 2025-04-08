@@ -25,6 +25,7 @@ module router_input_channel (
 
   always @(*) begin
     if (reset) begin
+      ready = 1'b1;
       virtual_channel_1 = 64'b0;
       virtual_channel_2 = 64'b0;
       vc_1_blocked = 1'b0;
@@ -68,7 +69,6 @@ module router_input_channel (
 
   always @(posedge clk) begin
     if (reset) begin
-      ready <= 1'b1;
       data_out <= 64'b0;
       vc_1_read <= 1'b1;
       vc_2_read <= 1'b1;

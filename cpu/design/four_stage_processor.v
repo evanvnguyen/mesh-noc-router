@@ -3,11 +3,16 @@ module four_stage_processor (
   input reset,
   input [0:31] inst_in,       // Instruction in from instruction memory
   input [0:63] d_in,          // Data input from data memory
-  output [0:31] pc_out,   // Program counter out
+  output [0:31] pc_out,       // Program counter out
   output reg [0:63] d_out,    // Data output to data memory
   output reg [0:31] addr_out, // Data memory address
   output reg memWrEn,         // Data memory write enable
-  output reg memEn            // Data memory enable
+  output reg memEn,           // Data memory enable
+  output nicEn,               // NIC enable 
+  output nicWrEn,             // NIC write enable
+  output reg [0:1] addr_nic,   // NIC address
+  output reg [0:63] d_out_nic, // NIC data
+  input [0:63] d_in_nic,       // NIC data in
 );
 
 // We have 4 stages so we will need 3 pipeline registers
@@ -187,7 +192,7 @@ mux ex_rB_mux(
 
 mux wb_result_mux(
   .value_if_low(ex_stage_alu_out),
-  .value_if_high(d_in),
+  .value_if_high((id_stage_immediate_address[0:1] == 2'b11 && ex_stage_ld) ? d_in_nic : d_in),
   .control_signal(ex_stage_ld & !ex_stage_alu_or_sfu),
   .selection(wb_result_mux_out)
 );
@@ -216,25 +221,46 @@ always @(id_stage_ld or ex_stage_ld or id_stage_sd or id_stage_immediate_address
     memWrEn = 1'b0;
     d_out = 64'b0;
     addr_out = 5'b0;
+    addr_nic = 2'b0;
+    d_out_nic = 64'b0;
+    nicEn = 1'b0;
+    nicWrEn = 1'b0;
     // We should be loading data from the data memory
     // Loading takes 2 cycles and needs to start in the ID stage.
     // This will allow us to write the loaded value into the 
     // RF in the WB stage.
-    if (id_stage_ld | id_stage_sd) begin
-      addr_out = {16'b0, id_out_immediate_address};
-      memEn = 1'b1;
+    if (id_stage_ld) begin
+      if (id_stage_immediate_address[0:1] == 2'b11) begin
+        nicEn = 1'b1;
+        addr_nic = id_stage_immediate_address[14:15];
+      end else begin
+        addr_out = {16'b0, id_out_immediate_address};
+        memEn = 1'b1;
+      end
     end
     
     if (ex_stage_ld) begin
-      addr_out = {16'b0, id_stage_immediate_address};
-      memEn = 1'b1;
+      if (id_stage_immediate_address[0:1] == 2'b11) begin
+        nicEn = 1'b1;
+        addr_nic = 2'b10;
+      end else begin
+        addr_out = {16'b0, id_stage_immediate_address};
+        memEn = 1'b1;
+      end
     end
 
     if (id_stage_sd) begin
-      memEn = 1'b1;
-      memWrEn = 1'b1;
-      d_out = (fdu_forward_rB == 2'b10 || fdu_forward_rB == 2'b01 ? ex_rB_mux_out : id_stage_rB_data);
-      addr_out = {16'b0, id_stage_immediate_address};
+      if (id_stage_immediate_address[0:1] == 2'b11) begin
+        nicEn = 1'b1;
+        nicWrEn = 1'b1;
+        addr_nic = 2'b00
+        d_in_nic = (fdu_forward_rB == 2'b10 || fdu_forward_rB == 2'b01 ? ex_rB_mux_out : id_stage_rB_data);
+      end else begin
+        memEn = 1'b1;
+        memWrEn = 1'b1;
+        d_out = (fdu_forward_rB == 2'b10 || fdu_forward_rB == 2'b01 ? ex_rB_mux_out : id_stage_rB_data);
+        addr_out = {16'b0, id_stage_immediate_address};
+      end
     end
 
     // if (id_stage_sd) begin
