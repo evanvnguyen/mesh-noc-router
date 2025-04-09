@@ -253,7 +253,7 @@ always @(id_stage_ld or ex_stage_ld or id_stage_sd or id_stage_immediate_address
       if (id_stage_immediate_address[0:1] == 2'b11) begin
         nicEn = 1'b1;
         nicWrEn = 1'b1;
-        addr_nic = 2'b00
+        addr_nic = 2'b00;
         d_in_nic = (fdu_forward_rB == 2'b10 || fdu_forward_rB == 2'b01 ? ex_rB_mux_out : id_stage_rB_data);
       end else begin
         memEn = 1'b1;
