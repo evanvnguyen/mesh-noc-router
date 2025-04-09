@@ -8,11 +8,11 @@ module four_stage_processor (
   output reg [0:31] addr_out, // Data memory address
   output reg memWrEn,         // Data memory write enable
   output reg memEn,           // Data memory enable
-  output nicEn,               // NIC enable 
-  output nicWrEn,             // NIC write enable
+  output reg nicEn,               // NIC enable 
+  output reg nicWrEn,             // NIC write enable
   output reg [0:1] addr_nic,   // NIC address
   output reg [0:63] d_out_nic, // NIC data
-  input [0:63] d_in_nic,       // NIC data in
+  output reg [0:63] d_in_nic       // NIC data in
 );
 
 // We have 4 stages so we will need 3 pipeline registers
