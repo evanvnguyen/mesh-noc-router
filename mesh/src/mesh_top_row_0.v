@@ -138,10 +138,10 @@ module mesh_top_row_0 #(
     
         // CPU-NIC Interface
         .addr(addr_nic_0_0),
-        .d_in(d_in_0_0_between_nic),
-        .d_out(d_out_0_0_between_nic),
-        .nicEn(memEn_0_0),
-        .nicEnWR(memWrEn_0_0),
+        .d_in(d_in_nic_0_0),
+        .d_out(d_out_nic_0_0),
+        .nicEn(nicEn_0_0),
+        .nicEnWR(nicWrEn_0_0),
     
         // Router-NIC Interface
         .net_si(net_si_0_0),
@@ -156,7 +156,7 @@ module mesh_top_row_0 #(
     
     four_stage_processor cpu_0_0 (
         .clk(clk),
-        .reset(clk),
+        .reset(reset),
     
         // CPU - CPU interface
         .inst_in(inst_in_0_0),
@@ -204,10 +204,10 @@ module mesh_top_row_0 #(
     
         // CPU-NIC Interface
         .addr(addr_nic_1_0),
-        .d_in(d_out_1_0_between_nic),
-        .d_out(d_in_1_0_between_nic),
-        .nicEn(memEn_1_0),
-        .nicEnWR(memWrEn_1_0),
+        .d_in(d_in_nic_1_0),
+        .d_out(d_out_nic_1_0),
+        .nicEn(nicEn_1_0),
+        .nicEnWR(nicWrEn_1_0),
     
         // Router-NIC Interface
         .net_si(net_si_1_0),
@@ -222,7 +222,7 @@ module mesh_top_row_0 #(
     
     four_stage_processor cpu_1_0 (
         .clk(clk),
-        .reset(clk),
+        .reset(reset),
     
         // CPU - CPU interface
         .inst_in(inst_in_1_0),
@@ -270,10 +270,10 @@ module mesh_top_row_0 #(
     
         // CPU-NIC Interface
         .addr(addr_nic_2_0),
-        .d_in(d_in_2_0_between_nic),
-        .d_out(d_out_2_0_between_nic),
-        .nicEn(memEn_2_0),
-        .nicEnWR(memWrEn_2_0),
+        .d_in(d_in_nic_2_0),
+        .d_out(d_out_nic_2_0),
+        .nicEn(nicEn_2_0),
+        .nicEnWR(nicWrEn_2_0),
     
         // Router-NIC Interface
         .net_si(net_si_2_0),
@@ -288,7 +288,7 @@ module mesh_top_row_0 #(
 
     four_stage_processor cpu_2_0 (
         .clk(clk),
-        .reset(clk),
+        .reset(reset),
     
         // CPU - CPU interface
         .inst_in(inst_in_2_0),
@@ -336,10 +336,10 @@ module mesh_top_row_0 #(
     
         // CPU-NIC Interface
         .addr(addr_nic_3_0),
-        .d_in(d_in_3_0_between_nic),
-        .d_out(d_out_3_0_between_nic),
-        .nicEn(memEn_3_0),
-        .nicEnWR(memWrEn_3_0),
+        .d_in(d_in_nic_3_0),
+        .d_out(d_out_nic_3_0),
+        .nicEn(nicEn_3_0),
+        .nicEnWR(nicWrEn_3_0),
     
         // Router-NIC Interface
         .net_si(net_si_3_0),
@@ -355,7 +355,7 @@ module mesh_top_row_0 #(
     
     four_stage_processor cpu_3_0 (
         .clk(clk),
-        .reset(clk),
+        .reset(reset),
     
         // CPU - CPU interface
         .inst_in(inst_in_3_0),
