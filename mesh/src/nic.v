@@ -20,6 +20,9 @@ module nic #(parameter PACKET_WIDTH = 64)(
 );
 
 
+    
+
+
     // Internal Buffers and Status Registers
     reg [PACKET_WIDTH-1:0] channel_input_buffer;
     reg [PACKET_WIDTH-1:0] channel_output_buffer;
@@ -34,8 +37,24 @@ module nic #(parameter PACKET_WIDTH = 64)(
         net_ri = (channel_input_buffer_status == 0) ? 1'b1 : 1'b0;
     end
     
+    wire output_channel_blocked;
+    // if our output buffer is full and the router channel is full, we are blocked
+    assign output_channel_blocked = net_ro && (channel_output_buffer_status == 1'b1);
+    
+    
+    wire nic_output_clk_gate;
+    assign nic_output_clk_gate = (output_channel_blocked == 1'b0) ? 1'b1 : 1'b0;
+    
+   //` wire NIC_OUTPUT_GCLK;
+   // clk_gate_latch ccw_output_clk_gate (
+   //     .CLK(clk),
+   //     .EN(nic_output_clk_gate), 
+   //     .GCLK(NIC_OUTPUT_GCLK));
+
+
     // router handhsake
     always @(posedge clk or posedge reset) begin
+    //always @(posedge NIC_OUTPUT_GCLK or posedge reset) begin
         if (reset) begin
             channel_input_buffer <= 0;
             channel_output_buffer <= 0;
