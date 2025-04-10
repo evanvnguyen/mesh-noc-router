@@ -198,8 +198,18 @@ module router (
     .data_out(sn_input_channel_data_out)
   );
 
+  // CW
+  wire cw_output_clk_gate_en;
+  wire CW_OUTPUT_GCLK;
+  assign cw_output_clk_gate_en = (cw_output_channel_blocked == 1'b0) ? 1'b1 : 1'b0;
+  clk_gate_latch cw_output_clk_gate (
+    .CLK(clk), 
+    .EN(cw_output_clk_gate_en), .
+    GCLK(CW_OUTPUT_GCLK));
+
   router_output_channel cw_output_channel (
-    .clk(clk),
+    //.clk(clk),
+    .clk(CW_OUTPUT_GCLK),
     .reset(reset),
     .polarity(polarity),
     .ready(cwro),
@@ -208,9 +218,18 @@ module router (
     .send(cwso),
     .data_out(cwdo)
   );
+    
+  // CCW
+  wire ccw_output_clk_gate_en;
+  wire CCW_OUTPUT_GCLK;
+  assign ccw_output_clk_gate_en = (ccw_output_channel_blocked == 1'b0) ? 1'b1 : 1'b0;
+  clk_gate_latch ccw_output_clk_gate (
+    .CLK(clk),
+    .EN(ccw_output_clk_gate_en), 
+    .GCLK(CCW_OUTPUT_GCLK));
 
   router_output_channel ccw_output_channel (
-    .clk(clk),
+    .clk(CCW_OUTPUT_GCLK),
     .reset(reset),
     .polarity(polarity),
     .ready(ccwro),
@@ -219,9 +238,19 @@ module router (
     .send(ccwso),
     .data_out(ccwdo)
   );
-
+  
+  // PE
+  wire pe_output_clk_gate_en;
+  wire PE_OUTPUT_GCLK;
+  assign pe_output_clk_gate_en = (pe_output_channel_blocked == 1'b0) ? 1'b1 : 1'b0;
+  clk_gate_latch pe_output_clk_gate (
+      .CLK(clk),
+      .EN(pe_output_clk_gate_en),
+      .GCLK(PE_OUTPUT_GCLK)
+  );
+  
   router_output_channel pe_output_channel (
-    .clk(clk),
+    .clk(PE_OUTPUT_GCLK),
     .reset(reset),
     .polarity(polarity),
     .ready(pero),
@@ -230,9 +259,19 @@ module router (
     .send(peso),
     .data_out(pedo)
   );
+  
+  // NS
+  wire ns_output_clk_gate_en;
+  wire NS_OUTPUT_GCLK;
+  assign ns_output_clk_gate_en = (ns_output_channel_blocked == 1'b0) ? 1'b1 : 1'b0;
+  clk_gate_latch ns_output_clk_gate (
+      .CLK(clk),
+      .EN(ns_output_clk_gate_en),
+      .GCLK(NS_OUTPUT_GCLK)
+  );
 
   router_output_channel ns_output_channel (
-    .clk(clk),
+    .clk(NS_OUTPUT_GCLK),
     .reset(reset),
     .polarity(polarity),
     .ready(nsro),
@@ -241,9 +280,19 @@ module router (
     .send(nsso),
     .data_out(nsdo)
   );
-
+  
+  // SN
+  wire sn_output_clk_gate_en;
+  wire SN_OUTPUT_GCLK;
+  assign sn_output_clk_gate_en = (sn_output_channel_blocked == 1'b0) ? 1'b1 : 1'b0;
+  clk_gate_latch sn_output_clk_gate (
+      .CLK(clk),
+      .EN(sn_output_clk_gate_en),
+      .GCLK(SN_OUTPUT_GCLK)
+  );
+  
   router_output_channel sn_output_channel (
-    .clk(clk),
+    .clk(SN_OUTPUT_GCLK),
     .reset(reset),
     .polarity(polarity),
     .ready(snro),
