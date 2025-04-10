@@ -133,12 +133,11 @@ module mesh_top_row_2 #(
     router router_0_2 (
         .clk(clk), .reset(reset), .router_position(), .polarity_out(net_polarity_0_2),
         
-        //right 
+        //left 
         .cwsi(), .cwri(), .cwdi(), .ccwso(), .ccwro(), .ccwdo(),
         //.cwso(wasd0), .cwro(wasd1), .cwdo(wasd5), .ccwsi(wasd2), .ccwri(wasd3), .ccwdi(wasd6),
 
-        //left - gnd
-        //.cwso(), .cwro(), .cwdo(), .ccwsi(), .ccwri(), .ccwdi(),
+        //right        
         .cwso(wasd0), .cwro(wasd1), .cwdo(wasd5), .ccwsi(wasd2), .ccwri(wasd3), .ccwdi(wasd6),
         
         // top
@@ -335,10 +334,10 @@ module mesh_top_row_2 #(
     router router_3_2 (
         .clk(clk), .reset(reset), .router_position(), .polarity_out(net_polarity_3_2),
         
-        //right - gnd 
+        //left 
         .cwsi(cwsi_cwso_1), .cwri(cwri_cwro_1), .cwdi(cwdi_cwdo_1), .ccwso(ccwso_ccwsi_1), .ccwro(ccwro_ccwri_1), .ccwdo(ccwdo_ccwdi_1),
 
-        //left
+        //right
         .cwso(), .cwro(), .cwdo(), .ccwsi(), .ccwri(), .ccwdi(),
         
         // top

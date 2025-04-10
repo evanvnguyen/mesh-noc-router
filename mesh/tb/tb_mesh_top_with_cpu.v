@@ -367,29 +367,49 @@ module tb_mesh_top_with_cpu;
     for (j=1; j < 10; j = j + 1) begin
         repeat(5) @(negedge clk); 
         reset = 1'b0;
-    
         // Format the filename string: "imem_<j>.fill"
         // For all x_y combinations
-        $sformat(imem_filename_0_0, "imem_%0d.fill", j);
-        $sformat(imem_filename_1_0, "imem_%0d.fill", j);
-        $sformat(imem_filename_2_0, "imem_%0d.fill", j);
-        $sformat(imem_filename_3_0, "imem_%0d.fill", j);
-       
-        $sformat(imem_filename_0_1, "imem_%0d.fill", j);
-        $sformat(imem_filename_1_1, "imem_%0d.fill", j);
-        $sformat(imem_filename_2_1, "imem_%0d.fill", j);
-        $sformat(imem_filename_3_1, "imem_%0d.fill", j);
-       
-        $sformat(imem_filename_0_2, "imem_%0d.fill", j);
-        $sformat(imem_filename_1_2, "imem_%0d.fill", j);
-        $sformat(imem_filename_2_2, "imem_%0d.fill", j);
-        $sformat(imem_filename_3_2, "imem_%0d.fill", j);
-       
-        $sformat(imem_filename_0_3, "imem_%0d.fill", j);
-        $sformat(imem_filename_1_3, "imem_%0d.fill", j);
-        $sformat(imem_filename_2_3, "imem_%0d.fill", j);
-        $sformat(imem_filename_3_3, "imem_%0d.fill", j);
+        //$sformat(imem_filename_0_0, "imem_%0d.fill", j);
+        //$sformat(imem_filename_1_0, "imem_%0d.fill", j);
+        //$sformat(imem_filename_2_0, "imem_%0d.fill", j);
+        //$sformat(imem_filename_3_0, "imem_%0d.fill", j);
+        //
+        //$sformat(imem_filename_0_1, "imem_%0d.fill", j);
+        //$sformat(imem_filename_1_1, "imem_%0d.fill", j);
+        //$sformat(imem_filename_2_1, "imem_%0d.fill", j);
+        //$sformat(imem_filename_3_1, "imem_%0d.fill", j);
+        //
+        //$sformat(imem_filename_0_2, "imem_%0d.fill", j);
+        //$sformat(imem_filename_1_2, "imem_%0d.fill", j);
+        //$sformat(imem_filename_2_2, "imem_%0d.fill", j);
+        //$sformat(imem_filename_3_2, "imem_%0d.fill", j);
+        //
+        //$sformat(imem_filename_0_3, "imem_%0d.fill", j);
+        //$sformat(imem_filename_1_3, "imem_%0d.fill", j);
+        //$sformat(imem_filename_2_3, "imem_%0d.fill", j);
+        //$sformat(imem_filename_3_3, "imem_%0d.fill", j);
         
+        $sformat(imem_filename_0_0, "imem_0.0.fill", j);
+        $sformat(imem_filename_1_0, "imem_0.0.fill", j);
+        $sformat(imem_filename_2_0, "imem_0.0.fill", j);
+        $sformat(imem_filename_3_0, "imem_0.0.fill", j);
+                                          
+        $sformat(imem_filename_0_1, "imem_0.0.fill", j);
+        $sformat(imem_filename_1_1, "imem_0.0.fill", j);
+        $sformat(imem_filename_2_1, "imem_0.0.fill", j);
+        $sformat(imem_filename_3_1, "imem_0.0.fill", j);
+                                         
+        $sformat(imem_filename_0_2, "imem_0.0.fill", j);
+        $sformat(imem_filename_1_2, "imem_0.0.fill", j);
+        $sformat(imem_filename_2_2, "imem_0.0.fill", j);
+        $sformat(imem_filename_3_2, "imem_0.0.fill", j);
+                                          
+        $sformat(imem_filename_0_3, "imem_0.0.fill", j);
+        $sformat(imem_filename_1_3, "imem_0.0.fill", j);
+        $sformat(imem_filename_2_3, "imem_0.0.fill", j);
+        $sformat(imem_filename_3_3, "imem_0.0.fill", j);
+        
+    
         // For all x_y combinations
         $readmemh(imem_filename_0_0, instruc_mem_0_0.MEM);
         $readmemh("dmem.fill", data_mem_0_0.MEM);

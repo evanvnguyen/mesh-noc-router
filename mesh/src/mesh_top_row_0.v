@@ -106,15 +106,51 @@ module mesh_top_row_0 #(
     wire [0:63] d_out_nic_0_0, d_out_nic_1_0, d_out_nic_2_0, d_out_nic_3_0;     // NIC data output
     wire [0:63] d_in_nic_0_0, d_in_nic_1_0, d_in_nic_2_0, d_in_nic_3_0;              // NIC data input
 
+    // Left Ports Wire Declarations
+    wire ccwsi_0_0 = 0;
+    wire ccwso_0_0;
+    wire ccwro_0_0 = 0;
+    
+    wire cwsi_0_0 = 0;
+    wire cwri_0_0;
+    wire cwso_0_0;
+    wire cwro_0_0 = 0;
+    
+    // Bottom Ports Wire Declarations
+    wire snsi_0_0 = 0;
+    wire snri_0_0;
+    wire nsso_0_0;
+    wire nsro_0_0 = 0;
 
+
+    // These signals should always be 1, as they are corresponding to the empty edge router buffers
+    wire signal_to_icg_high_0_0, signal_to_icg_low_0_0;
+    // Clock Gate Enable based on the conditions:
+    // 1) SI signals are LOW (no data sending into input buffer)
+    // 2) RO signals are HIGH (neighbor can accept a packet) OR RO signals are LOW (neighbor can't accept a packet)
+    // 3) SO signal is LOW (no packet to be sent to a neighbor)
+    // Clock Gate Enable for router_0_0
+    wire router_0_0_icg_enable = !( 
+        (cwsi_0_0 == 1'b0) &&            // SI signal LOW for left (no data in input buffer)
+        (wasd1 == 1'b1 || wasd1 == 1'b0) && // RO signal HIGH or LOW for left (neighbor can/can't accept packet)
+        (ccwso_0_0 == 1'b0) &&           // SO signal LOW for right (no packet to send to neighbor)
+        (ccwro_0_0 == 1'b1 || ccwro_0_0 == 1'b0) && // RO signal HIGH or LOW for right (neighbor can/can't accept packet)
+        (snsi_0_0 == 1'b0) &&            // SI signal LOW for bottom (no data in input buffer)
+        (nsso_0_0 == 1'b0) &&            // SO signal LOW for bottom (no packet to send to neighbor)
+        (nsro_0_0 == 1'b1 || nsro_0_0 == 1'b0)); // RO signal HIGH or LOW for bottom (neighbor can/can't accept packet)
+
+        // 1 && 1 && 1 && 1 && 1 && 1 1
+    wire router_0_0_gclk;
+    clk_gate_latch router_0_0_icg (.CLK(clk), .EN(router_0_0_icg_enable), .GCLK(router_0_0_gclk));
+    
     // bottom left corner 
     router router_0_0 (
-        .clk(clk), .reset(reset), .router_position(), .polarity_out(net_polarity_0_0),
+        .clk(router_0_0_gclk), .reset(reset), .router_position(), .polarity_out(net_polarity_0_0),
         
-        //right -- THIS IS GROUNDED!!!! rework this
-        .cwsi(), .cwri(), .cwdi(), .ccwso(), .ccwro(), .ccwdo(),
+        //left -- grounded
+        .cwsi(cwsi_0_0), .cwri(cwri_0_0), .cwdi(), .ccwso(ccwso_0_0), .ccwro(ccwro_0_0), .ccwdo(),
 
-        //left - gnd - BUT NOT REALLY
+        //right 
         //.cwso(cwsi_cwso_1), .cwro(cwri_cwro_1), .cwdo(cwdi_cwdo_1), .ccwsi(ccwso_ccwsi_1), .ccwri(ccwro_ccwri_1), .ccwdi(ccwdo_ccwdi_1),
         .cwso(wasd0), .cwro(wasd1), .cwdo(wasd5), .ccwsi(wasd2), .ccwri(wasd3), .ccwdi(wasd6),
 
@@ -122,7 +158,7 @@ module mesh_top_row_0 #(
         .snso(snso_0_0), .snro(snro_0_0), .sndo(sndo_0_0), .nssi(nssi_0_0), .nsri(nsri_0_0), .nsdi(nsdi_0_0),  
     
         // bottom - gnd
-        .snsi(), .snri(), .sndi(), .nsso(), .nsro(), .nsdo(),
+        .snsi(snsi_0_0), .snri(snri_0_0), .sndi(), .nsso(nsso_0_0), .nsro(nsro_0_0), .nsdo(),
  
         // PE input/output to NIC
         .pesi(net_so_0_0), .pedi(net_do_0_0), .peri(net_ro_0_0), 
@@ -310,13 +346,13 @@ module mesh_top_row_0 #(
     router router_3_0 (
         .clk(clk), .reset(reset), .router_position(), .polarity_out(net_polarity_3_0),
         
-        //right -- THIS IS GROUNDED!!!! rework this -- right -> left
+        //left
         .cwsi(cwsi_cwso_1), .cwri(cwri_cwro_1), .cwdi(cwdi_cwdo_1), .ccwso(ccwso_ccwsi_1), .ccwro(ccwro_ccwri_1), .ccwdo(ccwdo_ccwdi_1),
 
-        //left
+        //right
         .cwso(), .cwro(), .cwdo(), .ccwsi(), .ccwri(), .ccwdi(),
 
-        //left - gnd - BUT NOT REALLY
+        
         .snso(snso_3_0), .snro(snro_3_0), .sndo(sndo_3_0), .nssi(nssi_3_0), .nsri(nsri_3_0), .nsdi(nsdi_3_0),  
 
         // bottom - gnd
