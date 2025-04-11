@@ -90,7 +90,7 @@ module mesh_top_row_1 #(
     wire [63:0] cwdi_cwdo_2, ccwdo_ccwdi_2;
     
     // Add CPU for part 3
-    wire [1:0] addr_0_1, addr_1_1, addr_2_1, addr_3_1;
+    wire [31:0] addr_0_1, addr_1_1, addr_2_1, addr_3_1;
     wire [PACKET_WIDTH-1:0] d_in_0_1, d_out_0_1;
     wire [PACKET_WIDTH-1:0] d_in_1_1, d_out_1_1;
     wire [PACKET_WIDTH-1:0] d_in_2_1, d_out_2_1;
@@ -132,10 +132,10 @@ module mesh_top_row_1 #(
     router router_0_1 (
         .clk(clk), .reset(reset), .router_position(), .polarity_out(net_polarity_0_1),
         
-        //right -- THIS IS GROUNDED!!!! rework this
+        //left 
         .cwsi(), .cwri(), .cwdi(), .ccwso(), .ccwro(), .ccwdo(),
 
-        //left - gnd - BUT NOT REALLY
+        //right 
         //.cwso(cwsi_cwso_1), .cwro(cwri_cwro_1), .cwdo(cwdi_cwdo_1), .ccwsi(ccwso_ccwsi_1), .ccwri(ccwro_ccwri_1), .ccwdi(ccwdo_ccwdi_1),
         .cwso(wasd0), .cwro(wasd1), .cwdo(wasd5), .ccwsi(wasd2), .ccwri(wasd3), .ccwdi(wasd6),
         
@@ -177,7 +177,7 @@ module mesh_top_row_1 #(
     
     four_stage_processor cpu_0_1 (
         .clk(clk),
-        .reset(clk),
+        .reset(reset),
     
         // CPU - CPU interface
         .inst_in(inst_in_0_1),
@@ -224,7 +224,7 @@ module mesh_top_row_1 #(
         .reset(reset),
     
         // CPU-NIC Interface
-        .addr(d_out_nic_1_1),
+        .addr(addr_nic_1_1),
         .d_in(d_in_1_1),
         .d_out(d_out_1_1),
         .nicEn(nicEn_1_1),
@@ -243,7 +243,7 @@ module mesh_top_row_1 #(
     
     four_stage_processor cpu_1_1 (
         .clk(clk),
-        .reset(clk),
+        .reset(reset),
     
         // CPU - CPU interface
         .inst_in(inst_in_1_1),
@@ -291,8 +291,8 @@ module mesh_top_row_1 #(
     
         // CPU-NIC Interface
         .addr(addr_nic_2_1),
-        .d_in(d_in_2_1),
-        .d_out(d_out_2_1),
+        .d_in(d_in_nic_2_1),
+        .d_out(d_out_nic_2_1),
         .nicEn(nicEn_2_1),
         .nicEnWR(nicWrEn_2_1),
     
@@ -309,7 +309,7 @@ module mesh_top_row_1 #(
     
     four_stage_processor cpu_2_1 (
         .clk(clk),
-        .reset(clk),
+        .reset(reset),
     
         // CPU - CPU interface
         .inst_in(inst_in_2_1),
@@ -331,10 +331,10 @@ module mesh_top_row_1 #(
     router router_3_1 (
         .clk(clk), .reset(reset), .router_position(), .polarity_out(net_polarity_3_1),
         
-        //right -- THIS IS GROUNDED!!!! rework this -- right -> left
+        //left
         .cwsi(cwsi_cwso_1), .cwri(cwri_cwro_1), .cwdi(cwdi_cwdo_1), .ccwso(ccwso_ccwsi_1), .ccwro(ccwro_ccwri_1), .ccwdo(ccwdo_ccwdi_1),
 
-        //left
+        //right
         .cwso(), .cwro(), .cwdo(), .ccwsi(), .ccwri(), .ccwdi(),
         
         // top
@@ -357,8 +357,8 @@ module mesh_top_row_1 #(
     
         // CPU-NIC Interface
         .addr(addr_nic_3_1),
-        .d_in(d_in_3_1),
-        .d_out(d_out_3_1),
+        .d_in(d_in_nic_3_1),
+        .d_out(d_out_nic_3_1),
         .nicEn(nicEn_3_1),
         .nicEnWR(nicWrEn_3_1),
     
@@ -375,7 +375,7 @@ module mesh_top_row_1 #(
     
     four_stage_processor cpu_3_1 (
         .clk(clk),
-        .reset(clk),
+        .reset(reset),
     
         // CPU - CPU interface
         .inst_in(inst_in_3_1),

@@ -11,9 +11,9 @@ module four_stage_processor (
   output reg nicEn,               // NIC enable 
   output reg nicWrEn,             // NIC write enable
   output reg [0:1] addr_nic,   // NIC address
-  output reg [0:63] d_out_nic, // NIC data
-  output reg [0:63] d_in_nic       // NIC data in
-);
+  input [0:63] d_out_nic,           // NIC data (NIC Data OUT to the CPU) were getting data from d out port of the NIC
+  output reg [0:63] d_in_nic       // NIC data in (NIC Data IN from the CPU) were pushing data to the d in port of the NIC
+); 
 
 // We have 4 stages so we will need 3 pipeline registers
 
@@ -222,7 +222,7 @@ always @(id_stage_ld or ex_stage_ld or id_stage_sd or id_stage_immediate_address
     d_out = 64'b0;
     addr_out = 5'b0;
     addr_nic = 2'b0;
-    d_out_nic = 64'b0;
+    //d_out_nic = 64'b0;
     nicEn = 1'b0;
     nicWrEn = 1'b0;
     // We should be loading data from the data memory
