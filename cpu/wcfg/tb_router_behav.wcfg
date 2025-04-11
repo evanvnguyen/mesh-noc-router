@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="tb_router_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="glbl" />
+            <top_module name="tb_router" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="26.176 ns"></ZoomStartTime>
+      <ZoomEndTime time="53.717 ns"></ZoomEndTime>
+      <Cursor1Time time="38.156 ns"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="303"></NameColumnWidth>
+      <ValueColumnWidth column_width="131"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="9" />
+   <wvobject fp_name="/tb_router/clk" type="logic">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_router/reset" type="logic">
+      <obj_property name="ElementShortName">reset</obj_property>
+      <obj_property name="ObjectShortName">reset</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_router/cycle_count" type="array">
+      <obj_property name="ElementShortName">cycle_count[31:0]</obj_property>
+      <obj_property name="ObjectShortName">cycle_count[31:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_router/polarity_out" type="logic">
+      <obj_property name="ElementShortName">polarity_out</obj_property>
+      <obj_property name="ObjectShortName">polarity_out</obj_property>
+   </wvobject>
+   <wvobject fp_name="group1053" type="group">
+      <obj_property name="label">Test Bench</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject fp_name="/tb_router/cwdi" type="array">
+         <obj_property name="ElementShortName">cwdi[63:0]</obj_property>
+         <obj_property name="ObjectShortName">cwdi[63:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_router/ccwdi" type="array">
+         <obj_property name="ElementShortName">ccwdi[63:0]</obj_property>
+         <obj_property name="ObjectShortName">ccwdi[63:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_router/pedi" type="array">
+         <obj_property name="ElementShortName">pedi[63:0]</obj_property>
+         <obj_property name="ObjectShortName">pedi[63:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_router/nsdi" type="array">
+         <obj_property name="ElementShortName">nsdi[63:0]</obj_property>
+         <obj_property name="ObjectShortName">nsdi[63:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_router/sndi" type="array">
+         <obj_property name="ElementShortName">sndi[63:0]</obj_property>
+         <obj_property name="ObjectShortName">sndi[63:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_router/router_position" type="array">
+         <obj_property name="ElementShortName">router_position[3:0]</obj_property>
+         <obj_property name="ObjectShortName">router_position[3:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_router/cwdo" type="array">
+         <obj_property name="ElementShortName">cwdo[63:0]</obj_property>
+         <obj_property name="ObjectShortName">cwdo[63:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_router/ccwdo" type="array">
+         <obj_property name="ElementShortName">ccwdo[63:0]</obj_property>
+         <obj_property name="ObjectShortName">ccwdo[63:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_router/pedo" type="array">
+         <obj_property name="ElementShortName">pedo[63:0]</obj_property>
+         <obj_property name="ObjectShortName">pedo[63:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_router/nsdo" type="array">
+         <obj_property name="ElementShortName">nsdo[63:0]</obj_property>
+         <obj_property name="ObjectShortName">nsdo[63:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_router/sndo" type="array">
+         <obj_property name="ElementShortName">sndo[63:0]</obj_property>
+         <obj_property name="ObjectShortName">sndo[63:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_router/data_array" type="array">
+         <obj_property name="ElementShortName">data_array[11:0][63:0]</obj_property>
+         <obj_property name="ObjectShortName">data_array[11:0][63:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_router/passedTests" type="array">
+         <obj_property name="ElementShortName">passedTests[10:0]</obj_property>
+         <obj_property name="ObjectShortName">passedTests[10:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_router/returnedData" type="array">
+         <obj_property name="ElementShortName">returnedData[10:0][63:0]</obj_property>
+         <obj_property name="ObjectShortName">returnedData[10:0][63:0]</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject type="divider" fp_name="divider172">
+      <obj_property name="label">Router</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject fp_name="group178" type="group">
+      <obj_property name="label">Input</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/tb_router/uut/cwdi" type="array">
+         <obj_property name="ElementShortName">cwdi[63:0]</obj_property>
+         <obj_property name="ObjectShortName">cwdi[63:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_router/uut/ccwdi" type="array">
+         <obj_property name="ElementShortName">ccwdi[63:0]</obj_property>
+         <obj_property name="ObjectShortName">ccwdi[63:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_router/uut/pedi" type="array">
+         <obj_property name="ElementShortName">pedi[63:0]</obj_property>
+         <obj_property name="ObjectShortName">pedi[63:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_router/uut/nsdi" type="array">
+         <obj_property name="ElementShortName">nsdi[63:0]</obj_property>
+         <obj_property name="ObjectShortName">nsdi[63:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_router/uut/sndi" type="array">
+         <obj_property name="ElementShortName">sndi[63:0]</obj_property>
+         <obj_property name="ObjectShortName">sndi[63:0]</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="group179" type="group">
+      <obj_property name="label">Inter-router Signal</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="group65" type="group">
+         <obj_property name="label">CW</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <wvobject fp_name="/tb_router/uut/cw_input_channel_data_out" type="array">
+            <obj_property name="ElementShortName">cw_input_channel_data_out[63:0]</obj_property>
+            <obj_property name="ObjectShortName">cw_input_channel_data_out[63:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_router/uut/cw_requests" type="array">
+            <obj_property name="ElementShortName">cw_requests[1:0]</obj_property>
+            <obj_property name="ObjectShortName">cw_requests[1:0]</obj_property>
+            <obj_property name="Radix">BINARYRADIX</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_router/uut/cw_granted" type="logic">
+            <obj_property name="ElementShortName">cw_granted</obj_property>
+            <obj_property name="ObjectShortName">cw_granted</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_router/uut/block_cw_input_channel" type="logic">
+            <obj_property name="ElementShortName">block_cw_input_channel</obj_property>
+            <obj_property name="ObjectShortName">block_cw_input_channel</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_router/uut/cw_output_channel_data_in" type="array">
+            <obj_property name="ElementShortName">cw_output_channel_data_in[63:0]</obj_property>
+            <obj_property name="ObjectShortName">cw_output_channel_data_in[63:0]</obj_property>
+         </wvobject>
+      </wvobject>
+      <wvobject fp_name="group66" type="group">
+         <obj_property name="label">CCW</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <wvobject fp_name="/tb_router/uut/ccw_input_channel_data_out" type="array">
+            <obj_property name="ElementShortName">ccw_input_channel_data_out[63:0]</obj_property>
+            <obj_property name="ObjectShortName">ccw_input_channel_data_out[63:0]</obj_property>
+            <obj_property name="CustomSignalColor">#800000</obj_property>
+            <obj_property name="UseCustomSignalColor">true</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_router/uut/ccw_requests" type="array">
+            <obj_property name="ElementShortName">ccw_requests[1:0]</obj_property>
+            <obj_property name="ObjectShortName">ccw_requests[1:0]</obj_property>
+            <obj_property name="Radix">BINARYRADIX</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_router/uut/ccw_granted" type="logic">
+            <obj_property name="ElementShortName">ccw_granted</obj_property>
+            <obj_property name="ObjectShortName">ccw_granted</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_router/uut/block_ccw_input_channel" type="logic">
+            <obj_property name="ElementShortName">block_ccw_input_channel</obj_property>
+            <obj_property name="ObjectShortName">block_ccw_input_channel</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_router/uut/ccw_output_channel_data_in" type="array">
+            <obj_property name="ElementShortName">ccw_output_channel_data_in[63:0]</obj_property>
+            <obj_property name="ObjectShortName">ccw_output_channel_data_in[63:0]</obj_property>
+         </wvobject>
+      </wvobject>
+      <wvobject fp_name="group67" type="group">
+         <obj_property name="label">PE</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <wvobject fp_name="/tb_router/uut/pe_input_channel_data_out" type="array">
+            <obj_property name="ElementShortName">pe_input_channel_data_out[63:0]</obj_property>
+            <obj_property name="ObjectShortName">pe_input_channel_data_out[63:0]</obj_property>
+            <obj_property name="CustomSignalColor">#FAAFBE</obj_property>
+            <obj_property name="UseCustomSignalColor">true</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_router/uut/pe_requests" type="array">
+            <obj_property name="ElementShortName">pe_requests[3:0]</obj_property>
+            <obj_property name="ObjectShortName">pe_requests[3:0]</obj_property>
+            <obj_property name="Radix">BINARYRADIX</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_router/uut/pe_granted" type="array">
+            <obj_property name="ElementShortName">pe_granted[1:0]</obj_property>
+            <obj_property name="ObjectShortName">pe_granted[1:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_router/uut/block_pe_input_channel" type="logic">
+            <obj_property name="ElementShortName">block_pe_input_channel</obj_property>
+            <obj_property name="ObjectShortName">block_pe_input_channel</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_router/uut/pe_output_channel_data_in" type="array">
+            <obj_property name="ElementShortName">pe_output_channel_data_in[63:0]</obj_property>
+            <obj_property name="ObjectShortName">pe_output_channel_data_in[63:0]</obj_property>
+         </wvobject>
+      </wvobject>
+      <wvobject fp_name="group68" type="group">
+         <obj_property name="label">NS</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <wvobject fp_name="/tb_router/uut/ns_input_channel_data_out" type="array">
+            <obj_property name="ElementShortName">ns_input_channel_data_out[63:0]</obj_property>
+            <obj_property name="ObjectShortName">ns_input_channel_data_out[63:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_router/uut/ns_requests" type="array">
+            <obj_property name="ElementShortName">ns_requests[3:0]</obj_property>
+            <obj_property name="ObjectShortName">ns_requests[3:0]</obj_property>
+            <obj_property name="Radix">BINARYRADIX</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_router/uut/ns_granted" type="array">
+            <obj_property name="ElementShortName">ns_granted[1:0]</obj_property>
+            <obj_property name="ObjectShortName">ns_granted[1:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_router/uut/block_ns_input_channel" type="logic">
+            <obj_property name="ElementShortName">block_ns_input_channel</obj_property>
+            <obj_property name="ObjectShortName">block_ns_input_channel</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_router/uut/ns_output_channel_data_in" type="array">
+            <obj_property name="ElementShortName">ns_output_channel_data_in[63:0]</obj_property>
+            <obj_property name="ObjectShortName">ns_output_channel_data_in[63:0]</obj_property>
+            <obj_property name="CustomSignalColor">#808000</obj_property>
+            <obj_property name="UseCustomSignalColor">true</obj_property>
+         </wvobject>
+      </wvobject>
+      <wvobject fp_name="group69" type="group">
+         <obj_property name="label">SN</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <wvobject fp_name="/tb_router/uut/sn_input_channel_data_out" type="array">
+            <obj_property name="ElementShortName">sn_input_channel_data_out[63:0]</obj_property>
+            <obj_property name="ObjectShortName">sn_input_channel_data_out[63:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_router/uut/sn_requests" type="array">
+            <obj_property name="ElementShortName">sn_requests[3:0]</obj_property>
+            <obj_property name="ObjectShortName">sn_requests[3:0]</obj_property>
+            <obj_property name="Radix">BINARYRADIX</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_router/uut/block_sn_input_channel" type="logic">
+            <obj_property name="ElementShortName">block_sn_input_channel</obj_property>
+            <obj_property name="ObjectShortName">block_sn_input_channel</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_router/uut/sn_granted" type="array">
+            <obj_property name="ElementShortName">sn_granted[1:0]</obj_property>
+            <obj_property name="ObjectShortName">sn_granted[1:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_router/uut/sn_output_channel_data_in" type="array">
+            <obj_property name="ElementShortName">sn_output_channel_data_in[63:0]</obj_property>
+            <obj_property name="ObjectShortName">sn_output_channel_data_in[63:0]</obj_property>
+         </wvobject>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="group183" type="group">
+      <obj_property name="label">Output</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/tb_router/uut/cwdo" type="array">
+         <obj_property name="ElementShortName">cwdo[63:0]</obj_property>
+         <obj_property name="ObjectShortName">cwdo[63:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_router/uut/ccwdo" type="array">
+         <obj_property name="ElementShortName">ccwdo[63:0]</obj_property>
+         <obj_property name="ObjectShortName">ccwdo[63:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_router/uut/pedo" type="array">
+         <obj_property name="ElementShortName">pedo[63:0]</obj_property>
+         <obj_property name="ObjectShortName">pedo[63:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_router/uut/nsdo" type="array">
+         <obj_property name="ElementShortName">nsdo[63:0]</obj_property>
+         <obj_property name="ObjectShortName">nsdo[63:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_router/uut/sndo" type="array">
+         <obj_property name="ElementShortName">sndo[63:0]</obj_property>
+         <obj_property name="ObjectShortName">sndo[63:0]</obj_property>
+      </wvobject>
+   </wvobject>
+</wave_config>

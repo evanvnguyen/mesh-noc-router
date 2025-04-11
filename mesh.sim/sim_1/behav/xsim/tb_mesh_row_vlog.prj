@@ -1,0 +1,27 @@
+# compile verilog/system verilog design source files
+verilog xil_defaultlib  --include "../../../../cpu/design" \
+"../../../../cpu/design/alu.v" \
+"../../../../cpu/design/clk_gate_latch.v" \
+"../../../../cpu/include/dmem.v" \
+"../../../../cpu/design/forwarding_unit.v" \
+"../../../../cpu/design/four_stage_processor.v" \
+"../../../../cpu/design/four_way_arbiter.v" \
+"../../../../cpu/design/hazard_detection_unit.v" \
+"../../../../cpu/include/imem.v" \
+"../../../../cpu/design/instruction_decoder.v" \
+"../../../../cpu/design/mesh_row_0.v" \
+"../../../../cpu/design/mux.v" \
+"../../../../cpu/design/nic.v" \
+"../../../../cpu/design/program_counter.v" \
+"../../../../cpu/design/register_file.v" \
+"../../../../cpu/design/router.v" \
+"../../../../cpu/design/router_input_channel.v" \
+"../../../../cpu/design/router_output_channel.v" \
+"../../../../cpu/design/two_way_arbiter.v" \
+"../../../../cpu/tb/tb_mesh_row.v" \
+
+# compile glbl module
+verilog xil_defaultlib "glbl.v"
+
+# Do not sort compile order
+nosort

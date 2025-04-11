@@ -1,0 +1,40 @@
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/Dev-Projects/mesh-noc-router/cpu/design/alu.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module DW_div
+INFO: [VRFC 10-311] analyzing module DW_sqrt
+INFO: [VRFC 10-311] analyzing module alu
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/Dev-Projects/mesh-noc-router/cpu/design/clk_gate_latch.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module clk_gate_latch
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/Dev-Projects/mesh-noc-router/cpu/include/dmem.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module dmem
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/Dev-Projects/mesh-noc-router/cpu/design/forwarding_unit.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module forwarding_unit
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/Dev-Projects/mesh-noc-router/cpu/design/four_stage_processor.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module four_stage_processor
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/Dev-Projects/mesh-noc-router/cpu/design/four_way_arbiter.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module four_way_arbiter
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/Dev-Projects/mesh-noc-router/cpu/design/hazard_detection_unit.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module hazard_detection_unit
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/Dev-Projects/mesh-noc-router/cpu/include/imem.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module imem
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/Dev-Projects/mesh-noc-router/cpu/design/instruction_decoder.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module instruction_decoder
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/Dev-Projects/mesh-noc-router/cpu/design/mesh_row_0.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module mesh_row_0
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/Dev-Projects/mesh-noc-router/cpu/design/mux.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module mux
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/Dev-Projects/mesh-noc-router/cpu/design/nic.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module nic
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/Dev-Projects/mesh-noc-router/cpu/design/program_counter.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module program_counter
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/Dev-Projects/mesh-noc-router/cpu/design/register_file.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module register_file
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/Dev-Projects/mesh-noc-router/cpu/design/router.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module router
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/Dev-Projects/mesh-noc-router/cpu/design/router_input_channel.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module router_input_channel
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/Dev-Projects/mesh-noc-router/cpu/design/router_output_channel.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module router_output_channel
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/Dev-Projects/mesh-noc-router/cpu/design/two_way_arbiter.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module two_way_arbiter
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/Dev-Projects/mesh-noc-router/cpu/tb/tb_mesh_row.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module tb_mesh_row

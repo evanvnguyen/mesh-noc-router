@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="tb_router_input_channel_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="glbl" />
+            <top_module name="tb_router_input_channel" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="21.140 ns"></ZoomStartTime>
+      <ZoomEndTime time="66.781 ns"></ZoomEndTime>
+      <Cursor1Time time="34.000 ns"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="211"></NameColumnWidth>
+      <ValueColumnWidth column_width="58"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="15" />
+   <wvobject fp_name="/tb_router_input_channel/clk" type="logic">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_router_input_channel/reset" type="logic">
+      <obj_property name="ElementShortName">reset</obj_property>
+      <obj_property name="ObjectShortName">reset</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_router_input_channel/polarity" type="logic">
+      <obj_property name="ElementShortName">polarity</obj_property>
+      <obj_property name="ObjectShortName">polarity</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_router_input_channel/send" type="logic">
+      <obj_property name="ElementShortName">send</obj_property>
+      <obj_property name="ObjectShortName">send</obj_property>
+      <obj_property name="CustomSignalColor">#FFA500</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_router_input_channel/blocked" type="logic">
+      <obj_property name="ElementShortName">blocked</obj_property>
+      <obj_property name="ObjectShortName">blocked</obj_property>
+      <obj_property name="CustomSignalColor">#00FFFF</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_router_input_channel/data_in" type="array">
+      <obj_property name="ElementShortName">data_in[63:0]</obj_property>
+      <obj_property name="ObjectShortName">data_in[63:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_router_input_channel/ready" type="logic">
+      <obj_property name="ElementShortName">ready</obj_property>
+      <obj_property name="ObjectShortName">ready</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_router_input_channel/data_out" type="array">
+      <obj_property name="ElementShortName">data_out[63:0]</obj_property>
+      <obj_property name="ObjectShortName">data_out[63:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_router_input_channel/data_array" type="array">
+      <obj_property name="ElementShortName">data_array[10:0][63:0]</obj_property>
+      <obj_property name="ObjectShortName">data_array[10:0][63:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_router_input_channel/cycle_count" type="array">
+      <obj_property name="ElementShortName">cycle_count[31:0]</obj_property>
+      <obj_property name="ObjectShortName">cycle_count[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_router_input_channel/data_index" type="array">
+      <obj_property name="ElementShortName">data_index[31:0]</obj_property>
+      <obj_property name="ObjectShortName">data_index[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_router_input_channel/uut/virtual_channel_1" type="array">
+      <obj_property name="ElementShortName">virtual_channel_1[63:0]</obj_property>
+      <obj_property name="ObjectShortName">virtual_channel_1[63:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_router_input_channel/uut/virtual_channel_2" type="array">
+      <obj_property name="ElementShortName">virtual_channel_2[63:0]</obj_property>
+      <obj_property name="ObjectShortName">virtual_channel_2[63:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_router_input_channel/uut/vc_1_read" type="logic">
+      <obj_property name="ElementShortName">vc_1_read</obj_property>
+      <obj_property name="ObjectShortName">vc_1_read</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_router_input_channel/uut/vc_2_read" type="logic">
+      <obj_property name="ElementShortName">vc_2_read</obj_property>
+      <obj_property name="ObjectShortName">vc_2_read</obj_property>
+   </wvobject>
+</wave_config>

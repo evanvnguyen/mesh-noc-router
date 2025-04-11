@@ -1,0 +1,4 @@
+Running: xsim.dir/tb_mesh_row_behav/xsimk.exe -simmode gui -wdb tb_mesh_row_behav.wdb -simrunnum 0 -socket 61284
+Design successfully loaded
+Design Loading Memory Usage: 32780 KB (Peak: 32780 KB)
+Design Loading CPU Usage: 718 ms
