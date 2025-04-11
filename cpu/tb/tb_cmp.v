@@ -15,9 +15,7 @@
 
 // Include Files
 // Memory Files
-`include "./include/dmem.v"
-`include "./include/imem.v"
-`include "./include/gscl45nm.v"
+
 
 // Register File
 //`include "./design/REGFILE32x64.v"
@@ -81,8 +79,15 @@ integer dmem0_dump_file;		// Channel Descriptor for DMEM0 final dump
 integer dmem1_dump_file;		// Channel Descriptor for DMEM1 final dump
 integer dmem2_dump_file;		// Channel Descriptor for DMEM2 final dump
 integer dmem3_dump_file;		// Channel Descriptor for DMEM3 final dump
-integer i;
+integer i,j;
 integer cycle_number;
+
+reg [256:0] imem_filename;
+reg [256:0] dump_filename0;
+reg [256:0] dump_filename1;
+reg [256:0] dump_filename2;
+reg [256:0] dump_filename3;
+
 
 //// ******************** Module Instantiations ******************** \\\\
 
@@ -183,59 +188,61 @@ cardinal_cmp CMP(
 always #(`CYCLE_TIME / 2) CLK <= ~CLK;	
 
 initial begin
-    #50000
-    $finish;
 end
 	
 initial
 begin
-	$readmemh("cmp_test.imem.0.fill", IM_node0.MEM); 	// loading instruction memory into node0
-	$readmemh("cmp_test.imem.1.fill", IM_node1.MEM); 	// loading instruction memory into node1
-	$readmemh("cmp_test.imem.2.fill", IM_node2.MEM); 	// loading instruction memory into node2
-	$readmemh("cmp_test.imem.3.fill", IM_node3.MEM); 	// loading instruction memory into node3
 
-	$readmemh("cmp_test.dmem.0.fill", DM_node0.MEM); 	// loading data memory into node0
-	$readmemh("cmp_test.dmem.1.fill", DM_node1.MEM); 	// loading data memory into node1
-	$readmemh("cmp_test.dmem.2.fill", DM_node2.MEM); 	// loading data memory into node2
-	$readmemh("cmp_test.dmem.3.fill", DM_node3.MEM); 	// loading data memory into node3
+	for (j=1; j < 21; j = j + 1) begin
+		// Format the filename string: "imem_<j>.fill"
+		$sformat(imem_filename, "imem_%0d.fill", j);
 
-	// $readmemh("cmp_test.nic.0.fill", CMP.NIC_NODE0.MEM);	// loading dummy nic 0 memory
-	// $readmemh("cmp_test.nic.1.fill", CMP.NIC_NODE1.MEM);	// loading dummy nic 1 memory
-	// $readmemh("cmp_test.nic.2.fill", CMP.NIC_NODE2.MEM);	// loading dummy nic 2 memory
-	// $readmemh("cmp_test.nic.3.fill", CMP.NIC_NODE3.MEM);	// loading dummy nic 3 memory
-	
-	CLK <= 0;				// initialize Clock
-	RESET <= 1'b1;				// reset the CPU 
-	repeat(5) @(negedge CLK);		// wait for 5 clock cycles
-	RESET <= 1'b0;				// de-activate reset signal after 5ns
+		$readmemh(imem_filename, IM_node0.MEM); 	// loading instruction memory into node0
+		$readmemh(imem_filename, IM_node1.MEM); 	// loading instruction memory into node1
+		$readmemh(imem_filename, IM_node2.MEM); 	// loading instruction memory into node2
+		$readmemh(imem_filename, IM_node3.MEM); 	// loading instruction memory into node3
 
-	// Convention for the last instruction
-	// We would have a last instruction NOP  => 32'h00000000
-	wait (node0_inst_in == 32'h00000000 && node1_inst_in == 32'h00000000 && node2_inst_in == 32'h00000000 && node3_inst_in == 32'h00000000);
-	// Let us see how much did you stall
-	$display("The program completed in %d cycles", cycle_number);
-	// Let us now flush the pipe line
-	repeat(5) @(negedge CLK); 
-	// Open file for output
-	dmem0_dump_file = $fopen("cmp_test.dmem0.dump"); // assigning the channel descriptor for output file
-	dmem1_dump_file = $fopen("cmp_test.dmem1.dump"); // assigning the channel descriptor for output file
-	dmem2_dump_file = $fopen("cmp_test.dmem2.dump"); // assigning the channel descriptor for output file
-	dmem3_dump_file = $fopen("cmp_test.dmem3.dump"); // assigning the channel descriptor for output file
+		$readmemh("dmem.fill", DM_node0.MEM); 	// loading data memory into node0
+		$readmemh("dmem.fill", DM_node1.MEM); 	// loading data memory into node1
+		$readmemh("dmem.fill", DM_node2.MEM); 	// loading data memory into node2
+		$readmemh("dmem.fill", DM_node3.MEM); 	// loading data memory into node3
+			
+		CLK <= 0;				// initialize Clock
+		RESET <= 1'b1;				// reset the CPU 
+		repeat(5) @(negedge CLK);		// wait for 5 clock cycles
+		RESET <= 1'b0;				// de-activate reset signal after 5ns
 
-	// Let us now dump all the locations of the data memory now
-	for (i=0; i<128; i=i+1) 
-	begin
-		$fdisplay(dmem0_dump_file, "Memory location #%d : %h ", i, DM_node0.MEM[i]);
-		$fdisplay(dmem1_dump_file, "Memory location #%d : %h ", i, DM_node1.MEM[i]);
-		$fdisplay(dmem2_dump_file, "Memory location #%d : %h ", i, DM_node2.MEM[i]);
-		$fdisplay(dmem3_dump_file, "Memory location #%d : %h ", i, DM_node3.MEM[i]);
-	end
-	$fclose(dmem0_dump_file);
-	$fclose(dmem1_dump_file);
-	$fclose(dmem2_dump_file);
-	$fclose(dmem3_dump_file);
-	$finish;
-	
+		// Convention for the last instruction
+		// We would have a last instruction NOP  => 32'h00000000
+		wait (node0_inst_in == 32'h00000000 && node1_inst_in == 32'h00000000 && node2_inst_in == 32'h00000000 && node3_inst_in == 32'h00000000);
+		// Let us see how much did you stall
+		$display("The program completed in %d cycles", cycle_number);
+		// Let us now flush the pipe line
+		repeat(5) @(negedge CLK); 
+		// Open file for output
+		$sformat(dump_filename0, "cmp_test.dmem0_%0d.dump", j);
+		dmem0_dump_file = $fopen(dump_filename0); // assigning the channel descriptor for output file
+		$sformat(dump_filename1, "cmp_test.dmem1_%0d.dump", j);
+		dmem1_dump_file = $fopen(dump_filename1); // assigning the channel descriptor for output file
+		$sformat(dump_filename2, "cmp_test.dmem2_%0d.dump", j);
+		dmem2_dump_file = $fopen(dump_filename2); // assigning the channel descriptor for output file
+		$sformat(dump_filename3, "cmp_test.dmem3_%0d.dump", j);
+		dmem3_dump_file = $fopen(dump_filename3); // assigning the channel descriptor for output file
+
+		// Let us now dump all the locations of the data memory now
+		for (i=0; i<128; i=i+1) 
+		begin
+			$fdisplay(dmem0_dump_file, "Memory location #%d : %h ", i, DM_node0.MEM[i]);
+			$fdisplay(dmem1_dump_file, "Memory location #%d : %h ", i, DM_node1.MEM[i]);
+			$fdisplay(dmem2_dump_file, "Memory location #%d : %h ", i, DM_node2.MEM[i]);
+			$fdisplay(dmem3_dump_file, "Memory location #%d : %h ", i, DM_node3.MEM[i]);
+		end
+		$fclose(dmem0_dump_file);
+		$fclose(dmem1_dump_file);
+		$fclose(dmem2_dump_file);
+		$fclose(dmem3_dump_file);
+  end  
+$finish;
 end // initial begin
 	
 //// ******************** Cycle Counter ******************** \\\\

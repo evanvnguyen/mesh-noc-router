@@ -1,9 +1,44 @@
 import tkinter as tk
 from tkinter import messagebox, filedialog
 import random
+import subprocess
+import sys
+import os
+
+INSTR_FILE = "instruction_data.txt"
 
 root = tk.Tk()
 root.title("64-bit Packet Builder")
+
+def attach_instruction():
+    try:
+        # Remove old file
+        if os.path.exists(INSTR_FILE):
+            os.remove(INSTR_FILE)
+
+        # Open instruction generator
+        subprocess.Popen([sys.executable, "instruction_generator.py"])
+
+        # Polling check for file
+        root.after(500, poll_for_instruction)
+
+    except Exception as e:
+        messagebox.showerror("Error launching instruction generator", str(e))
+
+
+def poll_for_instruction():
+    if os.path.exists(INSTR_FILE):
+        try:
+            with open(INSTR_FILE, 'r') as f:
+                hex_val = f.read().strip()
+                data = int(hex_val, 16)
+                entries['data'].delete(0, tk.END)
+                entries['data'].insert(0, str(data))
+                messagebox.showinfo("Instruction Attached", f"Instruction loaded into data: 0x{hex_val.upper()}")
+        except Exception as e:
+            messagebox.showerror("Error reading instruction", str(e))
+    else:
+        root.after(500, poll_for_instruction)
 
 def make_packet(vc, ns_dir, ew_dir, y_hop, x_hop, y_src, x_src, data):
     packet = (
@@ -141,15 +176,16 @@ dropdown.grid(row=7, column=0, columnspan=2)
 dir_var.set("N→S, E→W")
 
 tk.Button(root, text="Generate Packet", command=generate_packet).grid(row=8, column=0, columnspan=2, pady=5)
-tk.Button(root, text="Regenerate Data", command=regenerate_data).grid(row=9, column=0, columnspan=2, pady=(0, 5))
+tk.Button(root, text="Attach Instruction", command=attach_instruction).grid(row=9, column=0, columnspan=2, pady=5)
+tk.Button(root, text="Regenerate Data", command=regenerate_data).grid(row=10, column=0, columnspan=2, pady=(0, 5))
 auto_data = tk.BooleanVar(value=False)
-tk.Checkbutton(root, text="Auto-generate random data", variable=auto_data).grid(row=10, column=0, columnspan=2)
+tk.Checkbutton(root, text="Auto-generate random data", variable=auto_data).grid(row=11, column=0, columnspan=2)
 
 hex_output = tk.StringVar()
-tk.Entry(root, textvariable=hex_output, state='readonly', width=30).grid(row=11, column=0, columnspan=2, pady=5)
+tk.Entry(root, textvariable=hex_output, state='readonly', width=30).grid(row=12, column=0, columnspan=2, pady=5)
 
 bitfield_output = tk.StringVar()
-tk.Label(root, textvariable=bitfield_output, justify='left').grid(row=12, column=0, columnspan=4)
+tk.Label(root, textvariable=bitfield_output, justify='left').grid(row=13, column=0, columnspan=4)
 
 packet_listbox = tk.Listbox(root, width=60, height=8)
 packet_listbox.grid(row=30, column=0, columnspan=10, padx=10, pady=(10, 5))

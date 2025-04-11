@@ -1,0 +1,30 @@
+F0000000  // NOP  // Program for single packet read and write from processor       
+8040C001  // load NIC[1] into R2					//read the input channel status register
+88400001  // VBEZ R2, 1                  //if empty, read again
+80A0C000  // store NIC[0] into R5
+84A00005  // VSD R5, 5                    //write R5 to datamem[5]
+00000000  // NOP End Program 
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000

@@ -132,6 +132,14 @@ def create_gui():
 
     def clear_history():
         history_listbox.delete(0, tk.END)
+        
+    def attach_instruction():
+        try:
+            temp_file = open("temp_instruction.txt", "w")
+            temp_file.write(f"{opcode_var.get()} {field2_var.get()} {field3_var.get()} {field4_var.get()} {field5_var.get()} {field6_var.get()}")
+            temp_file.close()
+        except Exception as e:
+            messagebox.showerror("Error", str(e))
 
     def export_history():
         file_path = filedialog.asksaveasfilename(defaultextension=".txt", filetypes=[("Text files", "*.txt")])
@@ -283,6 +291,7 @@ def create_gui():
         tk.Entry(root, textvariable=var, width=10, state='readonly').grid(row=9, column=i, padx=5, pady=2)
 
     tk.Button(root, text="Copy", command=copy_to_clipboard).grid(row=9, column=len(output_labels), padx=5)
+    #tk.Button(root, text="Attach", command=attach_instruction).grid(row=9, column=len(output_labels), padx=5)
 
     tk.Label(root, text="Instruction History:").grid(row=10, column=0, columnspan=2)
     history_listbox = tk.Listbox(root, height=10, width=80)
