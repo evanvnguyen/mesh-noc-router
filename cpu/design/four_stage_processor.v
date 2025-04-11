@@ -198,21 +198,24 @@ mux wb_result_mux(
 );
 
 // Check if we need to branch or not
-always @(id_out_bez or id_out_bnez or rf_out_rB_data) begin
-    if_branch = 1'b0;
+always @(id_out_bez or id_out_bnez or rf_out_rB_data or ex_rB_mux_out or nicEn) begin
+   //if_branch = 1'b0;
     
   // We use rB_data to access rD data.
   if (id_out_bez) begin
-    if (rf_out_rB_data == 64'b0) begin // if rf[rD] == 0
+    if (nicEn && ex_rB_mux_out == 64'b0) begin
+      if_branch = 1;
+    end else if (rf_out_rB_data == 64'b0) begin // if rf[rD] == 0
       if_branch = !hdu_out_is_hazard;
     end
-  end
-
-  if (id_out_bnez) begin
-    if (rf_out_rB_data != 64'b0) begin // if rf[rD] != 0
-      if_branch = !hdu_out_is_hazard;
+  end else if (id_out_bnez) begin
+      if (nicEn && ex_rB_mux_out != 64'b0) begin
+        if_branch = 1;
+      end else if (rf_out_rB_data != 64'b0) begin // if rf[rD] != 0
+        if_branch = !hdu_out_is_hazard;
     end
-  end
+  end else
+    if_branch = 1'b0;
 end
 
 always @(id_stage_ld or ex_stage_ld or id_stage_sd or id_stage_immediate_address) begin
