@@ -3,4 +3,4 @@ sim.out
 mesh-noc-router*
 *.wcfg
 cpu/cpu.*
-mesh/mesh.*
+mesh.*

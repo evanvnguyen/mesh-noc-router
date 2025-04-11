@@ -209,12 +209,12 @@ module tb_mesh_row;
     
         // Load instruction and data memory
         $readmemh("send_inst.txt", i_mem_0_0.MEM);
-        $readmemh("dmem.fill", d_mem_0_0.MEM);
+        //$readmemh("dmem.fill", d_mem_0_0.MEM);
         $readmemh("receive_inst.txt", i_mem_1_0.MEM);
         $readmemh("dmem2.fill", d_mem_1_0.MEM);
-        $readmemh("receive_inst.txt", i_mem_2_0.MEM);
+        //$readmemh("receive_inst.txt", i_mem_2_0.MEM);
         $readmemh("dmem2.fill", d_mem_2_0.MEM);
-        $readmemh("receive_inst.txt", i_mem_3_0.MEM);
+        //$readmemh("receive_inst.txt", i_mem_3_0.MEM);
         $readmemh("dmem2.fill", d_mem_3_0.MEM);
     
         wait (node_0_0_inst_in == 32'h00000000);
