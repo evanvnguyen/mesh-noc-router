@@ -232,7 +232,7 @@ module mesh_row_2 #(
       .d_in(nic_d_in_0_2),
       .d_out(nic_d_out_0_2),
       .nicEn(nicEn_0_2),
-      .nicEnWR(nicEnWR_0_2)
+      .nicEnWR(nicEnWR_0_2),
 
   
       // Router-NIC Interface
