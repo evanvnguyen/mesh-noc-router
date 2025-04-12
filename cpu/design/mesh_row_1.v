@@ -228,11 +228,12 @@ module mesh_row_1 #(
       .reset(reset),
   
       // CPU-NIC Interface
-      .addr(addr_0_1),
-      .d_in(d_in_0_1),
-      .d_out(d_out_0_1),
+      .addr(nic_addr_0_1),
+      .d_in(nic_d_in_0_1),
+      .d_out(nic_d_out_0_1),
       .nicEn(nicEn_0_1),
       .nicEnWR(nicEnWR_0_1),
+
   
       // Router-NIC Interface
       .net_si(net_si_peso_01),
@@ -294,11 +295,12 @@ module mesh_row_1 #(
       .reset(reset),
   
       // CPU-NIC Interface
-      .addr(addr_1_1),
-      .d_in(d_in_1_1),
-      .d_out(d_out_1_1),
+      .addr(nic_addr_1_1),
+      .d_in(nic_d_in_1_1),
+      .d_out(nic_d_out_1_1),
       .nicEn(nicEn_1_1),
       .nicEnWR(nicEnWR_1_1),
+
   
       // Router-NIC Interface
       .net_si(net_si_peso_11),
@@ -360,11 +362,12 @@ module mesh_row_1 #(
       .reset(reset),
   
       // CPU-NIC Interface
-      .addr(addr_2_1),
-      .d_in(d_in_2_1),
-      .d_out(d_out_2_1),
+      .addr(nic_addr_2_1),
+      .d_in(nic_d_in_2_1),
+      .d_out(nic_d_out_2_1),
       .nicEn(nicEn_2_1),
       .nicEnWR(nicEnWR_2_1),
+
   
       // Router-NIC Interface
       .net_si(net_si_peso_21),
@@ -427,11 +430,12 @@ module mesh_row_1 #(
       .reset(reset),
   
       // CPU-NIC Interface
-      .addr(addr_3_1),
-      .d_in(d_in_3_1),
-      .d_out(d_out_3_1),
+      .addr(nic_addr_3_1),
+      .d_in(nic_d_in_3_1),
+      .d_out(nic_d_out_3_1),
       .nicEn(nicEn_3_1),
       .nicEnWR(nicEnWR_3_1),
+
   
       // Router-NIC Interface
       .net_si(net_si_peso_31),
