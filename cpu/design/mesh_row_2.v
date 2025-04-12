@@ -298,7 +298,7 @@ four_stage_processor cpu_0_2 (
       .d_in(nic_d_in_1_2),
       .d_out(nic_d_out_1_2),
       .nicEn(nicEn_1_2),
-      .nicEnWR(nicEnWR_1_2)
+      .nicEnWR(nicEnWR_1_2),
 
   
       // Router-NIC Interface
@@ -365,7 +365,7 @@ four_stage_processor cpu_0_2 (
       .d_in(nic_d_in_2_2),
       .d_out(nic_d_out_2_2),
       .nicEn(nicEn_2_2),
-      .nicEnWR(nicEnWR_2_2)
+      .nicEnWR(nicEnWR_2_2),
 
   
       // Router-NIC Interface
@@ -430,7 +430,7 @@ four_stage_processor cpu_0_2 (
       .d_in(nic_d_in_3_2),
       .d_out(nic_d_out_3_2),
       .nicEn(nicEn_3_2),
-      .nicEnWR(nicEnWR_3_2)
+      .nicEnWR(nicEnWR_3_2),
 
   
       // Router-NIC Interface
