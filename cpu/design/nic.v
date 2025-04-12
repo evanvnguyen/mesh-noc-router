@@ -65,10 +65,7 @@ module nic #(parameter PACKET_WIDTH = 64)(
             net_so <= 0;
             net_do <= 0;
         end else begin
-            // Write to Output Buffer (if nicEnWR, nicEn, addr to output buffer, output buffer is empty)
-            if (nicEnWR && nicEn && addr == 2'b10 && !channel_output_buffer_status) begin
-                channel_output_buffer <= d_in;
-            end //else if (net_ro && net_si) begin // next data logic
+            //else if (net_ro && net_si) begin // next data logic
                 //channel_output_buffer <= d_in;
             //end
     
@@ -92,23 +89,30 @@ module nic #(parameter PACKET_WIDTH = 64)(
             end else begin
                 net_so <= 0;
             end
+        end
+    end
     
-            // Processor Read Logic
-            if (nicEn && !nicEnWR) begin
-                case (addr)
-                    2'b00: begin
-                        d_out <= channel_input_buffer;  // Read input buffer
-                        if (net_si)
-                            channel_input_buffer <= net_di;  // Immediately load new data if available
-                        else
-                            channel_input_buffer <= 64'b0;    // Otherwise clear the buffer
-                    end
-                    2'b01: d_out <= {63'b0, channel_input_buffer_status};               // Read input status
-                    2'b10: d_out <= 64'b0;                                              // Invalid read from output buffer
-                    2'b11: d_out <= {63'b0, channel_output_buffer_status};              // Read output status
-                    default: d_out <= 64'b0;
-                endcase
-            end
+    always @(nicEn or nicEnWR) begin
+    // Write to Output Buffer (if nicEnWR, nicEn, addr to output buffer, output buffer is empty)
+        if (nicEnWR && nicEn && addr == 2'b10 && !channel_output_buffer_status) begin
+            channel_output_buffer = d_in;
+        end 
+        
+        // Processor Read Logic
+        if (nicEn && !nicEnWR) begin
+            case (addr)
+                2'b00: begin
+                    d_out = channel_input_buffer;  // Read input buffer
+                    if (net_si)
+                        channel_input_buffer = net_di;  // Immediately load new data if available
+                    else
+                        channel_input_buffer = 64'b0;    // Otherwise clear the buffer
+                end
+                2'b01: d_out = {63'b0, channel_input_buffer_status};               // Read input status
+                2'b10: d_out = 64'b0;                                              // Invalid read from output buffer
+                2'b11: d_out = {63'b0, channel_output_buffer_status};              // Read output status
+                default: d_out = 64'b0;
+            endcase
         end
     end
 

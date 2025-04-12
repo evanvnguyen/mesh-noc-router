@@ -11,17 +11,17 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="106.404 ns"></ZoomStartTime>
-      <ZoomEndTime time="181.979 ns"></ZoomEndTime>
-      <Cursor1Time time="144.839 ns"></Cursor1Time>
+      <ZoomStartTime time="65.169 ns"></ZoomStartTime>
+      <ZoomEndTime time="120.277 ns"></ZoomEndTime>
+      <Cursor1Time time="78.000 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="293"></NameColumnWidth>
-      <ValueColumnWidth column_width="76"></ValueColumnWidth>
+      <ValueColumnWidth column_width="72"></ValueColumnWidth>
    </column_width_setting>
    <WVObjectSize size="12" />
    <wave_markers>
-      <marker time="100000" label="" />
+      <marker time="86000" label="" />
    </wave_markers>
    <wvobject fp_name="/tb_mesh_row/clk" type="logic">
       <obj_property name="ElementShortName">clk</obj_property>
@@ -38,6 +38,7 @@
    <wvobject fp_name="group225" type="group">
       <obj_property name="label">CPU 0</obj_property>
       <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
       <wvobject type="divider" fp_name="divider1653">
          <obj_property name="label">IF Stage</obj_property>
          <obj_property name="DisplayName">label</obj_property>
@@ -320,6 +321,7 @@
    <wvobject fp_name="group284" type="group">
       <obj_property name="label">NIC</obj_property>
       <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
       <wvobject fp_name="/tb_mesh_row/uut/nic_0_0/addr" type="array">
          <obj_property name="ElementShortName">addr[1:0]</obj_property>
          <obj_property name="ObjectShortName">addr[1:0]</obj_property>
@@ -531,6 +533,8 @@
       <wvobject fp_name="/tb_mesh_row/uut/nic_1_0/channel_input_buffer" type="array">
          <obj_property name="ElementShortName">channel_input_buffer[63:0]</obj_property>
          <obj_property name="ObjectShortName">channel_input_buffer[63:0]</obj_property>
+         <obj_property name="CustomSignalColor">#FF0000</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
       </wvobject>
       <wvobject fp_name="/tb_mesh_row/uut/nic_1_0/channel_output_buffer" type="array">
          <obj_property name="ElementShortName">channel_output_buffer[63:0]</obj_property>
@@ -572,6 +576,8 @@
       <wvobject fp_name="/tb_mesh_row/uut/cpu_1_0/d_out_nic" type="array">
          <obj_property name="ElementShortName">d_out_nic[0:63]</obj_property>
          <obj_property name="ObjectShortName">d_out_nic[0:63]</obj_property>
+         <obj_property name="CustomSignalColor">#FF0000</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
       </wvobject>
       <wvobject fp_name="/tb_mesh_row/uut/cpu_1_0/d_in_nic" type="array">
          <obj_property name="ElementShortName">d_in_nic[0:63]</obj_property>
@@ -665,6 +671,31 @@
             <obj_property name="ObjectShortName">id_out_nop</obj_property>
          </wvobject>
       </wvobject>
+      <wvobject fp_name="group1712" type="group">
+         <obj_property name="label">RF</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+         <wvobject fp_name="/tb_mesh_row/uut/cpu_1_0/rf_out_rA_data" type="array">
+            <obj_property name="ElementShortName">rf_out_rA_data[0:63]</obj_property>
+            <obj_property name="ObjectShortName">rf_out_rA_data[0:63]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_mesh_row/uut/cpu_1_0/rf_out_rB_data" type="array">
+            <obj_property name="ElementShortName">rf_out_rB_data[0:63]</obj_property>
+            <obj_property name="ObjectShortName">rf_out_rB_data[0:63]</obj_property>
+         </wvobject>
+      </wvobject>
+      <wvobject fp_name="/tb_mesh_row/uut/cpu_1_0/fdu_forward_rA" type="array">
+         <obj_property name="ElementShortName">fdu_forward_rA[0:1]</obj_property>
+         <obj_property name="ObjectShortName">fdu_forward_rA[0:1]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_mesh_row/uut/cpu_1_0/fdu_forward_rB" type="array">
+         <obj_property name="ElementShortName">fdu_forward_rB[0:1]</obj_property>
+         <obj_property name="ObjectShortName">fdu_forward_rB[0:1]</obj_property>
+      </wvobject>
+      <wvobject type="divider" fp_name="divider1692">
+         <obj_property name="label">EX Stage</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+      </wvobject>
       <wvobject fp_name="group1671" type="group">
          <obj_property name="label">Pipelines Registers</obj_property>
          <obj_property name="DisplayName">label</obj_property>
@@ -733,35 +764,25 @@
             <obj_property name="ObjectShortName">id_stage_nop</obj_property>
          </wvobject>
       </wvobject>
-      <wvobject fp_name="group1712" type="group">
-         <obj_property name="label">RF</obj_property>
-         <obj_property name="DisplayName">label</obj_property>
-         <obj_property name="isExpanded"></obj_property>
-         <wvobject fp_name="/tb_mesh_row/uut/cpu_1_0/rf_out_rA_data" type="array">
-            <obj_property name="ElementShortName">rf_out_rA_data[0:63]</obj_property>
-            <obj_property name="ObjectShortName">rf_out_rA_data[0:63]</obj_property>
-         </wvobject>
-         <wvobject fp_name="/tb_mesh_row/uut/cpu_1_0/rf_out_rB_data" type="array">
-            <obj_property name="ElementShortName">rf_out_rB_data[0:63]</obj_property>
-            <obj_property name="ObjectShortName">rf_out_rB_data[0:63]</obj_property>
-         </wvobject>
+      <wvobject fp_name="/tb_mesh_row/uut/cpu_1_0/ex_rA_mux_out" type="array">
+         <obj_property name="ElementShortName">ex_rA_mux_out[0:63]</obj_property>
+         <obj_property name="ObjectShortName">ex_rA_mux_out[0:63]</obj_property>
       </wvobject>
-      <wvobject fp_name="/tb_mesh_row/uut/cpu_1_0/fdu_forward_rA" type="array">
-         <obj_property name="ElementShortName">fdu_forward_rA[0:1]</obj_property>
-         <obj_property name="ObjectShortName">fdu_forward_rA[0:1]</obj_property>
+      <wvobject fp_name="/tb_mesh_row/uut/cpu_1_0/ex_rB_mux_out" type="array">
+         <obj_property name="ElementShortName">ex_rB_mux_out[0:63]</obj_property>
+         <obj_property name="ObjectShortName">ex_rB_mux_out[0:63]</obj_property>
       </wvobject>
-      <wvobject fp_name="/tb_mesh_row/uut/cpu_1_0/fdu_forward_rB" type="array">
-         <obj_property name="ElementShortName">fdu_forward_rB[0:1]</obj_property>
-         <obj_property name="ObjectShortName">fdu_forward_rB[0:1]</obj_property>
+      <wvobject fp_name="/tb_mesh_row/uut/cpu_1_0/ex_alu_output" type="array">
+         <obj_property name="ElementShortName">ex_alu_output[0:63]</obj_property>
+         <obj_property name="ObjectShortName">ex_alu_output[0:63]</obj_property>
       </wvobject>
-      <wvobject type="divider" fp_name="divider1692">
-         <obj_property name="label">EX Stage</obj_property>
+      <wvobject type="divider" fp_name="divider1708">
+         <obj_property name="label">WB Stage</obj_property>
          <obj_property name="DisplayName">label</obj_property>
       </wvobject>
       <wvobject fp_name="group1693" type="group">
          <obj_property name="label">Pipeline Registers</obj_property>
          <obj_property name="DisplayName">label</obj_property>
-         <obj_property name="isExpanded"></obj_property>
          <wvobject fp_name="/tb_mesh_row/uut/cpu_1_0/ex_stage_ld" type="logic">
             <obj_property name="ElementShortName">ex_stage_ld</obj_property>
             <obj_property name="ObjectShortName">ex_stage_ld</obj_property>
@@ -798,22 +819,6 @@
             <obj_property name="ElementShortName">ex_stage_ppp[0:2]</obj_property>
             <obj_property name="ObjectShortName">ex_stage_ppp[0:2]</obj_property>
          </wvobject>
-      </wvobject>
-      <wvobject fp_name="/tb_mesh_row/uut/cpu_1_0/ex_rA_mux_out" type="array">
-         <obj_property name="ElementShortName">ex_rA_mux_out[0:63]</obj_property>
-         <obj_property name="ObjectShortName">ex_rA_mux_out[0:63]</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb_mesh_row/uut/cpu_1_0/ex_rB_mux_out" type="array">
-         <obj_property name="ElementShortName">ex_rB_mux_out[0:63]</obj_property>
-         <obj_property name="ObjectShortName">ex_rB_mux_out[0:63]</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb_mesh_row/uut/cpu_1_0/ex_alu_output" type="array">
-         <obj_property name="ElementShortName">ex_alu_output[0:63]</obj_property>
-         <obj_property name="ObjectShortName">ex_alu_output[0:63]</obj_property>
-      </wvobject>
-      <wvobject type="divider" fp_name="divider1708">
-         <obj_property name="label">WB Stage</obj_property>
-         <obj_property name="DisplayName">label</obj_property>
       </wvobject>
       <wvobject fp_name="/tb_mesh_row/uut/cpu_1_0/wb_result_mux_out" type="array">
          <obj_property name="ElementShortName">wb_result_mux_out[0:63]</obj_property>

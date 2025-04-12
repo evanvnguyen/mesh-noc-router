@@ -36,7 +36,12 @@ module tb_four_stage_processor;
     .d_out(d_out),
     .addr_out(addr_out),
     .memWrEn(memWrEn),
-    .memEn(memEn)
+    .memEn(memEn),
+    .nicEn(),
+    .nicWrEn(),
+    .addr_nic(),
+    .d_in_nic(),
+    .d_out_nic()
   );
 
   initial clk = 0;
@@ -50,17 +55,17 @@ module tb_four_stage_processor;
     //$readmemh("imem_0.0.fill", instruc_mem.MEM);
     //$readmemh("dmem_0.0.fill", data_mem.MEM);
     
-    for (j=1; j < 10; j = j + 1) begin
+    for (j=1; j < 2; j = j + 1) begin
         reset = 1'b1;
         repeat(5) @(negedge clk); 
         reset = 1'b0;
     
         // Format the filename string: "imem_<j>.fill"
-        $sformat(imem_filename, "imem_%0d.fill", j);
+        //$sformat(imem_filename, "imem_%0d.fill", j);
     
         // Load instruction and data memory
-        $readmemh(imem_filename, instruc_mem.MEM);
-        $readmemh("dmem.fill", data_mem.MEM);
+        $readmemh("ld-add-st.txt", instruc_mem.MEM);
+        $readmemh("dmem copy.fill", data_mem.MEM);
     
         wait (inst_in == 32'h00000000);
         $display("The program completed in %d cycles", clock_cycle);
