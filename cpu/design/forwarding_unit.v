@@ -22,7 +22,7 @@ module forwarding_unit(
         forward_rA = 2'b10;
       
       if (id_stage_rB_address != 0 && id_stage_rB_address == ex_rD_address)
-        forward_rA = 2'b10;
+        forward_rB = 2'b10;
     end else begin
       if (id_out_rA_address != 0 && id_out_rA_address == ex_rD_address)
         forward_rA = 2'b01;

@@ -157,8 +157,8 @@ alu alu(
   .alu_op(id_stage_alu_operation),
   .width(id_stage_ww),
   .immediate_address(id_stage_immediate_address),
-  .reg_a_data((fdu_forward_rA == 2'b11 ? ex_rA_mux_out : id_stage_rA_data)),
-  .reg_b_data((fdu_forward_rB == 2'b11 ? ex_rB_mux_out : id_stage_rB_data)),
+  .reg_a_data(ex_rA_mux_out),
+  .reg_b_data(ex_rB_mux_out),
   .instruction(),
   .alu_out(ex_alu_output)
 );
@@ -218,7 +218,7 @@ always @(id_out_bez or id_out_bnez or rf_out_rB_data or ex_rB_mux_out or nicEn) 
     if_branch = 1'b0;
 end
 
-always @(id_stage_ld or ex_stage_ld or id_stage_sd or id_stage_immediate_address) begin
+always @(id_stage_ld or ex_stage_ld or id_stage_sd or id_stage_immediate_address or ex_rB_mux_out) begin
   if (!reset) begin
     memEn = 1'b0;
     memWrEn = 1'b0;
@@ -255,11 +255,11 @@ always @(id_stage_ld or ex_stage_ld or id_stage_sd or id_stage_immediate_address
         nicEn = 1'b1;
         nicWrEn = 1'b1;
         addr_nic = 2'b10;
-        d_in_nic = (fdu_forward_rB == 2'b10 || fdu_forward_rB == 2'b01 ? ex_rB_mux_out : id_stage_rB_data);
+        d_in_nic = ex_rB_mux_out;
       end else begin
         memEn = 1'b1;
         memWrEn = 1'b1;
-        d_out = (fdu_forward_rB == 2'b10 || fdu_forward_rB == 2'b01 ? ex_rB_mux_out : id_stage_rB_data);
+        d_out = ex_rB_mux_out;
         addr_out = {16'b0, id_stage_immediate_address};
       end
     end
