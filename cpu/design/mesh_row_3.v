@@ -40,29 +40,43 @@ module mesh_row_3 #(
     output [63:0] nsdo_2_3,
     output [63:0] nsdo_3_3,
     
-    input [1:0]   addr_0_3,
-    input [63:0]  d_in_0_3,
-    output [63:0]  d_out_0_3,
-    input         nicEn_0_3,
-    input         nicEnWR_0_3,
+    // CPU tb signals with _3 signals
     
-    input [1:0]   addr_1_3,
-    input [63:0]  d_in_1_3,
-    output [63:0]  d_out_1_3,
-    input         nicEn_1_3,
-    input         nicEnWR_1_3,
+    // For node 0_3
+    input  [0:31] node_0_3_inst_in,
+    input  [0:63] node_0_3_d_in,
+    output [0:31] node_0_3_pc_out,
+    output [0:63] node_0_3_d_out,
+    output [0:31] node_0_3_addr_out,
+    output        node_0_3_memWrEn,
+    output        node_0_3_memEn,
     
-    input [1:0]   addr_2_3,
-    input [63:0]  d_in_2_3,
-    output [63:0]  d_out_2_3,
-    input         nicEn_2_3,
-    input         nicEnWR_2_3,
+    // For node 1_3
+    input  [0:31] node_1_3_inst_in,
+    input  [0:63] node_1_3_d_in,
+    output [0:31] node_1_3_pc_out,
+    output [0:63] node_1_3_d_out,
+    output [0:31] node_1_3_addr_out,
+    output        node_1_3_memWrEn,
+    output        node_1_3_memEn,
     
-    input [1:0]   addr_3_3,
-    input [63:0]  d_in_3_3,
-    output [63:0]  d_out_3_3,
-    input         nicEn_3_3,
-    input         nicEnWR_3_3
+    // For node 2_3
+    input  [0:31] node_2_3_inst_in,
+    input  [0:63] node_2_3_d_in,
+    output [0:31] node_2_3_pc_out,
+    output [0:63] node_2_3_d_out,
+    output [0:31] node_2_3_addr_out,
+    output        node_2_3_memWrEn,
+    output        node_2_3_memEn,
+    
+    // For node 3_3
+    input  [0:31] node_3_3_inst_in,
+    input  [0:63] node_3_3_d_in,
+    output [0:31] node_3_3_pc_out,
+    output [0:63] node_3_3_d_out,
+    output [0:31] node_3_3_addr_out,
+    output        node_3_3_memWrEn,
+    output        node_3_3_memEn
 
 ); 
 
@@ -131,6 +145,31 @@ module mesh_row_3 #(
   wire net_ri_pero_33;
   wire [63:0] net_di_pedo_33;
 
+  // CPU-NIC Interface
+  wire nicEn_0_3;
+  wire nicEnWR_0_3;
+  wire [1:0]  nic_addr_0_3;
+  wire [63:0] nic_d_in_0_3;
+  wire [63:0] nic_d_out_0_3;
+
+  wire nicEn_1_3;
+  wire nicEnWR_1_3;
+  wire [1:0]  nic_addr_1_3;
+  wire [63:0] nic_d_in_1_3;
+  wire [63:0] nic_d_out_1_3;
+
+  wire nicEn_2_3;
+  wire nicEnWR_2_3;
+  wire [1:0]  nic_addr_2_3;
+  wire [63:0] nic_d_in_2_3;
+  wire [63:0] nic_d_out_2_3;
+
+  wire nicEn_3_3;
+  wire nicEnWR_3_3;
+  wire [1:0]  nic_addr_3_3;
+  wire [63:0] nic_d_in_3_3;
+  wire [63:0] nic_d_out_3_3;
+
   router router_0_3 (
     .clk (clk),
     .reset(reset),
@@ -162,11 +201,12 @@ module mesh_row_3 #(
       .reset(reset),
   
       // CPU-NIC Interface
-      .addr(addr_0_3),
-      .d_in(d_in_0_3),
-      .d_out(d_out_0_3),
+      .addr(nic_addr_0_3),
+      .d_in(nic_d_in_0_3),
+      .d_out(nic_d_out_0_3),
       .nicEn(nicEn_0_3),
       .nicEnWR(nicEnWR_0_3),
+
   
       // Router-NIC Interface
       .net_si(net_si_peso_03),
@@ -178,6 +218,23 @@ module mesh_row_3 #(
       .net_do(net_do_pedi_03),
       .net_polarity(net_polarity_03)
   );
+  
+four_stage_processor cpu_0_3 (
+    .clk(clk),
+    .reset(reset),
+    .inst_in(node_0_3_inst_in),
+    .d_in(node_0_3_d_in),
+    .pc_out(node_0_3_pc_out),
+    .d_out(node_0_3_d_out),
+    .addr_out(node_0_3_addr_out),
+    .memWrEn(node_0_3_memWrEn),
+    .memEn(node_0_3_memEn),
+    .nicEn(nicEn_0_3),
+    .nicWrEn(nicEnWR_0_3),
+    .addr_nic(nic_addr_0_3),
+    .d_in_nic(nic_d_in_0_3),
+    .d_out_nic(nic_d_out_0_3)
+);
 
   router router_1_3 (
     .clk (clk),
@@ -211,11 +268,12 @@ module mesh_row_3 #(
       .reset(reset),
   
       // CPU-NIC Interface
-      .addr(addr_1_3),
-      .d_in(d_in_1_3),
-      .d_out(d_out_1_3),
+      .addr(nic_addr_1_3),
+      .d_in(nic_d_in_1_3),
+      .d_out(nic_d_out_1_3),
       .nicEn(nicEn_1_3),
       .nicEnWR(nicEnWR_1_3),
+
   
       // Router-NIC Interface
       .net_si(net_si_peso_13),
@@ -227,6 +285,23 @@ module mesh_row_3 #(
       .net_do(net_do_pedi_13),
       .net_polarity(net_polarity_13)
   );
+  
+four_stage_processor cpu_1_3 (
+    .clk(clk),
+    .reset(reset),
+    .inst_in(node_1_3_inst_in),
+    .d_in(node_1_3_d_in),
+    .pc_out(node_1_3_pc_out),
+    .d_out(node_1_3_d_out),
+    .addr_out(node_1_3_addr_out),
+    .memWrEn(node_1_3_memWrEn),
+    .memEn(node_1_3_memEn),
+    .nicEn(nicEn_1_3),
+    .nicWrEn(nicEnWR_1_3),
+    .addr_nic(nic_addr_1_3),
+    .d_in_nic(nic_d_in_1_3),
+    .d_out_nic(nic_d_out_1_3)
+);
 
     router router_2_3 (
     .clk (clk),
@@ -260,11 +335,12 @@ module mesh_row_3 #(
       .reset(reset),
   
       // CPU-NIC Interface
-      .addr(addr_2_3),
-      .d_in(d_in_2_3),
-      .d_out(d_out_2_3),
+      .addr(nic_addr_2_3),
+      .d_in(nic_d_in_2_3),
+      .d_out(nic_d_out_2_3),
       .nicEn(nicEn_2_3),
       .nicEnWR(nicEnWR_2_3),
+
   
       // Router-NIC Interface
       .net_si(net_si_peso_23),
@@ -276,8 +352,25 @@ module mesh_row_3 #(
       .net_do(net_do_pedi_23),
       .net_polarity(net_polarity_23)
   );
+  
+four_stage_processor cpu_2_3 (
+    .clk(clk),
+    .reset(reset),
+    .inst_in(node_2_3_inst_in),
+    .d_in(node_2_3_d_in),
+    .pc_out(node_2_3_pc_out),
+    .d_out(node_2_3_d_out),
+    .addr_out(node_2_3_addr_out),
+    .memWrEn(node_2_3_memWrEn),
+    .memEn(node_2_3_memEn),
+    .nicEn(nicEn_2_3),
+    .nicWrEn(nicEnWR_2_3),
+    .addr_nic(nic_addr_2_3),
+    .d_in_nic(nic_d_in_2_3),
+    .d_out_nic(nic_d_out_2_3)
+);
 
-      router router_3_3 (
+  router router_3_3 (
     .clk (clk),
     .reset(reset),
     .router_position(0), 
@@ -308,11 +401,12 @@ module mesh_row_3 #(
       .reset(reset),
   
       // CPU-NIC Interface
-      .addr(addr_3_3),
-      .d_in(d_in_3_3),
-      .d_out(d_out_3_3),
-      .nicEn(nicEn_3_3),
-      .nicEnWR(nicEnWR_3_3),
+      .addr(nic_addr_2_3),
+      .d_in(nic_d_in_2_3),
+      .d_out(nic_d_out_2_3),
+      .nicEn(nicEn_2_3),
+      .nicEnWR(nicEnWR_2_3),
+
   
       // Router-NIC Interface
       .net_si(net_si_peso_33),
@@ -324,5 +418,22 @@ module mesh_row_3 #(
       .net_do(net_do_pedi_33),
       .net_polarity(net_polarity_33)
   );
+  
+four_stage_processor cpu_3_3 (
+    .clk(clk),
+    .reset(reset),
+    .inst_in(node_3_3_inst_in),
+    .d_in(node_3_3_d_in),
+    .pc_out(node_3_3_pc_out),
+    .d_out(node_3_3_d_out),
+    .addr_out(node_3_3_addr_out),
+    .memWrEn(node_3_3_memWrEn),
+    .memEn(node_3_3_memEn),
+    .nicEn(nicEn_3_3),
+    .nicWrEn(nicEnWR_3_3),
+    .addr_nic(nic_addr_3_3),
+    .d_in_nic(nic_d_in_3_3),
+    .d_out_nic(nic_d_out_3_3)
+);
 
 endmodule

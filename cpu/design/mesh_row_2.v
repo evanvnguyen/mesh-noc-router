@@ -61,29 +61,43 @@ module mesh_row_2 #(
     output [63:0] nsdo_2_2,
     output [63:0] nsdo_3_2,
     
-    input [1:0]   addr_0_2,
-    input [63:0]  d_in_0_2,
-    output [63:0]  d_out_0_2,
-    input         nicEn_0_2,
-    input         nicEnWR_0_2,
+// CPU tb signals for x_2
+
+    // For node 0_2
+    input  [0:31] node_0_2_inst_in,
+    input  [0:63] node_0_2_d_in,
+    output [0:31] node_0_2_pc_out,
+    output [0:63] node_0_2_d_out,
+    output [0:31] node_0_2_addr_out,
+    output        node_0_2_memWrEn,
+    output        node_0_2_memEn,
     
-    input [1:0]   addr_1_2,
-    input [63:0]  d_in_1_2,
-    output [63:0]  d_out_1_2,
-    input         nicEn_1_2,
-    input         nicEnWR_1_2,
+    // For node 1_2
+    input  [0:31] node_1_2_inst_in,
+    input  [0:63] node_1_2_d_in,
+    output [0:31] node_1_2_pc_out,
+    output [0:63] node_1_2_d_out,
+    output [0:31] node_1_2_addr_out,
+    output        node_1_2_memWrEn,
+    output        node_1_2_memEn,
     
-    input [1:0]   addr_2_2,
-    input [63:0]  d_in_2_2,
-    output [63:0]  d_out_2_2,
-    input         nicEn_2_2,
-    input         nicEnWR_2_2,
+    // For node 2_2
+    input  [0:31] node_2_2_inst_in,
+    input  [0:63] node_2_2_d_in,
+    output [0:31] node_2_2_pc_out,
+    output [0:63] node_2_2_d_out,
+    output [0:31] node_2_2_addr_out,
+    output        node_2_2_memWrEn,
+    output        node_2_2_memEn,
     
-    input [1:0]   addr_3_2,
-    input [63:0]  d_in_3_2,
-    output [63:0]  d_out_3_2,
-    input         nicEn_3_2,
-    input         nicEnWR_3_2
+    // For node 3_2
+    input  [0:31] node_3_2_inst_in,
+    input  [0:63] node_3_2_d_in,
+    output [0:31] node_3_2_pc_out,
+    output [0:63] node_3_2_d_out,
+    output [0:31] node_3_2_addr_out,
+    output        node_3_2_memWrEn,
+    output        node_3_2_memEn
 
 ); 
 
@@ -152,6 +166,37 @@ module mesh_row_2 #(
   wire net_ri_pero_32;
   wire [63:0] net_di_pedo_32;
 
+  // NIC wires for x_2
+
+  // For NIC of node 0_2
+  wire        nicEn_0_2;
+  wire        nicEnWR_0_2;
+  wire [1:0]  nic_addr_0_2;
+  wire [63:0] nic_d_in_0_2;
+  wire [63:0] nic_d_out_0_2;
+
+  // For NIC of node 1_2
+  wire        nicEn_1_2;
+  wire        nicEnWR_1_2;
+  wire [1:0]  nic_addr_1_2;
+  wire [63:0] nic_d_in_1_2;
+  wire [63:0] nic_d_out_1_2;
+
+  // For NIC of node 2_2
+  wire        nicEn_2_2;
+  wire        nicEnWR_2_2;
+  wire [1:0]  nic_addr_2_2;
+  wire [63:0] nic_d_in_2_2;
+  wire [63:0] nic_d_out_2_2;
+
+  // For NIC of node 3_2
+  wire        nicEn_3_2;
+  wire        nicEnWR_3_2;
+  wire [1:0]  nic_addr_3_2;
+  wire [63:0] nic_d_in_3_2;
+  wire [63:0] nic_d_out_3_2;
+
+
   router router_0_2 (
     .clk (clk),
     .reset(reset),
@@ -199,7 +244,23 @@ module mesh_row_2 #(
       .net_do(net_do_pedi_02),
       .net_polarity(net_polarity_02)
   );
-
+  
+four_stage_processor cpu_0_2 (
+    .clk(clk),
+    .reset(reset),
+    .inst_in(node_0_2_inst_in),
+    .d_in(node_0_2_d_in),
+    .pc_out(node_0_2_pc_out),
+    .d_out(node_0_2_d_out),
+    .addr_out(node_0_2_addr_out),
+    .memWrEn(node_0_2_memWrEn),
+    .memEn(node_0_2_memEn),
+    .nicEn(nicEn_0_2),
+    .nicWrEn(nicEnWR_0_2),
+    .addr_nic(nic_addr_0_2),
+    .d_in_nic(nic_d_in_0_2),
+    .d_out_nic(nic_d_out_0_2)
+);
   router router_1_2 (
     .clk (clk),
     .reset(reset),
@@ -248,6 +309,23 @@ module mesh_row_2 #(
       .net_do(net_do_pedi_12),
       .net_polarity(net_polarity_12)
   );
+  
+    four_stage_processor cpu_1_2 (
+        .clk(clk),
+        .reset(reset),
+        .inst_in(node_1_2_inst_in),
+        .d_in(node_1_2_d_in),
+        .pc_out(node_1_2_pc_out),
+        .d_out(node_1_2_d_out),
+        .addr_out(node_1_2_addr_out),
+        .memWrEn(node_1_2_memWrEn),
+        .memEn(node_1_2_memEn),
+        .nicEn(nicEn_1_2),
+        .nicWrEn(nicEnWR_1_2),
+        .addr_nic(nic_addr_1_2),
+        .d_in_nic(nic_d_in_1_2),
+        .d_out_nic(nic_d_out_1_2)
+    );
 
     router router_2_2 (
     .clk (clk),
@@ -297,7 +375,23 @@ module mesh_row_2 #(
       .net_do(net_do_pedi_22),
       .net_polarity(net_polarity_22)
   );
-
+  
+    four_stage_processor cpu_2_2 (
+        .clk(clk),
+        .reset(reset),
+        .inst_in(node_2_2_inst_in),
+        .d_in(node_2_2_d_in),
+        .pc_out(node_2_2_pc_out),
+        .d_out(node_2_2_d_out),
+        .addr_out(node_2_2_addr_out),
+        .memWrEn(node_2_2_memWrEn),
+        .memEn(node_2_2_memEn),
+        .nicEn(nicEn_2_2),
+        .nicWrEn(nicEnWR_2_2),
+        .addr_nic(nic_addr_2_2),
+        .d_in_nic(nic_d_in_2_2),
+        .d_out_nic(nic_d_out_2_2)
+    );
       router router_3_2 (
     .clk (clk),
     .reset(reset),
@@ -345,5 +439,22 @@ module mesh_row_2 #(
       .net_do(net_do_pedi_32),
       .net_polarity(net_polarity_32)
   );
+
+four_stage_processor cpu_3_2 (
+    .clk(clk),
+    .reset(reset),
+    .inst_in(node_3_2_inst_in),
+    .d_in(node_3_2_d_in),
+    .pc_out(node_3_2_pc_out),
+    .d_out(node_3_2_d_out),
+    .addr_out(node_3_2_addr_out),
+    .memWrEn(node_3_2_memWrEn),
+    .memEn(node_3_2_memEn),
+    .nicEn(nicEn_3_2),
+    .nicWrEn(nicEnWR_3_2),
+    .addr_nic(nic_addr_3_2),
+    .d_in_nic(nic_d_in_3_2),
+    .d_out_nic(nic_d_out_3_2)
+);
 
 endmodule

@@ -117,7 +117,7 @@ module mesh_top_flat (
     wire [0:63] cpu_d_in_nic_0_3, cpu_d_in_nic_1_3, cpu_d_in_nic_2_3, cpu_d_in_nic_3_3;         // NIC data input
     
 
-    mesh_top_row_3 #(
+    mesh_row_3 #(
         .PACKET_WIDTH(PACKET_WIDTH)
     ) row_3 (
         .clk(clk), 
@@ -136,14 +136,13 @@ module mesh_top_flat (
         .snsi_3_3(snso_from_32_to_snsi_33), .snri_3_3(snso_from_32_to_snsi_33), .sndi_3_3(sndo_from_32_to_sndi_33), .nsso_3_3(nssi_from_32_to_nsso_33), .nsro_3_3(nsri_from_32_to_nsro_33), .nsdo_3_3(nsdi_from_32_to_nsdo_33),
 
 
-        .inst_in_0_3(cpu_inst_in_0_3), .inst_in_1_3(cpu_inst_in_1_3), .inst_in_2_3(cpu_inst_in_2_3), .inst_in_3_3(cpu_inst_in_3_3),                // from imem
-        .d_in_0_3(cpu_d_in_0_3), .d_in_1_3(cpu_d_in_1_3), .d_in_2_3(cpu_d_in_2_3), .d_in_3_3(cpu_d_in_3_3),                            // data input from dmem
-        .pc_out_0_3(cpu_pc_out_0_3), .pc_out_1_3(cpu_pc_out_1_3), .pc_out_2_3(cpu_pc_out_2_3), .pc_out_3_3(cpu_pc_out_3_3),                    // program counter out
-        .d_out_0_3(cpu_d_out_0_3), .d_out_1_3(cpu_d_out_1_3), .d_out_2_3(cpu_d_out_2_3), .d_out_3_3(cpu_d_out_3_3),                   // data output to data memory
-        .addr_out_0_3(cpu_addr_out_0_3), .addr_out_1_3(cpu_addr_out_1_3), .addr_out_2_3(cpu_addr_out_2_3), .addr_out_3_3(cpu_addr_out_3_3),        // data memory address
-        .memWrEn_0_3(cpu_memWrEn_0_3), .memWrEn_1_3(cpu_memWrEn_1_3), .memWrEn_2_3(cpu_memWrEn_2_3), .memWrEn_3_3(cpu_memWrEn_3_3),                  // data memory write enable
-        .memEn_0_3(cpu_memEn_0_3), .memEn_1_3(cpu_memEn_1_3), .memEn_2_3(cpu_memEn_2_3), .memEn_3_3(cpu_memEn_3_3)                          // data memory enable
-    
+        .node_0_3_inst_in(cpu_inst_in_0_3), .node_1_3_inst_in(cpu_inst_in_1_3), .node_2_3_inst_in(cpu_inst_in_2_3), .node_3_3_inst_in(cpu_inst_in_3_3),                // from imem
+        .node_0_3_d_in(cpu_d_in_0_3),       .node_1_3_d_in(cpu_d_in_1_3),       .node_2_3_d_in(cpu_d_in_2_3),       .node_3_3_d_in(cpu_d_in_3_3),                            // data input from dmem
+        .node_0_3_pc_out(cpu_pc_out_0_3),     .node_1_3_pc_out(cpu_pc_out_1_3),     .node_2_3_pc_out(cpu_pc_out_2_3),     .node_3_3_pc_out(cpu_pc_out_3_3),                    // program counter out
+        .node_0_3_d_out(cpu_d_out_0_3),       .node_1_3_d_out(cpu_d_out_1_3),       .node_2_3_d_out(cpu_d_out_2_3),       .node_3_3_d_out(cpu_d_out_3_3),                   // data output to data memory
+        .node_0_3_addr_out(cpu_addr_out_0_3), .node_1_3_addr_out(cpu_addr_out_1_3), .node_2_3_addr_out(cpu_addr_out_2_3), .node_3_3_addr_out(cpu_addr_out_3_3),        // data memory address
+        .node_0_3_memWrEn(cpu_memWrEn_0_3),   .node_1_3_memWrEn(cpu_memWrEn_1_3),   .node_2_3_memWrEn(cpu_memWrEn_2_3),   .node_3_3_memWrEn(cpu_memWrEn_3_3),              // data memory write enable
+        .node_0_3_memEn(cpu_memEn_0_3),       .node_1_3_memEn(cpu_memEn_1_3),       .node_2_3_memEn(cpu_memEn_2_3),       .node_3_3_memEn(cpu_memEn_3_3)                       // data memory enable
     );
 
     wire [63:0] sndo_from_01_to_sndi_02;
@@ -176,7 +175,7 @@ module mesh_top_flat (
     wire nssi_from_31_to_nsso_32;
     wire nsri_from_31_to_nsro_32;
 
-    mesh_top_row_2 #(
+    mesh_row_2 #(
         .PACKET_WIDTH(PACKET_WIDTH)
     ) row_2 (
         .clk(clk), 
@@ -206,13 +205,15 @@ module mesh_top_flat (
         // bottom signal router 3,2
         .snsi_3_2(snso_from_31_to_snsi_32), .snri_3_2(snro_from_31_to_snri_32), .sndi_3_2(sndo_from_31_to_sndi_32), .nsso_3_2(nssi_from_31_to_nsso_32), .nsro_3_2(nsri_from_31_to_nsro_32), .nsdo_3_2(nsdi_from_31_to_nsdo_32),
        
-        .inst_in_0_2(cpu_inst_in_0_2), .inst_in_1_2(cpu_inst_in_1_2), .inst_in_2_2(cpu_inst_in_2_2), .inst_in_3_2(cpu_inst_in_3_2),                // from imem
-        .d_in_0_2(cpu_d_in_0_2), .d_in_1_2(cpu_d_in_1_2), .d_in_2_2(cpu_d_in_2_2), .d_in_3_2(cpu_d_in_3_2),                            // data input from dmem
-        .pc_out_0_2(cpu_pc_out_0_2), .pc_out_1_2(cpu_pc_out_1_2), .pc_out_2_2(cpu_pc_out_2_2), .pc_out_3_2(cpu_pc_out_3_2),                    // program counter out
-        .d_out_0_2(cpu_d_out_0_2), .d_out_1_2(cpu_d_out_1_2), .d_out_2_2(cpu_d_out_2_2), .d_out_3_2(cpu_d_out_3_2),                   // data output to data memory
-        .addr_out_0_2(cpu_addr_out_0_2), .addr_out_1_2(cpu_addr_out_1_2), .addr_out_2_2(cpu_addr_out_2_2), .addr_out_3_2(cpu_addr_out_3_2),        // data memory address
-        .memWrEn_0_2(cpu_memWrEn_0_2), .memWrEn_1_2(cpu_memWrEn_1_2), .memWrEn_2_2(cpu_memWrEn_2_2), .memWrEn_3_2(cpu_memWrEn_3_2),                  // data memory write enable
-        .memEn_0_2(cpu_memEn_0_2), .memEn_1_2(cpu_memEn_1_2), .memEn_2_2(cpu_memEn_2_2), .memEn_3_2(cpu_memEn_3_2)                          // data memory enable
+        .node_0_2_inst_in(cpu_inst_in_0_2), .node_1_2_inst_in(cpu_inst_in_1_2), .node_2_2_inst_in(cpu_inst_in_2_2), .node_3_2_inst_in(cpu_inst_in_3_2),                // from imem
+        .node_0_2_d_in(cpu_d_in_0_2),       .node_1_2_d_in(cpu_d_in_1_2),       .node_2_2_d_in(cpu_d_in_2_2),       .node_3_2_d_in(cpu_d_in_3_2),                            // data input from dmem
+        .node_0_2_pc_out(cpu_pc_out_0_2),     .node_1_2_pc_out(cpu_pc_out_1_2),     .node_2_2_pc_out(cpu_pc_out_2_2),     .node_3_2_pc_out(cpu_pc_out_3_2),                    // program counter out
+        .node_0_2_d_out(cpu_d_out_0_2),       .node_1_2_d_out(cpu_d_out_1_2),       .node_2_2_d_out(cpu_d_out_2_2),       .node_3_2_d_out(cpu_d_out_3_2),                   // data output to data memory
+        .node_0_2_addr_out(cpu_addr_out_0_2), .node_1_2_addr_out(cpu_addr_out_1_2), .node_2_2_addr_out(cpu_addr_out_2_2), .node_3_2_addr_out(cpu_addr_out_3_2),        // data memory address
+        .node_0_2_memWrEn(cpu_memWrEn_0_2),   .node_1_2_memWrEn(cpu_memWrEn_1_2),   .node_2_2_memWrEn(cpu_memWrEn_2_2),   .node_3_2_memWrEn(cpu_memWrEn_3_2),              // data memory write enable
+        .node_0_2_memEn(cpu_memEn_0_2),       .node_1_2_memEn(cpu_memEn_1_2),       .node_2_2_memEn(cpu_memEn_2_2),       .node_3_2_memEn(cpu_memEn_3_2)                       // data memory enable
+
+
     
 
     );
@@ -247,7 +248,7 @@ module mesh_top_flat (
     wire nssi_from_30_to_nsso_31;
     wire nsri_from_30_to_nsro_31;
 
-    mesh_top_row_1 #(
+    mesh_row_1 #(
         .PACKET_WIDTH(PACKET_WIDTH)
     ) row_1 (
         .clk(clk), 
@@ -277,19 +278,21 @@ module mesh_top_flat (
         // botto2 signal router 3,1
         .snsi_3_1(snso_from_30_to_snsi_31), .snri_3_1(snro_from_30_to_snri_31), .sndi_3_1(sndo_from_30_to_sndi_31), .nsso_3_1(nssi_from_30_to_nsso_31), .nsro_3_1(nsri_from_30_to_nsro_31), .nsdo_3_1(nsdi_from_30_to_nsdo_31),
         
-        .inst_in_0_1(cpu_inst_in_0_1), .inst_in_1_1(cpu_inst_in_1_1), .inst_in_2_1(cpu_inst_in_2_1), .inst_in_3_1(cpu_inst_in_3_1),                // from imem
-        .d_in_0_1(cpu_d_in_0_1), .d_in_1_1(cpu_d_in_1_1), .d_in_2_1(cpu_d_in_2_1), .d_in_3_1(cpu_d_in_3_1),                            // data input from dmem
-        .pc_out_0_1(cpu_pc_out_0_1), .pc_out_1_1(cpu_pc_out_1_1), .pc_out_2_1(cpu_pc_out_2_1), .pc_out_3_1(cpu_pc_out_3_1),                    // program counter out
-        .d_out_0_1(cpu_d_out_0_1), .d_out_1_1(cpu_d_out_1_1), .d_out_2_1(cpu_d_out_2_1), .d_out_3_1(cpu_d_out_3_1),                   // data output to data memory
-        .addr_out_0_1(cpu_addr_out_0_1), .addr_out_1_1(cpu_addr_out_1_1), .addr_out_2_1(cpu_addr_out_2_1), .addr_out_3_1(cpu_addr_out_3_1),        // data memory address
-        .memWrEn_0_1(cpu_memWrEn_0_1), .memWrEn_1_1(cpu_memWrEn_1_1), .memWrEn_2_1(cpu_memWrEn_2_1), .memWrEn_3_1(cpu_memWrEn_3_1),                  // data memory write enable
-        .memEn_0_1(cpu_memEn_0_1), .memEn_1_1(cpu_memEn_1_1), .memEn_2_1(cpu_memEn_2_1), .memEn_3_1(cpu_memEn_3_1)                          // data memory enable
+        .node_0_1_inst_in(cpu_inst_in_0_1), .node_1_1_inst_in(cpu_inst_in_1_1), .node_2_1_inst_in(cpu_inst_in_2_1), .node_3_1_inst_in(cpu_inst_in_3_1),                // from imem
+        .node_0_1_d_in(cpu_d_in_0_1),       .node_1_1_d_in(cpu_d_in_1_1),       .node_2_1_d_in(cpu_d_in_2_1),       .node_3_1_d_in(cpu_d_in_3_1),                            // data input from dmem
+        .node_0_1_pc_out(cpu_pc_out_0_1),     .node_1_1_pc_out(cpu_pc_out_1_1),     .node_2_1_pc_out(cpu_pc_out_2_1),     .node_3_1_pc_out(cpu_pc_out_3_1),                    // program counter out
+        .node_0_1_d_out(cpu_d_out_0_1),       .node_1_1_d_out(cpu_d_out_1_1),       .node_2_1_d_out(cpu_d_out_2_1),       .node_3_1_d_out(cpu_d_out_3_1),                   // data output to data memory
+        .node_0_1_addr_out(cpu_addr_out_0_1), .node_1_1_addr_out(cpu_addr_out_1_1), .node_2_1_addr_out(cpu_addr_out_2_1), .node_3_1_addr_out(cpu_addr_out_3_1),        // data memory address
+        .node_0_1_memWrEn(cpu_memWrEn_0_1),   .node_1_1_memWrEn(cpu_memWrEn_1_1),   .node_2_1_memWrEn(cpu_memWrEn_2_1),   .node_3_1_memWrEn(cpu_memWrEn_3_1),              // data memory write enable
+        .node_0_1_memEn(cpu_memEn_0_1),       .node_1_1_memEn(cpu_memEn_1_1),       .node_2_1_memEn(cpu_memEn_2_1),       .node_3_1_memEn(cpu_memEn_3_1)                       // data memory enable
+
+
 
 
     );
 
 
-    mesh_top_row_0 #(
+    mesh_row_0 #(
         .PACKET_WIDTH(PACKET_WIDTH)
     ) row_0 (
         .clk(clk), 
@@ -307,13 +310,15 @@ module mesh_top_flat (
         // top signal router 3,0 
         .snso_3_0(snso_from_30_to_snsi_31), .snro_3_0(snro_from_30_to_snri_31), .sndo_3_0(sndo_from_30_to_sndi_31), .nssi_3_0(nssi_from_30_to_nsso_31), .nsri_3_0(nsri_from_30_to_nsro_31), .nsdi_3_0(nsdi_from_30_to_nsdo_31),
         
-        .inst_in_0_0(cpu_inst_in_0_0), .inst_in_1_0(cpu_inst_in_1_0), .inst_in_2_0(cpu_inst_in_2_0), .inst_in_3_0(cpu_inst_in_3_0),                // from imem
-        .d_in_0_0(cpu_d_in_0_0), .d_in_1_0(cpu_d_in_1_0), .d_in_2_0(cpu_d_in_2_0), .d_in_3_0(cpu_d_in_3_0),                            // data input from dmem
-        .pc_out_0_0(cpu_pc_out_0_0), .pc_out_1_0(cpu_pc_out_1_0), .pc_out_2_0(cpu_pc_out_2_0), .pc_out_3_0(cpu_pc_out_3_0),                    // program counter out
-        .d_out_0_0(cpu_d_out_0_0), .d_out_1_0(cpu_d_out_1_0), .d_out_2_0(cpu_d_out_2_0), .d_out_3_0(cpu_d_out_3_0),                   // data output to data memory
-        .addr_out_0_0(cpu_addr_out_0_0), .addr_out_1_0(cpu_addr_out_1_0), .addr_out_2_0(cpu_addr_out_2_0), .addr_out_3_0(cpu_addr_out_3_0),        // data memory address
-        .memWrEn_0_0(cpu_memWrEn_0_0), .memWrEn_1_0(cpu_memWrEn_1_0), .memWrEn_2_0(cpu_memWrEn_2_0), .memWrEn_3_0(cpu_memWrEn_3_0),                  // data memory write enable
-        .memEn_0_0(cpu_memEn_0_0), .memEn_1_0(cpu_memEn_1_0), .memEn_2_0(cpu_memEn_2_0), .memEn_3_0(cpu_memEn_3_0)                          // data memory enable
+        .node_0_0_inst_in(cpu_inst_in_0_0), .node_1_0_inst_in(cpu_inst_in_1_0), .node_2_0_inst_in(cpu_inst_in_2_0), .node_3_0_inst_in(cpu_inst_in_3_0),                // from imem
+        .node_0_0_d_in(cpu_d_in_0_0),       .node_1_0_d_in(cpu_d_in_1_0),       .node_2_0_d_in(cpu_d_in_2_0),       .node_3_0_d_in(cpu_d_in_3_0),                            // data input from dmem
+        .node_0_0_pc_out(cpu_pc_out_0_0),     .node_1_0_pc_out(cpu_pc_out_1_0),     .node_2_0_pc_out(cpu_pc_out_2_0),     .node_3_0_pc_out(cpu_pc_out_3_0),                    // program counter out
+        .node_0_0_d_out(cpu_d_out_0_0),       .node_1_0_d_out(cpu_d_out_1_0),       .node_2_0_d_out(cpu_d_out_2_0),       .node_3_0_d_out(cpu_d_out_3_0),                   // data output to data memory
+        .node_0_0_addr_out(cpu_addr_out_0_0), .node_1_0_addr_out(cpu_addr_out_1_0), .node_2_0_addr_out(cpu_addr_out_2_0), .node_3_0_addr_out(cpu_addr_out_3_0),        // data memory address
+        .node_0_0_memWrEn(cpu_memWrEn_0_0),   .node_1_0_memWrEn(cpu_memWrEn_1_0),   .node_2_0_memWrEn(cpu_memWrEn_2_0),   .node_3_0_memWrEn(cpu_memWrEn_3_0),              // data memory write enable
+        .node_0_0_memEn(cpu_memEn_0_0),       .node_1_0_memEn(cpu_memEn_1_0),       .node_2_0_memEn(cpu_memEn_2_0),       .node_3_0_memEn(cpu_memEn_3_0)                       // data memory enable
+
+
 
 
     );
