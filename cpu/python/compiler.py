@@ -1,0 +1,232 @@
+import argparse
+import os
+import re
+
+verbose_mode = False
+
+# Define the instruction set
+instruction_set = {
+    "VAND": {"opcode": "101010", "alu_op": "000001"},
+    "VOR":  {"opcode": "101010", "alu_op": "000010"},
+    "VXOR": {"opcode": "101010", "alu_op": "000011"},
+    "VNOT": {"opcode": "101010", "alu_op": "000100"},
+    "VMOV": {"opcode": "101010", "alu_op": "000101"},
+    "VADD": {"opcode": "101010", "alu_op": "000110"},
+    "VSUB": {"opcode": "101010", "alu_op": "000111"},
+    "VMULEU": {"opcode": "101010", "alu_op": "001000"},
+    "VMULOU": {"opcode": "101010", "alu_op": "001001"},
+    "VSLL": {"opcode": "101010", "alu_op": "001010"},
+    "VSRL": {"opcode": "101010", "alu_op": "001011"},
+    "VSRA": {"opcode": "101010", "alu_op": "001100"},
+    "VRTTH": {"opcode": "101010", "alu_op": "001101"},
+    "VDIV": {"opcode": "101010", "alu_op": "001110"},
+    "VMOD": {"opcode": "101010", "alu_op": "001111"},
+    "VSQEU": {"opcode": "101010", "alu_op": "010000"},
+    "VSQOU": {"opcode": "101010", "alu_op": "010001"},
+    "VSQRT": {"opcode": "101010", "alu_op": "010010"},
+    "VLD": {"opcode": "100000", "alu_op": ""},
+    "VSD": {"opcode": "100001", "alu_op": ""},
+    "VBEZ": {"opcode": "100010", "alu_op": ""},
+    "VBNEZ": {"opcode": "100011", "alu_op": ""},
+    "VNOP": {"opcode": "111100", "alu_op": "000000"}    
+}
+
+byte_width = {
+  "b": "00",
+  "h": "01",
+  "w": "10",
+  "d": "11"
+}
+
+def vprint(*args, **kwargs):
+    if verbose_mode:
+        print(*args, **kwargs)
+
+def parse_mnemonic(mnemonic):
+    mnemonic = mnemonic.strip()
+    match = re.fullmatch(r'([A-Za-z]+)(?:\.(b|h|w|d))?', mnemonic, re.IGNORECASE)
+    if not match:
+        raise ValueError(f"Invalid instruction mnemonic: {mnemonic}")
+    base = match.group(1).upper()
+    suffix = match.group(2).lower() if match.group(2) else None
+    return base, suffix
+
+  
+def to_binary(value, bits=5):
+    try:
+        int_value = int(value) #int(value, 2) if all(c in '01' for c in value) else int(value)
+        if not (0 <= int_value <= 31):
+            raise ValueError("Register values must be between 0 and 31")
+        return format(int_value, f'0{bits}b')
+    except Exception:
+        raise ValueError("Register values must be integers or binary strings between 0 and 31")
+
+def to_imm_binary(value, bits=16):
+    try:
+        int_value = int(value)
+        if not (0 <= int_value < 2**bits):
+            raise ValueError(f"Immediate must be between 0 and {2**bits - 1}")
+        return format(int_value, f'0{bits}b')
+    except Exception:
+        raise ValueError("Immediate must be an integer between 0 and 65535")
+  
+def generate_instruction(instr, rD, rA, rB=0, imm=None, wwwpp="00000"):
+    vprint(f"Generating instruction for {instr} with rD={rD}, rA={rA}, rB={rB}, imm={imm}, wwwpp={wwwpp}")
+    if instr not in instruction_set:
+        raise ValueError(f"Instruction '{instr}' not recognized.")
+
+    data = instruction_set[instr]
+    opcode = data["opcode"]
+    alu_op = data["alu_op"]
+
+    rD_bin = to_binary(rD)
+    rA_bin = to_binary(rA)
+    rB_bin = to_binary(rB)
+    
+    result = ""
+
+    if instr in ["VLD", "VSD", "VBEZ", "VBNEZ"]:
+        if imm is None:
+            raise ValueError("Immediate address required for this instruction")
+        result = f"{opcode}{rD_bin}{rA_bin}{imm}"        
+    else:
+        result = f"{opcode}{rD_bin}{rA_bin}{rB_bin}{wwwpp}{alu_op}"
+      
+    byte_array = int(result, 2).to_bytes(len(result) // 8, byteorder='big')
+    vprint(f"Generated binary: {result}")
+    hex_result = byte_array.hex().upper()
+    vprint(f"Generated hex: {hex_result}")
+    return hex_result
+
+def parse_imm_value(value: str, bits: int = 16) -> str:
+    value = value.strip().lower()
+
+    if value.startswith('0x'):
+        intval = int(value, 16)
+    elif value.endswith('h'):
+        intval = int(value[:-1], 16)
+    elif value.startswith('0b'):
+        intval = int(value, 2)
+    elif value.endswith('b'):
+        intval = int(value[:-1], 2)
+    else:
+        intval = int(value, 10)
+
+    if not (0 <= intval < 2 ** bits):
+        raise ValueError(f"Immediate out of range (0 to {2**bits - 1})")
+
+    return format(intval, f'0{bits}b')
+
+parser = argparse.ArgumentParser(description="Compile assembly code its hezadecimal representation.")
+parser.add_argument("-i", "--input", type=str, help="Path to the input assembly file")
+parser.add_argument("-o", "--output", type=str, help="Path to the output file")
+parser.add_argument("-v", "--verbose", action="store_true", help="Enable verbose output")
+args = parser.parse_args()
+
+verbose_mode = args.verbose
+if args.verbose:
+    print("Verbose mode enabled")
+
+if  (not args.input or args.input == ""):
+    print("Input file is invalid")
+    exit(1)
+
+if (os.path.exists(args.input) == False or os.path.isfile(args.input) == False):
+    print("Input file does not exist")
+    exit(1)
+
+def compile():
+    output_lines = "// Generated by compiler.py\n"
+    output_lines += "// Do not edit this file\n"
+    vprint(f"Opening Input file: {args.input}")
+    # Read the file
+    try:
+        input_file = open(args.input, "r")
+        
+        lines = input_file.readlines()
+        input_file.close()
+        line_count = 1
+        
+        for line in lines:
+            vprint(f"Processing line: {line.strip()}")
+            # If the line is empty, skip it
+            if line.strip() == "":
+                vprint("Empty line, skipping")
+                continue
+            
+            instruction_and_comments = line.split("//")
+            instruction_line = instruction_and_comments[0].strip().split()
+            comment = instruction_and_comments[1].strip() if len(instruction_and_comments) > 1 else ""
+            vprint(f"Instruction set: {instruction_line}, Comment: {comment}")
+            
+            if (len(instruction_line) < 1 or instruction_line[0] == ""):
+                vprint("Empty instruction, skipping")
+                continue
+            instruction, mnemonic = parse_mnemonic(instruction_line[0])
+            vprint(f"Parsed instruction: {instruction}, mnemonic: {mnemonic}")
+            if mnemonic is None:
+                mnemonic = "w"  # default to word size if no suffix is provided   
+            
+            if instruction not in instruction_set:
+                print(f"Error: {instruction} is not a valid instruction")
+                exit(1)
+            
+            rD = 0;
+            rA = 0;
+            rB = 0;
+            imm = 0;
+            wwwpp = 0;
+            hex_instruction = ""
+            
+            # VADD R1, R2, R3
+            # VLD R1, 1
+            if instruction in ["VLD", "VSD", "VBEZ", "VBNEZ", "VNOP"]:
+                # VLD R1, 1
+                if len(instruction_line) == 3:
+                    rD = instruction_line[1].strip(",").replace("R", "")
+                    imm = parse_imm_value(instruction_line[2].strip(","))
+                    hex_instruction = generate_instruction(instruction, rD, rA, imm=imm)
+                    vprint(f"Generated instruction: {hex_instruction}, rD: {rD}, imm: {imm}")
+                elif instruction == "VNOP":
+                    hex_instruction = generate_instruction(instruction, rD, rA, imm=imm)
+                    vprint(f"Generated instruction: {hex_instruction}, rD: {rD}, imm: {imm}")
+                else:
+                    print(f"Error: Invalid number of operands for {instruction}")
+                    exit(1)
+            else:
+                # VADD R1, R2, R3 or VADD R1, R2, 1
+                if len(instruction_line) == 4:
+                    rD = instruction_line[1].strip(",").replace("R", "")
+                    rA = instruction_line[2].strip(",").replace("R", "")
+                    rB = instruction_line[3].strip(",").replace("R", "")
+                    hex_instruction = generate_instruction(instruction, rD, rA, rB, wwwpp=f"000{byte_width[mnemonic]}")
+                    vprint(f"Generated instruction: {hex_instruction}, rD: {rD}, rA: {rA}, rB: {rB}, wwwpp: {wwwpp}")
+                elif len(instruction_line) == 3: # MOV, NOT, etc.
+                    rD = instruction_line[1].strip(",").replace("R", "")
+                    rA = instruction_line[2].strip(",").replace("R", "")
+                    hex_instruction = generate_instruction(instruction, rD, rA, wwwpp=f"000{byte_width[mnemonic]}")
+                    vprint(f"Generated instruction: {hex_instruction}, rD: {rD}, rA: {rA}, wwwpp: {wwwpp}")
+                else:
+                    print(f"Error: Invalid number of operands for {instruction} [{line_count}]")
+                    exit(1)
+            
+            output_lines += hex_instruction + " // " + comment + "\n"
+            line_count += 1
+            
+    except Exception as e:
+        print(f"Error: {e}")
+        exit(1)
+    
+    try:
+        output_lines += "00000000 // End of program\n"
+        output_lines += "// End of file\n"
+        vprint(f"Writing output to {args.output}")
+        output_file = open(args.output, "w")
+        output_file.write(output_lines)
+        output_file.close()
+    except Exception as e:
+        print(f"Error: {e}")
+        exit(1)
+
+
+compile()
