@@ -19,10 +19,6 @@ module nic #(parameter PACKET_WIDTH = 64)(
     input net_polarity                 // Polarity input from Router connected to NIC
 );
 
-
-    
-
-
     // Internal Buffers and Status Registers
     reg [PACKET_WIDTH-1:0] channel_input_buffer;
     reg [PACKET_WIDTH-1:0] channel_output_buffer;
@@ -84,7 +80,8 @@ module nic #(parameter PACKET_WIDTH = 64)(
                 net_do <= channel_output_buffer;
                 if (nicEnWR && nicEn && addr == 2'b10) begin // get next data if it was blocked
                     channel_output_buffer <= d_in;
-                end
+                end else 
+                    channel_output_buffer <= 0;
                 net_so <= 1;
             end else begin
                 net_so <= 0;
@@ -93,7 +90,7 @@ module nic #(parameter PACKET_WIDTH = 64)(
     end
     
     always @(nicEn or nicEnWR) begin
-    // Write to Output Buffer (if nicEnWR, nicEn, addr to output buffer, output buffer is empty)
+        // Write to Output Buffer (if nicEnWR, nicEn, addr to output buffer, output buffer is empty)
         if (nicEnWR && nicEn && addr == 2'b10 && !channel_output_buffer_status) begin
             channel_output_buffer = d_in;
         end 

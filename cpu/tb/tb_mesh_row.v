@@ -220,7 +220,7 @@ module tb_mesh_row;
         wait (node_0_0_inst_in == 32'h00000000);
         $display("The program completed in %d cycles", clock_cycle);
         // Let us now flush the pipe line
-        repeat(5) @(negedge clk); 
+        repeat(20) @(negedge clk); 
         // Open file for wire
         // Dump data memory to a file
         $sformat(dump_filename, "mesh_row_%0d.dump", j);

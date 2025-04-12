@@ -10,6 +10,7 @@ INFO: [VRFC 10-2263] Analyzing Verilog file "D:/Dev-Projects/mesh-noc-router/cpu
 INFO: [VRFC 10-311] analyzing module forwarding_unit
 INFO: [VRFC 10-2263] Analyzing Verilog file "D:/Dev-Projects/mesh-noc-router/cpu/design/four_stage_processor.v" into library xil_defaultlib
 INFO: [VRFC 10-311] analyzing module four_stage_processor
+WARNING: [VRFC 10-8497] literal value 'b11 truncated to fit in 1 bits [D:/Dev-Projects/mesh-noc-router/cpu/design/four_stage_processor.v:235]
 INFO: [VRFC 10-2263] Analyzing Verilog file "D:/Dev-Projects/mesh-noc-router/cpu/design/four_way_arbiter.v" into library xil_defaultlib
 INFO: [VRFC 10-311] analyzing module four_way_arbiter
 INFO: [VRFC 10-2263] Analyzing Verilog file "D:/Dev-Projects/mesh-noc-router/cpu/design/hazard_detection_unit.v" into library xil_defaultlib

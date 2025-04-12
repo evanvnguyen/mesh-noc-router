@@ -232,7 +232,10 @@ always @(id_stage_ld or ex_stage_ld or id_stage_sd or id_stage_immediate_address
     // This will allow us to write the loaded value into the 
     // RF in the WB stage.
     if (id_stage_ld) begin
-      if (id_out_immediate_address[0:1] != 2'b11) begin
+      if (id_stage_immediate_address[0:1] == 1'b11) begin
+        nicEn = 1'b1;
+        addr_out = id_stage_immediate_address[14:15];
+      end else begin
         addr_out = {16'b0, id_out_immediate_address};
         memEn = 1'b1;
       end
