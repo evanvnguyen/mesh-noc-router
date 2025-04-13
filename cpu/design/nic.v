@@ -48,8 +48,15 @@ module nic #(parameter PACKET_WIDTH = 64)(
    //     .GCLK(NIC_OUTPUT_GCLK));
 
 
+    // Send our on clock signal
+    // received on not clocked signal
+
+    always @(*) begin
+
+    end
+
     // router handhsake
-    always @(posedge clk or posedge reset) begin
+    always @(posedge clk) begin
     //always @(posedge NIC_OUTPUT_GCLK or posedge reset) begin
         if (reset) begin
             channel_input_buffer <= 0;
@@ -76,20 +83,22 @@ module nic #(parameter PACKET_WIDTH = 64)(
             //net_ri <= (channel_input_buffer_status == 0) ? 1'b1 : 1'b0;
     
             // Send data to router (if router ready, polarity ok, buffer is full)
-            if (channel_output_buffer_status && net_ro && net_polarity) begin
+            if (channel_output_buffer_status && net_ro && (net_polarity == channel_output_buffer[63])) begin
                 net_do <= channel_output_buffer;
                 if (nicEnWR && nicEn && addr == 2'b10) begin // get next data if it was blocked
                     channel_output_buffer <= d_in;
                 end else 
                     channel_output_buffer <= 0;
+                channel_output_buffer <= 0;
                 net_so <= 1;
             end else begin
                 net_so <= 0;
+                net_do <= 0;
             end
         end
     end
     
-    always @(nicEn or nicEnWR) begin
+    always @(nicEn or nicEnWR or posedge clk) begin
         // Write to Output Buffer (if nicEnWR, nicEn, addr to output buffer, output buffer is empty)
         if (nicEnWR && nicEn && addr == 2'b10 && !channel_output_buffer_status) begin
             channel_output_buffer = d_in;

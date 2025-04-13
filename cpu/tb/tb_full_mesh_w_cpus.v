@@ -309,21 +309,348 @@ module tb_full_mesh_w_cpus;
     .cpu_memEn_0_0(cpu_memEn_0_0), .cpu_memEn_1_0(cpu_memEn_1_0), .cpu_memEn_2_0(cpu_memEn_2_0), .cpu_memEn_3_0(cpu_memEn_3_0)
   );
 
-
-  initial clk = 0;
-  always #2 clk <= ~clk;
-
-  initial begin
-    clock_cycle = 0;
-
-    for (j=0; j < 1; j = j + 1) begin
-        reset = 1'b1;
-        repeat(5) @(negedge clk); 
-        reset = 1'b0;    
-        // Format the filename string: "imem_<j>.fill"
-        //$sformat(imem_filename, "imem_%0d.fill", j);
+// the source is x
     
-        // Load instruction memory
+    initial clk = 0;
+    always #2 clk <= ~clk;
+
+    integer cpu_inject_log, cpu_dmem_log;
+    integer cpu_dmem_log_0_0, cpu_dmem_log_0_1, cpu_dmem_log_0_2, cpu_dmem_log_0_3;
+    integer cpu_dmem_log_1_0, cpu_dmem_log_1_1, cpu_dmem_log_1_2, cpu_dmem_log_1_3;
+    integer cpu_dmem_log_2_0, cpu_dmem_log_2_1, cpu_dmem_log_2_2, cpu_dmem_log_2_3;
+    integer cpu_dmem_log_3_0, cpu_dmem_log_3_1, cpu_dmem_log_3_2, cpu_dmem_log_3_3;
+
+    // Task to open the cpu_inject_log file and set up fmonitor(s)
+    task setup_cpu_inject_monitor;
+      begin
+        cpu_inject_log = $fopen("cpu_inject_log.log", "w");
+        if (cpu_inject_log == 0) begin
+          $display("Error opening cpu_inject_log.log!");
+          $finish;
+        end
+    
+        // Write the header to the log file.
+        $fdisplay(cpu_inject_log, "block,component,type,clock_cycle,data,x_source,y_source");
+    
+        // Row 0 (y = 0): routers from 3_0, 2_0, 1_0, 0_0
+        $fmonitor(cpu_inject_log, "Router,3_0,cpu_data_inject,%0d,%h,%0d,%0d", 
+          clock_cycle, uut.row_0.router_3_0.pedi, uut.row_0.router_3_0.pedi[39:32], uut.row_0.router_3_0.pedi[47:40]);
+        $fmonitor(cpu_inject_log, "Router,2_0,cpu_data_inject,%0d,%h,%0d,%0d", 
+          clock_cycle, uut.row_0.router_2_0.pedi, uut.row_0.router_2_0.pedi[39:32], uut.row_0.router_2_0.pedi[47:40]);
+        $fmonitor(cpu_inject_log, "Router,1_0,cpu_data_inject,%0d,%h,%0d,%0d", 
+          clock_cycle, uut.row_0.router_1_0.pedi, uut.row_0.router_1_0.pedi[39:32], uut.row_0.router_1_0.pedi[47:40]);
+        $fmonitor(cpu_inject_log, "Router,0_0,cpu_data_inject,%0d,%h,%0d,%0d", 
+          clock_cycle, uut.row_0.router_0_0.pedi, uut.row_0.router_0_0.pedi[39:32], uut.row_0.router_0_0.pedi[47:40]);
+    
+        // Row 1 (y = 1): routers from 3_1, 2_1, 1_1, 0_1
+        $fmonitor(cpu_inject_log, "Router,3_1,cpu_data_inject,%0d,%h,%0d,%0d", 
+          clock_cycle, uut.row_1.router_3_1.pedi, uut.row_1.router_3_1.pedi[39:32], uut.row_1.router_3_1.pedi[47:40]);
+        $fmonitor(cpu_inject_log, "Router,2_1,cpu_data_inject,%0d,%h,%0d,%0d", 
+          clock_cycle, uut.row_1.router_2_1.pedi, uut.row_1.router_2_1.pedi[39:32], uut.row_1.router_2_1.pedi[47:40]);
+        $fmonitor(cpu_inject_log, "Router,1_1,cpu_data_inject,%0d,%h,%0d,%0d", 
+          clock_cycle, uut.row_1.router_1_1.pedi, uut.row_1.router_1_1.pedi[39:32], uut.row_1.router_1_1.pedi[47:40]);
+        $fmonitor(cpu_inject_log, "Router,0_1,cpu_data_inject,%0d,%h,%0d,%0d", 
+          clock_cycle, uut.row_1.router_0_1.pedi, uut.row_1.router_0_1.pedi[39:32], uut.row_1.router_0_1.pedi[47:40]);
+    
+        // Row 2 (y = 2): routers from 3_2, 2_2, 1_2, 0_2
+        $fmonitor(cpu_inject_log, "Router,3_2,cpu_data_inject,%0d,%h,%0d,%0d", 
+          clock_cycle, uut.row_2.router_3_2.pedi, uut.row_2.router_3_2.pedi[39:32], uut.row_2.router_3_2.pedi[47:40]);
+        $fmonitor(cpu_inject_log, "Router,2_2,cpu_data_inject,%0d,%h,%0d,%0d", 
+          clock_cycle, uut.row_2.router_2_2.pedi, uut.row_2.router_2_2.pedi[39:32], uut.row_2.router_2_2.pedi[47:40]);
+        $fmonitor(cpu_inject_log, "Router,1_2,cpu_data_inject,%0d,%h,%0d,%0d", 
+          clock_cycle, uut.row_2.router_1_2.pedi, uut.row_2.router_1_2.pedi[39:32], uut.row_2.router_1_2.pedi[47:40]);
+        $fmonitor(cpu_inject_log, "Router,0_2,cpu_data_inject,%0d,%h,%0d,%0d", 
+          clock_cycle, uut.row_2.router_0_2.pedi, uut.row_2.router_0_2.pedi[39:32], uut.row_2.router_0_2.pedi[47:40]);
+    
+        // Row 3 (y = 3): routers from 3_3, 2_3, 1_3, 0_3
+        $fmonitor(cpu_inject_log, "Router,3_3,cpu_data_inject,%0d,%h,%0d,%0d", 
+          clock_cycle, uut.row_3.router_3_3.pedi, uut.row_3.router_3_3.pedi[39:32], uut.row_3.router_3_3.pedi[47:40]);
+        $fmonitor(cpu_inject_log, "Router,2_3,cpu_data_inject,%0d,%h,%0d,%0d", 
+          clock_cycle, uut.row_3.router_2_3.pedi, uut.row_3.router_2_3.pedi[39:32], uut.row_3.router_2_3.pedi[47:40]);
+        $fmonitor(cpu_inject_log, "Router,1_3,cpu_data_inject,%0d,%h,%0d,%0d", 
+          clock_cycle, uut.row_3.router_1_3.pedi, uut.row_3.router_1_3.pedi[39:32], uut.row_3.router_1_3.pedi[47:40]);
+        $fmonitor(cpu_inject_log, "Router,0_3,cpu_data_inject,%0d,%h,%0d,%0d", 
+          clock_cycle, uut.row_3.router_0_3.pedi, uut.row_3.router_0_3.pedi[39:32], uut.row_3.router_0_3.pedi[47:40]);
+      end
+    endtask
+        
+    // Task to open the cpu_dmem_log file and set up fmonitor(s)
+    //task setup_destination_dmem_monitor;
+    //  begin
+    //    cpu_dmem_log = $fopen("cpu_0_0_dmem.log", "w");
+    //    if (cpu_dmem_log == 0) begin
+    //      $display("Error opening cpu_dmem_log.log!");
+    //      $finish;
+    //    end
+    //
+    //    // Print header
+    //    $fdisplay(cpu_dmem_log, "block,component,type,clock_cycle,data,x_source,y_source");
+    //
+    //    // Set up a monitor that prints:
+    //    // - clock_cycle
+    //    // - dataIn (the entire 64-bit value)
+    //    // - if dataIn is not 0 then a marker "<--dmem_inject"
+    //    // - the source extracted from dataIn: y_src is now bits [16:23], x_src is bits [24:31]
+    //    $fmonitor(cpu_dmem_log,
+    //      "CPU,dmem,data_in,%0d,%h,%0d,%0d",
+    //      clock_cycle,
+    //      d_mem_0_0.dataIn,
+    //      d_mem_0_0.dataIn[24:31],
+    //      d_mem_0_0.dataIn[16:23]
+    //    );
+    //  end
+    //endtask
+    task setup_destination_dmem_monitor;
+      begin
+        // ---------------- DMEM Instance: d_mem_0_0 ----------------
+        cpu_dmem_log_0_0 = $fopen("cpu_0_0_dmem.log", "w");
+        if (cpu_dmem_log_0_0 == 0) begin
+          $display("Error opening cpu_0_0_dmem.log!");
+          $finish;
+        end
+        $fdisplay(cpu_dmem_log_0_0, "block,component,type,clock_cycle,data,x_source,y_source");
+        $fmonitor(cpu_dmem_log_0_0,
+          "CPU,dmem,data_in,%0d,%h,%0d,%0d",
+          clock_cycle,
+          d_mem_0_0.dataIn,
+          d_mem_0_0.dataIn[24:31],
+          d_mem_0_0.dataIn[16:23]
+        );
+        
+        // ---------------- DMEM Instance: d_mem_0_1 ----------------
+        cpu_dmem_log_0_1 = $fopen("cpu_0_1_dmem.log", "w");
+        if (cpu_dmem_log_0_1 == 0) begin
+          $display("Error opening cpu_0_1_dmem.log!");
+          $finish;
+        end
+        $fdisplay(cpu_dmem_log_0_1, "block,component,type,clock_cycle,data,x_source,y_source");
+        $fmonitor(cpu_dmem_log_0_1,
+          "CPU,dmem,data_in,%0d,%h,%0d,%0d",
+          clock_cycle,
+          d_mem_0_1.dataIn,
+          d_mem_0_1.dataIn[24:31],
+          d_mem_0_1.dataIn[16:23]
+        );
+    
+        // ---------------- DMEM Instance: d_mem_0_2 ----------------
+        cpu_dmem_log_0_2 = $fopen("cpu_0_2_dmem.log", "w");
+        if (cpu_dmem_log_0_2 == 0) begin
+          $display("Error opening cpu_0_2_dmem.log!");
+          $finish;
+        end
+        $fdisplay(cpu_dmem_log_0_2, "block,component,type,clock_cycle,data,x_source,y_source");
+        $fmonitor(cpu_dmem_log_0_2,
+          "CPU,dmem,data_in,%0d,%h,%0d,%0d",
+          clock_cycle,
+          d_mem_0_2.dataIn,
+          d_mem_0_2.dataIn[24:31],
+          d_mem_0_2.dataIn[16:23]
+        );
+    
+        // ---------------- DMEM Instance: d_mem_0_3 ----------------
+        cpu_dmem_log_0_3 = $fopen("cpu_0_3_dmem.log", "w");
+        if (cpu_dmem_log_0_3 == 0) begin
+          $display("Error opening cpu_0_3_dmem.log!");
+          $finish;
+        end
+        $fdisplay(cpu_dmem_log_0_3, "block,component,type,clock_cycle,data,x_source,y_source");
+        $fmonitor(cpu_dmem_log_0_3,
+          "CPU,dmem,data_in,%0d,%h,%0d,%0d",
+          clock_cycle,
+          d_mem_0_3.dataIn,
+          d_mem_0_3.dataIn[24:31],
+          d_mem_0_3.dataIn[16:23]
+        );
+        
+        // ---------------- DMEM Instance: d_mem_1_0 ----------------
+        cpu_dmem_log_1_0 = $fopen("cpu_1_0_dmem.log", "w");
+        if (cpu_dmem_log_1_0 == 0) begin
+          $display("Error opening cpu_1_0_dmem.log!");
+          $finish;
+        end
+        $fdisplay(cpu_dmem_log_1_0, "block,component,type,clock_cycle,data,x_source,y_source");
+        $fmonitor(cpu_dmem_log_1_0,
+          "CPU,dmem,data_in,%0d,%h,%0d,%0d",
+          clock_cycle,
+          d_mem_1_0.dataIn,
+          d_mem_1_0.dataIn[24:31],
+          d_mem_1_0.dataIn[16:23]
+        );
+        
+        // ---------------- DMEM Instance: d_mem_1_1 ----------------
+        cpu_dmem_log_1_1 = $fopen("cpu_1_1_dmem.log", "w");
+        if (cpu_dmem_log_1_1 == 0) begin
+          $display("Error opening cpu_1_1_dmem.log!");
+          $finish;
+        end
+        $fdisplay(cpu_dmem_log_1_1, "block,component,type,clock_cycle,data,x_source,y_source");
+        $fmonitor(cpu_dmem_log_1_1,
+          "CPU,dmem,data_in,%0d,%h,%0d,%0d",
+          clock_cycle,
+          d_mem_1_1.dataIn,
+          d_mem_1_1.dataIn[24:31],
+          d_mem_1_1.dataIn[16:23]
+        );
+    
+        // ---------------- DMEM Instance: d_mem_1_2 ----------------
+        cpu_dmem_log_1_2 = $fopen("cpu_1_2_dmem.log", "w");
+        if (cpu_dmem_log_1_2 == 0) begin
+          $display("Error opening cpu_1_2_dmem.log!");
+          $finish;
+        end
+        $fdisplay(cpu_dmem_log_1_2, "block,component,type,clock_cycle,data,x_source,y_source");
+        $fmonitor(cpu_dmem_log_1_2,
+          "CPU,dmem,data_in,%0d,%h,%0d,%0d",
+          clock_cycle,
+          d_mem_1_2.dataIn,
+          d_mem_1_2.dataIn[24:31],
+          d_mem_1_2.dataIn[16:23]
+        );
+    
+        // ---------------- DMEM Instance: d_mem_1_3 ----------------
+        cpu_dmem_log_1_3 = $fopen("cpu_1_3_dmem.log", "w");
+        if (cpu_dmem_log_1_3 == 0) begin
+          $display("Error opening cpu_1_3_dmem.log!");
+          $finish;
+        end
+        $fdisplay(cpu_dmem_log_1_3, "block,component,type,clock_cycle,data,x_source,y_source");
+        $fmonitor(cpu_dmem_log_1_3,
+          "CPU,dmem,data_in,%0d,%h,%0d,%0d",
+          clock_cycle,
+          d_mem_1_3.dataIn,
+          d_mem_1_3.dataIn[24:31],
+          d_mem_1_3.dataIn[16:23]
+        );
+        
+        // ---------------- DMEM Instance: d_mem_2_0 ----------------
+        cpu_dmem_log_2_0 = $fopen("cpu_2_0_dmem.log", "w");
+        if (cpu_dmem_log_2_0 == 0) begin
+          $display("Error opening cpu_2_0_dmem.log!");
+          $finish;
+        end
+        $fdisplay(cpu_dmem_log_2_0, "block,component,type,clock_cycle,data,x_source,y_source");
+        $fmonitor(cpu_dmem_log_2_0,
+          "CPU,dmem,data_in,%0d,%h,%0d,%0d",
+          clock_cycle,
+          d_mem_2_0.dataIn,
+          d_mem_2_0.dataIn[24:31],
+          d_mem_2_0.dataIn[16:23]
+        );
+    
+        // ---------------- DMEM Instance: d_mem_2_1 ----------------
+        cpu_dmem_log_2_1 = $fopen("cpu_2_1_dmem.log", "w");
+        if (cpu_dmem_log_2_1 == 0) begin
+          $display("Error opening cpu_2_1_dmem.log!");
+          $finish;
+        end
+        $fdisplay(cpu_dmem_log_2_1, "block,component,type,clock_cycle,data,x_source,y_source");
+        $fmonitor(cpu_dmem_log_2_1,
+          "CPU,dmem,data_in,%0d,%h,%0d,%0d",
+          clock_cycle,
+          d_mem_2_1.dataIn,
+          d_mem_2_1.dataIn[24:31],
+          d_mem_2_1.dataIn[16:23]
+        );
+    
+        // ---------------- DMEM Instance: d_mem_2_2 ----------------
+        cpu_dmem_log_2_2 = $fopen("cpu_2_2_dmem.log", "w");
+        if (cpu_dmem_log_2_2 == 0) begin
+          $display("Error opening cpu_2_2_dmem.log!");
+          $finish;
+        end
+        $fdisplay(cpu_dmem_log_2_2, "block,component,type,clock_cycle,data,x_source,y_source");
+        $fmonitor(cpu_dmem_log_2_2,
+          "CPU,dmem,data_in,%0d,%h,%0d,%0d",
+          clock_cycle,
+          d_mem_2_2.dataIn,
+          d_mem_2_2.dataIn[24:31],
+          d_mem_2_2.dataIn[16:23]
+        );
+    
+        // ---------------- DMEM Instance: d_mem_2_3 ----------------
+        cpu_dmem_log_2_3 = $fopen("cpu_2_3_dmem.log", "w");
+        if (cpu_dmem_log_2_3 == 0) begin
+          $display("Error opening cpu_2_3_dmem.log!");
+          $finish;
+        end
+        $fdisplay(cpu_dmem_log_2_3, "block,component,type,clock_cycle,data,x_source,y_source");
+        $fmonitor(cpu_dmem_log_2_3,
+          "CPU,dmem,data_in,%0d,%h,%0d,%0d",
+          clock_cycle,
+          d_mem_2_3.dataIn,
+          d_mem_2_3.dataIn[24:31],
+          d_mem_2_3.dataIn[16:23]
+        );
+        
+        // ---------------- DMEM Instance: d_mem_3_0 ----------------
+        cpu_dmem_log_3_0 = $fopen("cpu_3_0_dmem.log", "w");
+        if (cpu_dmem_log_3_0 == 0) begin
+          $display("Error opening cpu_3_0_dmem.log!");
+          $finish;
+        end
+        $fdisplay(cpu_dmem_log_3_0, "block,component,type,clock_cycle,data,x_source,y_source");
+        $fmonitor(cpu_dmem_log_3_0,
+          "CPU,dmem,data_in,%0d,%h,%0d,%0d",
+          clock_cycle,
+          d_mem_3_0.dataIn,
+          d_mem_3_0.dataIn[24:31],
+          d_mem_3_0.dataIn[16:23]
+        );
+    
+        // ---------------- DMEM Instance: d_mem_3_1 ----------------
+        cpu_dmem_log_3_1 = $fopen("cpu_3_1_dmem.log", "w");
+        if (cpu_dmem_log_3_1 == 0) begin
+          $display("Error opening cpu_3_1_dmem.log!");
+          $finish;
+        end
+        $fdisplay(cpu_dmem_log_3_1, "block,component,type,clock_cycle,data,x_source,y_source");
+        $fmonitor(cpu_dmem_log_3_1,
+          "CPU,dmem,data_in,%0d,%h,%0d,%0d",
+          clock_cycle,
+          d_mem_3_1.dataIn,
+          d_mem_3_1.dataIn[24:31],
+          d_mem_3_1.dataIn[16:23]
+        );
+    
+        // ---------------- DMEM Instance: d_mem_3_2 ----------------
+        cpu_dmem_log_3_2 = $fopen("cpu_3_2_dmem.log", "w");
+        if (cpu_dmem_log_3_2 == 0) begin
+          $display("Error opening cpu_3_2_dmem.log!");
+          $finish;
+        end
+        $fdisplay(cpu_dmem_log_3_2, "block,component,type,clock_cycle,data,x_source,y_source");
+        $fmonitor(cpu_dmem_log_3_2,
+          "CPU,dmem,data_in,%0d,%h,%0d,%0d",
+          clock_cycle,
+          d_mem_3_2.dataIn,
+          d_mem_3_2.dataIn[24:31],
+          d_mem_3_2.dataIn[16:23]
+        );
+    
+        // ---------------- DMEM Instance: d_mem_3_3 ----------------
+        cpu_dmem_log_3_3 = $fopen("cpu_3_3_dmem.log", "w");
+        if (cpu_dmem_log_3_3 == 0) begin
+          $display("Error opening cpu_3_3_dmem.log!");
+          $finish;
+        end
+        $fdisplay(cpu_dmem_log_3_3, "block,component,type,clock_cycle,data,x_source,y_source");
+        $fmonitor(cpu_dmem_log_3_3,
+          "CPU,dmem,data_in,%0d,%h,%0d,%0d",
+          clock_cycle,
+          d_mem_3_3.dataIn,
+          d_mem_3_3.dataIn[24:31],
+          d_mem_3_3.dataIn[16:23]
+        );
+        
+      end
+    endtask
+
+
+    
+    // Task to load the instruction and data memory files
+    task load_memories;
+      begin
+        // Load instruction memory (for all instances)
         $readmemh("receive-inst.txt", i_mem_0_0.MEM);
         $readmemh("send-inst.txt", i_mem_0_1.MEM);
         $readmemh("send-inst.txt", i_mem_0_2.MEM);
@@ -340,8 +667,8 @@ module tb_full_mesh_w_cpus;
         $readmemh("send-inst.txt", i_mem_3_1.MEM);
         $readmemh("send-inst.txt", i_mem_3_2.MEM);
         $readmemh("send-inst.txt", i_mem_3_3.MEM);
-
-        // Load the data memory
+    
+        // Load selected data memories
         $readmemh("d_mem_0_0.txt", d_mem_0_0.MEM);
         $readmemh("d_mem_0_1.txt", d_mem_1_0.MEM);
         $readmemh("d_mem_0_2.txt", d_mem_2_0.MEM);
@@ -358,39 +685,68 @@ module tb_full_mesh_w_cpus;
         $readmemh("d_mem_3_1.txt", d_mem_1_3.MEM);
         $readmemh("d_mem_3_2.txt", d_mem_2_3.MEM);
         $readmemh("d_mem_3_3.txt", d_mem_3_3.MEM);
-
+      end
+    endtask
     
-        wait (cpu_inst_in_0_0 == 32'h00000000);
-        $display("The program completed in %d cycles", clock_cycle);
-        // Let us now flush the pipe line
-        repeat(20) @(negedge clk); 
-        // Open file for wire
-        // Dump data memory to a file
-        $sformat(dump_filename, "mesh_row_%0d.dump", j);
-        dmem0_dump_file = $fopen(dump_filename);// assigning the channel descriptor for wire file
-    
-        // Let us now dump all the locations of the data memory now
-        $fdisplay(dmem0_dump_file, "|\tMem\t|\tD0\t|\tD1\t|\tD2\t|\tD3\t|");
-        $fdisplay(dmem0_dump_file, "---------------------------------");        
-        for (i=0; i<128; i=i+1) 
-        begin
-          $fdisplay(dmem0_dump_file, "|\t#%0d\t|\t%h\t|\t%h\t|\t%h\t|\t%h\t|", i, d_mem_0_0.MEM[i], d_mem_1_0.MEM[i], d_mem_2_0.MEM[i], d_mem_3_0.MEM[i]);
+    // Task to dump the memory contents to a file
+    task dump_data_memory(input integer row);
+      integer i, dmem0_dump_file;
+      reg [1023:0] dump_filename;
+      begin
+        // Create a file name based on the row index
+        $sformat(dump_filename, "mesh_row_%0d.dump", row);
+        dmem0_dump_file = $fopen(dump_filename, "w");
+        if(dmem0_dump_file == 0) begin
+          $display("Error opening %s for writing!", dump_filename);
+          $finish;
         end
-        $fclose(dmem0_dump_file);    
-    end    
+    
+        // Write header and dump memory addresses 0 to 127
+        $fdisplay(dmem0_dump_file, "|\tMem\t|\tD0\t|\tD1\t|\tD2\t|\tD3\t|");
+        $fdisplay(dmem0_dump_file, "---------------------------------");
+        for (i = 0; i < 128; i = i + 1) begin
+          $fdisplay(dmem0_dump_file, "|\t#%0d\t|\t%h\t|\t%h\t|\t%h\t|\t%h\t|", 
+                    i, d_mem_0_0.MEM[i], d_mem_1_0.MEM[i], d_mem_2_0.MEM[i], d_mem_3_0.MEM[i]);
+        end
+        $fclose(dmem0_dump_file);
+      end
+    endtask
+    
+    // Main simulation initial block
+  // Main simulation initial block
+  initial begin
+    clock_cycle = 0;
+        
+    setup_destination_dmem_monitor();
+    setup_cpu_inject_monitor();
+    
+    // Assert reset and deassert after a few cycles
+    reset = 1'b1;
+    repeat(5) @(negedge clk);
+    reset = 1'b0;
+    
+    load_memories();
+    
+    // Wait for termination condition (for example, when instruction 0_0 becomes zero)
+    wait (cpu_inst_in_0_0 == 32'h00000000);
+    $display("The program completed in %d cycles", clock_cycle);
+    
+    // Flush the pipeline
+    repeat(20) @(negedge clk);
+    
+    // Dump logs
+    $fclose(cpu_dmem_log);
+    $fclose(cpu_inject_log);
     
     $finish;
-    //
-    //$readmemh("rf_random_values.txt", uut.rf.registerFile);
-    //$readmemh("cpu_test_instructions2.txt", instruc_mem.MEM);
-    //$readmemh("dmem.fill", data_mem.MEM);
   end
-  
+
+  // Clock cycle counter
   always @(posedge clk) begin
     if (reset)
-       clock_cycle <= 0;
+      clock_cycle <= 0;
     else  
-       clock_cycle <= clock_cycle + 1;
+      clock_cycle <= clock_cycle + 1;
   end
 
 endmodule

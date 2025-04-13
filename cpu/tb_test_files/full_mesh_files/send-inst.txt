@@ -5,5 +5,6 @@ F0000000 // NOP to start
 8040C003 // Read the output channel status register
 8C400002 // Branch if the output channel status register is not zero
 8420C002 // Send a packet out the NIC
+F0000000
 00000000 // End of program
 // End of file

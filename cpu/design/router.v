@@ -354,6 +354,7 @@ module router (
       reset_clocked_values;
       polarity <= 1'b0;
     end else begin
+      reset_clocked_values;
       block_channels;
 
       polarity <= ~polarity;
@@ -453,13 +454,11 @@ module router (
 
   task reset_clocked_values();
     begin
-      if (reset) begin
-        block_cw_input_channel = 1'b0;
-        block_ccw_input_channel = 1'b0;
-        block_pe_input_channel = 1'b0;
-        block_ns_input_channel = 1'b0;
-        block_sn_input_channel = 1'b0;
-      end
+        block_cw_input_channel <= 1'b0;
+        block_ccw_input_channel <= 1'b0;
+        block_pe_input_channel <= 1'b0;
+        block_ns_input_channel <= 1'b0;
+        block_sn_input_channel <= 1'b0;
     end
   endtask
 

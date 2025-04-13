@@ -9,6 +9,11 @@ module tb_four_stage_processor;
   wire memWrEn;
   wire memEn;
   
+  wire nicEn, nicWrEn;
+  wire [0:1] addr_nic;
+  wire [0:63] d_in_nic;
+  reg [0:63] d_out_nic;
+  
   integer clock_cycle, i, j, dmem0_dump_file;
   reg [127:0] imem_filename;
   reg [127:0] dump_filename;
@@ -37,11 +42,11 @@ module tb_four_stage_processor;
     .addr_out(addr_out),
     .memWrEn(memWrEn),
     .memEn(memEn),
-    .nicEn(),
-    .nicWrEn(),
-    .addr_nic(),
-    .d_in_nic(),
-    .d_out_nic()
+    .nicEn(nicEn),
+    .nicWrEn(nicWrEn),
+    .addr_nic(addr_nic),
+    .d_in_nic(d_in_nic),
+    .d_out_nic(d_out_nic)
   );
 
   initial clk = 0;
@@ -59,6 +64,7 @@ module tb_four_stage_processor;
         reset = 1'b1;
         repeat(5) @(negedge clk); 
         reset = 1'b0;
+        d_out_nic = 0;
     
         // Format the filename string: "imem_<j>.fill"
         //$sformat(imem_filename, "imem_%0d.fill", j);

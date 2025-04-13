@@ -12,9 +12,8 @@ sources = [
 ]
 
 #dest_y, dest_x = 3, 3  # Fixed destination
-
+vc = False
 # Instruction config
-vc = 0
 instr_set = [
     "VAND", "VOR", "VXOR", "VNOT", "VMOV", "VADD", "VSUB",
     "VMULEU", "VMULOU", "VSLL", "VSRL", "VSRA", "VRTTH",
@@ -29,9 +28,10 @@ for dest_y in range(4):
         for src_y, src_x in sources:
           if (src_y, src_x) == (dest_y, dest_x):
               continue  # Skip the destination CPU
-          y_hop = 0 if dest_y == src_y else 1 << abs(dest_y - src_y - 1)
-          x_hop = 0 if dest_x == src_x else 1 << abs(dest_x - src_x - 1)
-          ns_dir = int(dest_y < src_y)
+          vc = not vc
+          y_hop = 0 if dest_y == src_y else 1 << (abs(dest_y - src_y) - 1)
+          x_hop = 0 if dest_x == src_x else 1 << (abs(dest_x - src_x) - 1)
+          ns_dir = int(dest_y > src_y)
           ew_dir = int(dest_x > src_x)
           
           instr = random.choice(instr_set)
@@ -42,7 +42,7 @@ for dest_y in range(4):
           instr_bin, *_ = generate_instruction(instr, rD, rA, rB, wwwpp=wwwpp)
           data = int(instr_bin, 2) & 0xFFFFFFFF
 
-          packet = make_packet(vc, ns_dir, ew_dir, y_hop, x_hop, src_y, src_x, data)
+          packet = make_packet(int(vc), ns_dir, ew_dir, y_hop, x_hop, src_y, src_x, data)
           hex_packet = f"{packet:016X}"
           packets.append((src_y, src_x, hex_packet))
           instrution_str[src_y][src_x] += f"{instr} R{rD}, R{rA}, R{rB}"

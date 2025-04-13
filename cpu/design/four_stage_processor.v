@@ -227,6 +227,7 @@ always @(id_stage_ld or ex_stage_ld or id_stage_sd or id_stage_immediate_address
     addr_nic = 2'b0;
     nicEn = 1'b0;
     nicWrEn = 1'b0;
+    d_in_nic = 64'b0;
     // We should be loading data from the data memory
     // Loading takes 2 cycles and needs to start in the ID stage.
     // This will allow us to write the loaded value into the 

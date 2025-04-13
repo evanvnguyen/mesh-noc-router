@@ -34,13 +34,13 @@ module router_input_channel (
         // 0 (even) input goes to vc1. 1 (odd) input goes to vc2
         if (polarity) begin
           // If send is high and we have space in vc2, store data in vc2
-          if (send && vc_2_read && !blocked) begin
+          if (send && vc_2_read && !blocked && virtual_channel_1 != data_in) begin
             virtual_channel_2 = data_in;
             vc_2_read = 0;
           end
         end else begin
           // If send is high and we have space in vc1, store data in vc1
-          if (send && vc_1_read && !blocked) begin
+          if (send && vc_1_read && !blocked && virtual_channel_2 != data_in) begin
             virtual_channel_1 = data_in;
             vc_1_read = 0;
           end

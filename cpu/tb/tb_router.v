@@ -7,9 +7,10 @@ module tb_router();
   wire [63:0] cwdo, ccwdo, pedo, nsdo, sndo;
   
   reg [63:0] data_array [11:0];
+  reg [63:0] data_array_heavy [29:0];
   reg [10:0] passedTests;
   reg [63:0] returnedData [10:0];
-  integer cycle_count, data_index, i;
+  integer cycle_count, data_index, i, data_out_count, ccw_count, ns_count;
 
   initial clk = 0;
   always #2 clk = ~clk; // 250 Mhz
@@ -72,6 +73,38 @@ module tb_router();
 
     data_array[11] = 64'h00000000000dda42;
 
+    data_array_heavy[0] = 64'hC0400100DFF812AA;
+    data_array_heavy[1] = 64'h404001001EB066A8;
+    data_array_heavy[2] = 64'hC040010066AC331A;
+    data_array_heavy[3] = 64'h404001000A420F15;
+    data_array_heavy[4] = 64'hC04001009BEE4FA7;
+    data_array_heavy[5] = 64'h40400100C318552B;
+    data_array_heavy[6] = 64'hC0400100125050B9;
+    data_array_heavy[7] = 64'h404001001F34F62C;
+    data_array_heavy[8] = 64'hC04001008D978A29;
+    data_array_heavy[9] = 64'h40400100C5E92FA4;
+    data_array_heavy[10] = 64'hE04101007B0B46A1;
+    data_array_heavy[11] = 64'h604101008ADF56C8;
+    data_array_heavy[12] = 64'hE0410100121ABC7C;
+    data_array_heavy[13] = 64'h604101007F435666;
+    data_array_heavy[14] = 64'hE0410100704E8F62;
+
+    data_array_heavy[15] = 64'h00000001B95C7423;
+    data_array_heavy[16] = 64'h80000001255A9CF6;
+    data_array_heavy[17] = 64'h0000000115DD6567;
+    data_array_heavy[18] = 64'h80000001E597ECD5;
+    data_array_heavy[19] = 64'h00000001EC6DB183;
+    data_array_heavy[20] = 64'h800000012D67BC6B;
+    data_array_heavy[21] = 64'h00000001BBA1C816;
+    data_array_heavy[22] = 64'h800000017DB48FD6;
+    data_array_heavy[23] = 64'h00000001240E0216;
+    data_array_heavy[24] = 64'h80000001A14839F2;
+    data_array_heavy[25] = 64'h000000013333DDAE;
+    data_array_heavy[26] = 64'h80000001F48EC614;
+    data_array_heavy[27] = 64'h000000017684D401;
+    data_array_heavy[28] = 64'h800000012F7B31F5;
+    data_array_heavy[29] = 64'h00000001BF2AA8F2;
+
     for (i = 0; i < 10; i = i + 1) begin
       returnedData[i] = 64'h0;
     end
@@ -96,16 +129,19 @@ module tb_router();
     router_position = 4'b0;
     cycle_count = 0;
     data_index = 0;
+    data_out_count = 0;
+    ccw_count = 15;
+    ns_count = 0;
 
     reset = 1;
     #8
     reset = 0;
-    #100
+    #200
 
-    for (i = 0; i < 11; i = i + 1) begin
-      $display("Test %d %s, sent value %h, returned value %h", i, 
-              (passedTests[i] ? "Passed" : "Failed"), data_array[i], returnedData[i]);
-    end
+    //for (i = 0; i < 11; i = i + 1) begin
+    //  $display("Test %d %s, sent value %h, returned value %h", i, 
+    //          (passedTests[i] ? "Passed" : "Failed"), data_array[i], returnedData[i]);
+    //end
 
     $finish;
   end
@@ -124,39 +160,53 @@ module tb_router();
   // end
     
 	always @(posedge clk) begin
-	if (!reset) begin
-      cwsi <= 0;
-      ccwsi <= 0;
-      pesi <= 0;
-      nssi <= 0;
-      snsi <= 0;
-      cwdi <= 0;
-      ccwdi <= 0;
-      pedi <= 0;
-      nsdi <= 0;
-      sndi <= 0;
-
-      run_tests();
-/*       if (cycle_count == 3) begin
-        // test case 2 tests loading data into the ccwsi virtual channel
-        if (ccwri) begin
-          ccwsi <= 1;
-          ccwdi <= data_array[1];
-        end  
-      end
-
-      if (cycle_count == 4) begin
-        // test case 3 tests loading data into the pesi virtual channel
-        if (peri) begin
-          pesi <= 1;
-          pedi <= data_array[2];
-        end  
-      end */
-
-		end
-
-    cycle_count <= cycle_count + 1;
+        if (!reset) begin
+          cwsi <= 0;
+          ccwsi <= 0;
+          pesi <= 0;
+          nssi <= 0;
+          snsi <= 0;
+          cwdi <= 0;
+          ccwdi <= 0;
+          pedi <= 0;
+          nsdi <= 0;
+          sndi <= 0;
+    
+          //run_tests();
+          
+          if (cycle_count >= 3 && (ns_count < 16 || ccw_count < 30)) begin
+            if (nsri && ns_count < 16) begin
+              nssi <= 1;
+              nsdi <= data_array_heavy[ns_count];
+              ns_count <= ns_count + 1;
+            end
+            if (ccwri && ccw_count < 30) begin
+              ccwsi <= 1;
+              ccwdi <= data_array_heavy[ccw_count];
+              ccw_count <= ccw_count + 1;
+            end
+          end else begin
+            cwsi <= 0;
+            ccwsi <= 0;
+            pesi <= 0;
+            nssi <= 0;
+            snsi <= 0;
+            nsdi <= 0;
+          end
+          
+          if (cycle_count > 3) begin
+            if (pedo != 0) begin 
+                $display("Pedo: %h, Cycle: %d, Count: %d", pedo, cycle_count, data_out_count);
+                data_out_count = data_out_count + 1;
+            end          
+          end
+        end
 	end
+	
+	always @(posedge clk) begin
+	   if (!reset)
+	       cycle_count <= cycle_count + 1;
+    end
 
   task run_tests();
     begin
