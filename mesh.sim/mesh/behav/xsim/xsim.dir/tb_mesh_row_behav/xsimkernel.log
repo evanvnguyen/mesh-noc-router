@@ -2,3 +2,6 @@ Running: xsim.dir/tb_mesh_row_behav/xsimk.exe -simmode gui -wdb tb_mesh_row_beha
 Design successfully loaded
 Design Loading Memory Usage: 32784 KB (Peak: 32784 KB)
 Design Loading CPU Usage: 749 ms
+Simulation completed
+Simulation Memory Usage: 36768 KB (Peak: 36768 KB)
+Simulation CPU Usage: 1233 ms

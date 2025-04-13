@@ -4,8 +4,8 @@ module tb_full_mesh_w_cpus;
 
   reg clk, reset;
 
-  reg [0:31] cpu_inst_in_0_3, cpu_inst_in_1_3, cpu_inst_in_2_3, cpu_inst_in_3_3;          // from imem
-  reg [0:63] cpu_d_in_0_3, cpu_d_in_1_3, cpu_d_in_2_3, cpu_d_in_3_3;                      // data input from dmem
+  wire [0:31] cpu_inst_in_0_3, cpu_inst_in_1_3, cpu_inst_in_2_3, cpu_inst_in_3_3;          // from imem
+  wire [0:63] cpu_d_in_0_3, cpu_d_in_1_3, cpu_d_in_2_3, cpu_d_in_3_3;                      // data input from dmem
   wire [0:31] cpu_pc_out_0_3, cpu_pc_out_1_3, cpu_pc_out_2_3, cpu_pc_out_3_3;               // program counter out
   wire [0:63] cpu_d_out_0_3, cpu_d_out_1_3, cpu_d_out_2_3, cpu_d_out_3_3;               // data output to data memory
   wire [0:31] cpu_addr_out_0_3, cpu_addr_out_1_3, cpu_addr_out_2_3, cpu_addr_out_3_3;    // data memory address
@@ -13,8 +13,8 @@ module tb_full_mesh_w_cpus;
   wire cpu_memEn_0_3, cpu_memEn_1_3, cpu_memEn_2_3, cpu_memEn_3_3;                      // data memory enable
 
   // CPU signals for x_2
-  reg [0:31] cpu_inst_in_0_2, cpu_inst_in_1_2, cpu_inst_in_2_2, cpu_inst_in_3_2;          // from imem
-  reg [0:63] cpu_d_in_0_2, cpu_d_in_1_2, cpu_d_in_2_2, cpu_d_in_3_2;                      // data input from dmem
+  wire [0:31] cpu_inst_in_0_2, cpu_inst_in_1_2, cpu_inst_in_2_2, cpu_inst_in_3_2;          // from imem
+  wire [0:63] cpu_d_in_0_2, cpu_d_in_1_2, cpu_d_in_2_2, cpu_d_in_3_2;                      // data input from dmem
   wire [0:31] cpu_pc_out_0_2, cpu_pc_out_1_2, cpu_pc_out_2_2, cpu_pc_out_3_2;               // program counter out
   wire [0:63] cpu_d_out_0_2, cpu_d_out_1_2, cpu_d_out_2_2, cpu_d_out_3_2;               // data output to data memory
   wire [0:31] cpu_addr_out_0_2, cpu_addr_out_1_2, cpu_addr_out_2_2, cpu_addr_out_3_2;    // data memory address
@@ -22,8 +22,8 @@ module tb_full_mesh_w_cpus;
   wire cpu_memEn_0_2, cpu_memEn_1_2, cpu_memEn_2_2, cpu_memEn_3_2;                      // data memory enable
   
   // CPU signals for x_1
-  reg [0:31] cpu_inst_in_0_1, cpu_inst_in_1_1, cpu_inst_in_2_1, cpu_inst_in_3_1;          // from imem
-  reg [0:63] cpu_d_in_0_1, cpu_d_in_1_1, cpu_d_in_2_1, cpu_d_in_3_1;                      // data input from dmem
+  wire [0:31] cpu_inst_in_0_1, cpu_inst_in_1_1, cpu_inst_in_2_1, cpu_inst_in_3_1;          // from imem
+  wire [0:63] cpu_d_in_0_1, cpu_d_in_1_1, cpu_d_in_2_1, cpu_d_in_3_1;                      // data input from dmem
   wire [0:31] cpu_pc_out_0_1, cpu_pc_out_1_1, cpu_pc_out_2_1, cpu_pc_out_3_1;               // program counter out
   wire [0:63] cpu_d_out_0_1, cpu_d_out_1_1, cpu_d_out_2_1, cpu_d_out_3_1;               // data output to data memory
   wire [0:31] cpu_addr_out_0_1, cpu_addr_out_1_1, cpu_addr_out_2_1, cpu_addr_out_3_1;    // data memory address
@@ -31,8 +31,8 @@ module tb_full_mesh_w_cpus;
   wire cpu_memEn_0_1, cpu_memEn_1_1, cpu_memEn_2_1, cpu_memEn_3_1;                      // data memory enable
   
   // CPU signals for x_0
-  reg [0:31] cpu_inst_in_0_0, cpu_inst_in_1_0, cpu_inst_in_2_0, cpu_inst_in_3_0;          // from imem
-  reg [0:63] cpu_d_in_0_0, cpu_d_in_1_0, cpu_d_in_2_0, cpu_d_in_3_0;                      // data input from dmem
+  wire [0:31] cpu_inst_in_0_0, cpu_inst_in_1_0, cpu_inst_in_2_0, cpu_inst_in_3_0;          // from imem
+  wire [0:63] cpu_d_in_0_0, cpu_d_in_1_0, cpu_d_in_2_0, cpu_d_in_3_0;                      // data input from dmem
   wire [0:31] cpu_pc_out_0_0, cpu_pc_out_1_0, cpu_pc_out_2_0, cpu_pc_out_3_0;               // program counter out
   wire [0:63] cpu_d_out_0_0, cpu_d_out_1_0, cpu_d_out_2_0, cpu_d_out_3_0;               // data output to data memory
   wire [0:31] cpu_addr_out_0_0, cpu_addr_out_1_0, cpu_addr_out_2_0, cpu_addr_out_3_0;    // data memory address
@@ -316,8 +316,6 @@ module tb_full_mesh_w_cpus;
     clock_cycle = 0;
 
     for (j=0; j < 1; j = j + 1) begin
-        x = target % 4;
-        y = target / 4;
         reset = 1'b1;
         repeat(5) @(negedge clk); 
         reset = 1'b0;    
@@ -325,40 +323,40 @@ module tb_full_mesh_w_cpus;
         //$sformat(imem_filename, "imem_%0d.fill", j);
     
         // Load instruction memory
-        $readmemh("receive_inst.txt", i_mem_0_0.MEM);
-        $readmemh("send_inst_0_1.txt", i_mem_0_1.MEM);
-        $readmemh("send_inst_0_2.txt", i_mem_0_2.MEM);
-        $readmemh("send_inst_0_3.txt", i_mem_0_3.MEM);
-        $readmemh("send_inst_1_0.txt", i_mem_1_0.MEM);
-        $readmemh("send_inst_1_1.txt", i_mem_1_1.MEM);
-        $readmemh("send_inst_1_2.txt", i_mem_1_2.MEM);
-        $readmemh("send_inst_1_3.txt", i_mem_1_3.MEM);
-        $readmemh("send_inst_2_0.txt", i_mem_2_0.MEM);
-        $readmemh("send_inst_2_1.txt", i_mem_2_1.MEM);
-        $readmemh("send_inst_2_2.txt", i_mem_2_2.MEM);
-        $readmemh("send_inst_2_3.txt", i_mem_2_3.MEM);
-        $readmemh("send_inst_3_0.txt", i_mem_3_0.MEM);
-        $readmemh("send_inst_3_1.txt", i_mem_3_1.MEM);
-        $readmemh("send_inst_3_2.txt", i_mem_3_2.MEM);
-        $readmemh("send_inst_3_3.txt", i_mem_3_3.MEM);
+        $readmemh("receive-inst.txt", i_mem_0_0.MEM);
+        $readmemh("send-inst.txt", i_mem_0_1.MEM);
+        $readmemh("send-inst.txt", i_mem_0_2.MEM);
+        $readmemh("send-inst.txt", i_mem_0_3.MEM);
+        $readmemh("send-inst.txt", i_mem_1_0.MEM);
+        $readmemh("send-inst.txt", i_mem_1_1.MEM);
+        $readmemh("send-inst.txt", i_mem_1_2.MEM);
+        $readmemh("send-inst.txt", i_mem_1_3.MEM);
+        $readmemh("send-inst.txt", i_mem_2_0.MEM);
+        $readmemh("send-inst.txt", i_mem_2_1.MEM);
+        $readmemh("send-inst.txt", i_mem_2_2.MEM);
+        $readmemh("send-inst.txt", i_mem_2_3.MEM);
+        $readmemh("send-inst.txt", i_mem_3_0.MEM);
+        $readmemh("send-inst.txt", i_mem_3_1.MEM);
+        $readmemh("send-inst.txt", i_mem_3_2.MEM);
+        $readmemh("send-inst.txt", i_mem_3_3.MEM);
 
         // Load the data memory
-        $readmemh("data_memory_file_0_0.txt", d_mem_0_0.MEM);
-        $readmemh("data_memory_file_0_1.txt", d_mem_0_1.MEM);
-        $readmemh("data_memory_file_0_2.txt", d_mem_0_2.MEM);
-        $readmemh("data_memory_file_0_3.txt", d_mem_0_3.MEM);
-        $readmemh("data_memory_file_1_0.txt", d_mem_1_0.MEM);
-        $readmemh("data_memory_file_1_1.txt", d_mem_1_1.MEM);
-        $readmemh("data_memory_file_1_2.txt", d_mem_1_2.MEM);
-        $readmemh("data_memory_file_1_3.txt", d_mem_1_3.MEM);
-        $readmemh("data_memory_file_2_0.txt", d_mem_2_0.MEM);
-        $readmemh("data_memory_file_2_1.txt", d_mem_2_1.MEM);
-        $readmemh("data_memory_file_2_2.txt", d_mem_2_2.MEM);
-        $readmemh("data_memory_file_2_3.txt", d_mem_2_3.MEM);
-        $readmemh("data_memory_file_3_0.txt", d_mem_3_0.MEM);
-        $readmemh("data_memory_file_3_1.txt", d_mem_3_1.MEM);
-        $readmemh("data_memory_file_3_2.txt", d_mem_3_2.MEM);
-        $readmemh("data_memory_file_3_3.txt", d_mem_3_3.MEM);
+        $readmemh("d_mem_0_0.txt", d_mem_0_0.MEM);
+        $readmemh("d_mem_0_1.txt", d_mem_0_1.MEM);
+        $readmemh("d_mem_0_2.txt", d_mem_0_2.MEM);
+        $readmemh("d_mem_0_3.txt", d_mem_0_3.MEM);
+        $readmemh("d_mem_1_0.txt", d_mem_1_0.MEM);
+        $readmemh("d_mem_1_1.txt", d_mem_1_1.MEM);
+        $readmemh("d_mem_1_2.txt", d_mem_1_2.MEM);
+        $readmemh("d_mem_1_3.txt", d_mem_1_3.MEM);
+        $readmemh("d_mem_2_0.txt", d_mem_2_0.MEM);
+        $readmemh("d_mem_2_1.txt", d_mem_2_1.MEM);
+        $readmemh("d_mem_2_2.txt", d_mem_2_2.MEM);
+        $readmemh("d_mem_2_3.txt", d_mem_2_3.MEM);
+        $readmemh("d_mem_3_0.txt", d_mem_3_0.MEM);
+        $readmemh("d_mem_3_1.txt", d_mem_3_1.MEM);
+        $readmemh("d_mem_3_2.txt", d_mem_3_2.MEM);
+        $readmemh("d_mem_3_3.txt", d_mem_3_3.MEM);
 
     
         wait (cpu_inst_in_0_0 == 32'h00000000);

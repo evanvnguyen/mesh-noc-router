@@ -93,9 +93,9 @@ def update_hops_and_dirs():
         entries['x_src'].delete(0, tk.END)
         entries['x_src'].insert(0, sx)
         entries['y_hop'].delete(0, tk.END)
-        entries['y_hop'].insert(0, 0 if abs(dy - sy) == 0 else 1 << abs(dy - sy))
+        entries['y_hop'].insert(0, 0 if abs(dy - sy) == 0 else 1 << abs(dy - sy - 1))
         entries['x_hop'].delete(0, tk.END)
-        entries['x_hop'].insert(0, 0 if abs(dx - sx) == 0 else 1 << abs(dx - sx))
+        entries['x_hop'].insert(0, 0 if abs(dx - sx) == 0 else 1 << abs(dx - sx - 1))
         ns_dir = int(dy < sy)
         ew_dir = int(dx > sx)
         for k, v in dir_options.items():

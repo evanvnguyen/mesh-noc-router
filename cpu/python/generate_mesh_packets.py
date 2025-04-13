@@ -1,0 +1,63 @@
+# generate_packets.py
+import random
+from instruction_generator import generate_instruction
+from packet_generator import make_packet
+
+# Define source CPUs (y, x) excluding (3, 3)
+sources = [
+    (0, 0), (0, 1), (0, 2), (0, 3),
+    (1, 0), (1, 1), (1, 2), (1, 3),
+    (2, 0), (2, 1), (2, 2), (2, 3),
+    (3, 0), (3, 1), (3, 2), (3, 3)
+]
+
+#dest_y, dest_x = 3, 3  # Fixed destination
+
+# Instruction config
+vc = 0
+instr_set = [
+    "VAND", "VOR", "VXOR", "VNOT", "VMOV", "VADD", "VSUB",
+    "VMULEU", "VMULOU", "VSLL", "VSRL", "VSRA", "VRTTH",
+    "VDIV", "VMOD", "VSQEU", "VSQOU", "VSQRT"
+]
+wwwpp = "00000"
+
+for dest_y in range(4):
+    for dest_x in range(4):
+        packets = []
+        instrution_str = [["" for _ in range(4)] for _ in range(4)] 
+        for src_y, src_x in sources:
+          if (src_y, src_x) == (dest_y, dest_x):
+              continue  # Skip the destination CPU
+          y_hop = 0 if dest_y == src_y else 1 << abs(dest_y - src_y - 1)
+          x_hop = 0 if dest_x == src_x else 1 << abs(dest_x - src_x - 1)
+          ns_dir = int(dest_y < src_y)
+          ew_dir = int(dest_x > src_x)
+          
+          instr = random.choice(instr_set)
+          rD = random.randint(1, 31)
+          rA = random.randint(1, 31)
+          rB = random.randint(1, 31)
+
+          instr_bin, *_ = generate_instruction(instr, rD, rA, rB, wwwpp=wwwpp)
+          data = int(instr_bin, 2) & 0xFFFFFFFF
+
+          packet = make_packet(vc, ns_dir, ew_dir, y_hop, x_hop, src_y, src_x, data)
+          hex_packet = f"{packet:016X}"
+          packets.append((src_y, src_x, hex_packet))
+          instrution_str[src_y][src_x] += f"{instr} R{rD}, R{rA}, R{rB}"
+
+        # Print all packets
+        for y, x, packet in packets:
+            print(f"Source CPU ({y},{x}) -> Target (3,3): {packet}")
+
+        # Optional: Write packets to a file
+        for y, x, packet in packets:
+            with open(f"./gen/{dest_y}_{dest_x}/d_mem_{y}_{x}.txt", "w") as f:
+                f.write(f"{packet} // Source CPU ({y},{x}) -> Target ({dest_y},{dest_x}) | {instrution_str[y][x]}\n")
+                for i in range(127):
+                    f.write("0000000000000000\n")
+        
+        with open(f"./gen/{dest_y}_{dest_x}/d_mem_{dest_y}_{dest_x}.txt", "w") as f:
+            for i in range(128):
+                    f.write("0000000000000000\n")
