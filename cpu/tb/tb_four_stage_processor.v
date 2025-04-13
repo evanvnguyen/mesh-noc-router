@@ -64,7 +64,7 @@ module tb_four_stage_processor;
         //$sformat(imem_filename, "imem_%0d.fill", j);
     
         // Load instruction and data memory
-        $readmemh("ld-add-st.txt", instruc_mem.MEM);
+        $readmemh("send-inst.txt", instruc_mem.MEM);
         $readmemh("dmem copy.fill", data_mem.MEM);
     
         wait (inst_in == 32'h00000000);

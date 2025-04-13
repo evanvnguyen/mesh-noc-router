@@ -53,53 +53,11 @@ module tb_full_mesh_w_cpus;
     .memEn(cpu_memEn_0_0),
     .memWrEn(cpu_memWrEn_0_0),
     .memAddr(cpu_addr_out_0_0),
-    .dataIn(cpu_d_in_0_0),
-    .dataOut(cpu_d_out_0_0)
+    .dataIn(cpu_d_out_0_0),
+    .dataOut(cpu_d_in_0_0)
   );
 
-  imem i_mem_0_1(
-    .memAddr(cpu_pc_out_0_1),
-    .dataOut(cpu_inst_in_0_1)
-  );
-
-  dmem d_mem_0_1(
-    .clk(clk),
-    .memEn(cpu_memEn_0_1),
-    .memWrEn(cpu_memWrEn_0_1),
-    .memAddr(cpu_addr_out_0_1),
-    .dataIn(cpu_d_in_0_1),
-    .dataOut(cpu_d_out_0_1)
-  );
-
-  imem i_mem_0_2(
-    .memAddr(cpu_pc_out_0_2),
-    .dataOut(cpu_inst_in_0_2)
-  );
-
-  dmem d_mem_0_2(
-    .clk(clk),
-    .memEn(cpu_memEn_0_2),
-    .memWrEn(cpu_memWrEn_0_2),
-    .memAddr(cpu_addr_out_0_2),
-    .dataIn(cpu_d_in_0_2),
-    .dataOut(cpu_d_out_0_2)
-  );
-
-  imem i_mem_0_3(
-    .memAddr(cpu_pc_out_0_3),
-    .dataOut(cpu_inst_in_0_3)
-  );
-
-  dmem d_mem_0_3(
-    .clk(clk),
-    .memEn(cpu_memEn_0_3),
-    .memWrEn(cpu_memWrEn_0_3),
-    .memAddr(cpu_addr_out_0_3),
-    .dataIn(cpu_d_in_0_3),
-    .dataOut(cpu_d_out_0_3)
-  );
-
-  imem i_mem_1_0(
+   imem i_mem_1_0(
     .memAddr(cpu_pc_out_1_0),
     .dataOut(cpu_inst_in_1_0)
   );
@@ -109,50 +67,8 @@ module tb_full_mesh_w_cpus;
     .memEn(cpu_memEn_1_0),
     .memWrEn(cpu_memWrEn_1_0),
     .memAddr(cpu_addr_out_1_0),
-    .dataIn(cpu_d_in_1_0),
-    .dataOut(cpu_d_out_1_0)
-  );
-
-  imem i_mem_1_1(
-    .memAddr(cpu_pc_out_1_1),
-    .dataOut(cpu_inst_in_1_1)
-  );
-
-  dmem d_mem_1_1(
-    .clk(clk),
-    .memEn(cpu_memEn_1_1),
-    .memWrEn(cpu_memWrEn_1_1),
-    .memAddr(cpu_addr_out_1_1),
-    .dataIn(cpu_d_in_1_1),
-    .dataOut(cpu_d_out_1_1)
-  );
-
-  imem i_mem_1_2(
-    .memAddr(cpu_pc_out_1_2),
-    .dataOut(cpu_inst_in_1_2)
-  );
-
-  dmem d_mem_1_2(
-    .clk(clk),
-    .memEn(cpu_memEn_1_2),
-    .memWrEn(cpu_memWrEn_1_2),
-    .memAddr(cpu_addr_out_1_2),
-    .dataIn(cpu_d_in_1_2),
-    .dataOut(cpu_d_out_1_2)
-  );
-
-  imem i_mem_1_3(
-    .memAddr(cpu_pc_out_1_3),
-    .dataOut(cpu_inst_in_1_3)
-  );
-
-  dmem d_mem_1_3(
-    .clk(clk),
-    .memEn(cpu_memEn_1_3),
-    .memWrEn(cpu_memWrEn_1_3),
-    .memAddr(cpu_addr_out_1_3),
-    .dataIn(cpu_d_in_1_3),
-    .dataOut(cpu_d_out_1_3)
+    .dataIn(cpu_d_out_1_0),
+    .dataOut(cpu_d_in_1_0)
   );
 
   imem i_mem_2_0(
@@ -165,50 +81,8 @@ module tb_full_mesh_w_cpus;
     .memEn(cpu_memEn_2_0),
     .memWrEn(cpu_memWrEn_2_0),
     .memAddr(cpu_addr_out_2_0),
-    .dataIn(cpu_d_in_2_0),
-    .dataOut(cpu_d_out_2_0)
-  );
-
-  imem i_mem_2_1(
-    .memAddr(cpu_pc_out_2_1),
-    .dataOut(cpu_inst_in_2_1)
-  );
-
-  dmem d_mem_2_1(
-    .clk(clk),
-    .memEn(cpu_memEn_2_1),
-    .memWrEn(cpu_memWrEn_2_1),
-    .memAddr(cpu_addr_out_2_1),
-    .dataIn(cpu_d_in_2_1),
-    .dataOut(cpu_d_out_2_1)
-  );
-
-  imem i_mem_2_2(
-    .memAddr(cpu_pc_out_2_2),
-    .dataOut(cpu_inst_in_2_2)
-  );
-
-  dmem d_mem_2_2(
-    .clk(clk),
-    .memEn(cpu_memEn_2_2),
-    .memWrEn(cpu_memWrEn_2_2),
-    .memAddr(cpu_addr_out_2_2),
-    .dataIn(cpu_d_in_2_2),
-    .dataOut(cpu_d_out_2_2)
-  );
-
-  imem i_mem_2_3(
-    .memAddr(cpu_pc_out_2_3),
-    .dataOut(cpu_inst_in_2_3)
-  );
-
-  dmem d_mem_2_3(
-    .clk(clk),
-    .memEn(cpu_memEn_2_3),
-    .memWrEn(cpu_memWrEn_2_3),
-    .memAddr(cpu_addr_out_2_3),
-    .dataIn(cpu_d_in_2_3),
-    .dataOut(cpu_d_out_2_3)
+    .dataIn(cpu_d_out_2_0),
+    .dataOut(cpu_d_in_2_0)
   );
 
   imem i_mem_3_0(
@@ -221,8 +95,50 @@ module tb_full_mesh_w_cpus;
     .memEn(cpu_memEn_3_0),
     .memWrEn(cpu_memWrEn_3_0),
     .memAddr(cpu_addr_out_3_0),
-    .dataIn(cpu_d_in_3_0),
-    .dataOut(cpu_d_out_3_0)
+    .dataIn(cpu_d_out_3_0),
+    .dataOut(cpu_d_in_3_0)
+  );
+
+  imem i_mem_0_1(
+    .memAddr(cpu_pc_out_0_1),
+    .dataOut(cpu_inst_in_0_1)
+  );
+
+  dmem d_mem_0_1(
+    .clk(clk),
+    .memEn(cpu_memEn_0_1),
+    .memWrEn(cpu_memWrEn_0_1),
+    .memAddr(cpu_addr_out_0_1),
+    .dataIn(cpu_d_out_0_1),
+    .dataOut(cpu_d_in_0_1)
+  );
+
+  imem i_mem_1_1(
+    .memAddr(cpu_pc_out_1_1),
+    .dataOut(cpu_inst_in_1_1)
+  );
+
+  dmem d_mem_1_1(
+    .clk(clk),
+    .memEn(cpu_memEn_1_1),
+    .memWrEn(cpu_memWrEn_1_1),
+    .memAddr(cpu_addr_out_1_1),
+    .dataIn(cpu_d_out_1_1),
+    .dataOut(cpu_d_in_1_1)
+  );
+
+  imem i_mem_2_1(
+    .memAddr(cpu_pc_out_2_1),
+    .dataOut(cpu_inst_in_2_1)
+  );
+
+  dmem d_mem_2_1(
+    .clk(clk),
+    .memEn(cpu_memEn_2_1),
+    .memWrEn(cpu_memWrEn_2_1),
+    .memAddr(cpu_addr_out_2_1),
+    .dataIn(cpu_d_out_2_1),
+    .dataOut(cpu_d_in_2_1)
   );
 
   imem i_mem_3_1(
@@ -235,8 +151,50 @@ module tb_full_mesh_w_cpus;
     .memEn(cpu_memEn_3_1),
     .memWrEn(cpu_memWrEn_3_1),
     .memAddr(cpu_addr_out_3_1),
-    .dataIn(cpu_d_in_3_1),
-    .dataOut(cpu_d_out_3_1)
+    .dataIn(cpu_d_out_3_1),
+    .dataOut(cpu_d_in_3_1)
+  );
+
+  imem i_mem_0_2(
+    .memAddr(cpu_pc_out_0_2),
+    .dataOut(cpu_inst_in_0_2)
+  );
+
+  dmem d_mem_0_2(
+    .clk(clk),
+    .memEn(cpu_memEn_0_2),
+    .memWrEn(cpu_memWrEn_0_2),
+    .memAddr(cpu_addr_out_0_2),
+    .dataIn(cpu_d_out_0_2),
+    .dataOut(cpu_d_in_0_2)
+  );
+
+  imem i_mem_1_2(
+    .memAddr(cpu_pc_out_1_2),
+    .dataOut(cpu_inst_in_1_2)
+  );
+
+  dmem d_mem_1_2(
+    .clk(clk),
+    .memEn(cpu_memEn_1_2),
+    .memWrEn(cpu_memWrEn_1_2),
+    .memAddr(cpu_addr_out_1_2),
+    .dataIn(cpu_d_out_1_2),
+    .dataOut(cpu_d_in_1_2)
+  );
+
+  imem i_mem_2_2(
+    .memAddr(cpu_pc_out_2_2),
+    .dataOut(cpu_inst_in_2_2)
+  );
+
+  dmem d_mem_2_2(
+    .clk(clk),
+    .memEn(cpu_memEn_2_2),
+    .memWrEn(cpu_memWrEn_2_2),
+    .memAddr(cpu_addr_out_2_2),
+    .dataIn(cpu_d_out_2_2),
+    .dataOut(cpu_d_in_2_2)
   );
 
   imem i_mem_3_2(
@@ -249,8 +207,50 @@ module tb_full_mesh_w_cpus;
     .memEn(cpu_memEn_3_2),
     .memWrEn(cpu_memWrEn_3_2),
     .memAddr(cpu_addr_out_3_2),
-    .dataIn(cpu_d_in_3_2),
-    .dataOut(cpu_d_out_3_2)
+    .dataIn(cpu_d_out_3_2),
+    .dataOut(cpu_d_in_3_2)
+  );
+
+  imem i_mem_0_3(
+    .memAddr(cpu_pc_out_0_3),
+    .dataOut(cpu_inst_in_0_3)
+  );
+
+  dmem d_mem_0_3(
+    .clk(clk),
+    .memEn(cpu_memEn_0_3),
+    .memWrEn(cpu_memWrEn_0_3),
+    .memAddr(cpu_addr_out_0_3),
+    .dataIn(cpu_d_out_0_3),
+    .dataOut(cpu_d_in_0_3)
+  );
+
+  imem i_mem_1_3(
+    .memAddr(cpu_pc_out_1_3),
+    .dataOut(cpu_inst_in_1_3)
+  );
+
+  dmem d_mem_1_3(
+    .clk(clk),
+    .memEn(cpu_memEn_1_3),
+    .memWrEn(cpu_memWrEn_1_3),
+    .memAddr(cpu_addr_out_1_3),
+    .dataIn(cpu_d_out_1_3),
+    .dataOut(cpu_d_in_1_3)
+  );
+
+  imem i_mem_2_3(
+    .memAddr(cpu_pc_out_2_3),
+    .dataOut(cpu_inst_in_2_3)
+  );
+
+  dmem d_mem_2_3(
+    .clk(clk),
+    .memEn(cpu_memEn_2_3),
+    .memWrEn(cpu_memWrEn_2_3),
+    .memAddr(cpu_addr_out_2_3),
+    .dataIn(cpu_d_out_2_3),
+    .dataOut(cpu_d_in_2_3)
   );
 
   imem i_mem_3_3(
@@ -263,9 +263,10 @@ module tb_full_mesh_w_cpus;
     .memEn(cpu_memEn_3_3),
     .memWrEn(cpu_memWrEn_3_3),
     .memAddr(cpu_addr_out_3_3),
-    .dataIn(cpu_d_in_3_3),
-    .dataOut(cpu_d_out_3_3)
+    .dataIn(cpu_d_out_3_3),
+    .dataOut(cpu_d_in_3_3)
   );
+
 
   mesh_top_flat uut (
     .clk(clk),
@@ -342,20 +343,20 @@ module tb_full_mesh_w_cpus;
 
         // Load the data memory
         $readmemh("d_mem_0_0.txt", d_mem_0_0.MEM);
-        $readmemh("d_mem_0_1.txt", d_mem_0_1.MEM);
-        $readmemh("d_mem_0_2.txt", d_mem_0_2.MEM);
-        $readmemh("d_mem_0_3.txt", d_mem_0_3.MEM);
-        $readmemh("d_mem_1_0.txt", d_mem_1_0.MEM);
+        $readmemh("d_mem_0_1.txt", d_mem_1_0.MEM);
+        $readmemh("d_mem_0_2.txt", d_mem_2_0.MEM);
+        $readmemh("d_mem_0_3.txt", d_mem_3_0.MEM);
+        $readmemh("d_mem_1_0.txt", d_mem_0_1.MEM);
         $readmemh("d_mem_1_1.txt", d_mem_1_1.MEM);
-        $readmemh("d_mem_1_2.txt", d_mem_1_2.MEM);
-        $readmemh("d_mem_1_3.txt", d_mem_1_3.MEM);
-        $readmemh("d_mem_2_0.txt", d_mem_2_0.MEM);
-        $readmemh("d_mem_2_1.txt", d_mem_2_1.MEM);
+        $readmemh("d_mem_1_2.txt", d_mem_2_1.MEM);
+        $readmemh("d_mem_1_3.txt", d_mem_3_1.MEM);
+        $readmemh("d_mem_2_0.txt", d_mem_0_2.MEM);
+        $readmemh("d_mem_2_1.txt", d_mem_1_2.MEM);
         $readmemh("d_mem_2_2.txt", d_mem_2_2.MEM);
-        $readmemh("d_mem_2_3.txt", d_mem_2_3.MEM);
-        $readmemh("d_mem_3_0.txt", d_mem_3_0.MEM);
-        $readmemh("d_mem_3_1.txt", d_mem_3_1.MEM);
-        $readmemh("d_mem_3_2.txt", d_mem_3_2.MEM);
+        $readmemh("d_mem_2_3.txt", d_mem_3_2.MEM);
+        $readmemh("d_mem_3_0.txt", d_mem_0_3.MEM);
+        $readmemh("d_mem_3_1.txt", d_mem_1_3.MEM);
+        $readmemh("d_mem_3_2.txt", d_mem_2_3.MEM);
         $readmemh("d_mem_3_3.txt", d_mem_3_3.MEM);
 
     

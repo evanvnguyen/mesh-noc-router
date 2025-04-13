@@ -234,7 +234,7 @@ always @(id_stage_ld or ex_stage_ld or id_stage_sd or id_stage_immediate_address
     if (id_stage_ld) begin
       if (id_stage_immediate_address[0:1] == 1'b11) begin
         nicEn = 1'b1;
-        addr_out = id_stage_immediate_address[14:15];
+        addr_nic = id_stage_immediate_address[14:15];
       end else begin
         addr_out = {16'b0, id_out_immediate_address};
         memEn = 1'b1;
@@ -247,8 +247,11 @@ always @(id_stage_ld or ex_stage_ld or id_stage_sd or id_stage_immediate_address
         addr_nic = ex_stage_immediate_address[14:15];
       end else begin
         if (id_stage_immediate_address[0:1] != 2'b11) begin
-        addr_out = {16'b0, id_stage_immediate_address};
-        memEn = 1'b1;
+          addr_out = {16'b0, id_stage_immediate_address};
+          memEn = 1'b1;
+        end else if (ex_stage_immediate_address[0:1] != 2'b11) begin
+          addr_out = {16'b0, ex_stage_immediate_address};
+          memEn = 1'b1;
         end
       end
     end
