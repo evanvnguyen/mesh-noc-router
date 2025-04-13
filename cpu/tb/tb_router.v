@@ -73,21 +73,21 @@ module tb_router();
 
     data_array[11] = 64'h00000000000dda42;
 
-    data_array_heavy[0] = 64'hC0400100DFF812AA;
-    data_array_heavy[1] = 64'h404001001EB066A8;
-    data_array_heavy[2] = 64'hC040010066AC331A;
-    data_array_heavy[3] = 64'h404001000A420F15;
-    data_array_heavy[4] = 64'hC04001009BEE4FA7;
-    data_array_heavy[5] = 64'h40400100C318552B;
-    data_array_heavy[6] = 64'hC0400100125050B9;
-    data_array_heavy[7] = 64'h404001001F34F62C;
-    data_array_heavy[8] = 64'hC04001008D978A29;
-    data_array_heavy[9] = 64'h40400100C5E92FA4;
-    data_array_heavy[10] = 64'hE04101007B0B46A1;
-    data_array_heavy[11] = 64'h604101008ADF56C8;
-    data_array_heavy[12] = 64'hE0410100121ABC7C;
-    data_array_heavy[13] = 64'h604101007F435666;
-    data_array_heavy[14] = 64'hE0410100704E8F62;
+    data_array_heavy[0] = 64'hC0100100DFF812AA;
+    data_array_heavy[1] = 64'h401001001EB066A8;
+    data_array_heavy[2] = 64'hC010010066AC331A;
+    data_array_heavy[3] = 64'h401001000A420F15;
+    data_array_heavy[4] = 64'hC01001009BEE4FA7;
+    data_array_heavy[5] = 64'h40100100C318552B;
+    data_array_heavy[6] = 64'hC0100100125050B9;
+    data_array_heavy[7] = 64'h401001001F34F62C;
+    data_array_heavy[8] = 64'hC01001008D978A29;
+    data_array_heavy[9] = 64'h40100100C5E92FA4;
+    data_array_heavy[10] = 64'hE01001007B0B46A1;
+    data_array_heavy[11] = 64'h601001008ADF56C8;
+    data_array_heavy[12] = 64'hE0100100121ABC7C;
+    data_array_heavy[13] = 64'h601001007F435666;
+    data_array_heavy[14] = 64'hE0100100704E8F62;
 
     data_array_heavy[15] = 64'h00000001B95C7423;
     data_array_heavy[16] = 64'h80000001255A9CF6;
@@ -174,17 +174,19 @@ module tb_router();
     
           //run_tests();
           
-          if (cycle_count >= 3 && (ns_count < 16 || ccw_count < 30)) begin
+          if (cycle_count >= 3) begin
             if (nsri && ns_count < 16) begin
               nssi <= 1;
               nsdi <= data_array_heavy[ns_count];
               ns_count <= ns_count + 1;
-            end
+            end else if (!nsri && uut.block_ns_input_channel)
+              ns_count <= ns_count - 1;
             if (ccwri && ccw_count < 30) begin
               ccwsi <= 1;
               ccwdi <= data_array_heavy[ccw_count];
               ccw_count <= ccw_count + 1;
-            end
+            end else if (!ccwri && uut.block_ccw_input_channel)
+              ccw_count <= ccw_count - 1;
           end else begin
             cwsi <= 0;
             ccwsi <= 0;
@@ -193,6 +195,11 @@ module tb_router();
             snsi <= 0;
             nsdi <= 0;
           end
+          
+          if (cycle_count >= 5 && cycle_count <= 15)
+            pero <= 0;
+          else
+            pero <= 1;
           
           if (cycle_count > 3) begin
             if (pedo != 0) begin 

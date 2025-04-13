@@ -44,20 +44,20 @@ for dest_y in range(4):
 
           packet = make_packet(int(vc), ns_dir, ew_dir, y_hop, x_hop, src_y, src_x, data)
           hex_packet = f"{packet:016X}"
-          packets.append((src_y, src_x, hex_packet))
-          instrution_str[src_y][src_x] += f"{instr} R{rD}, R{rA}, R{rB}"
+          packets.append((src_x, src_y, hex_packet))
+          instrution_str[src_x][src_y] += f"{instr} R{rD}, R{rA}, R{rB}"
 
         # Print all packets
         for y, x, packet in packets:
-            print(f"Source CPU ({y},{x}) -> Target (3,3): {packet}")
+            print(f"Source CPU ({x},{y}) -> Target ({dest_x},{dest_y}): {packet}")
 
         # Optional: Write packets to a file
-        for y, x, packet in packets:
-            with open(f"./gen/{dest_y}_{dest_x}/d_mem_{y}_{x}.txt", "w") as f:
-                f.write(f"{packet} // Source CPU ({y},{x}) -> Target ({dest_y},{dest_x}) | {instrution_str[y][x]}\n")
+        for x, y, packet in packets:
+            with open(f"./gen/{dest_x}_{dest_y}/d_mem_{x}_{y}.txt", "w") as f:
+                f.write(f"{packet} // Source CPU ({x},{y}) -> Target ({dest_x},{dest_y}) | {instrution_str[x][y]}\n")
                 for i in range(127):
                     f.write("0000000000000000\n")
         
-        with open(f"./gen/{dest_y}_{dest_x}/d_mem_{dest_y}_{dest_x}.txt", "w") as f:
+        with open(f"./gen/{dest_x}_{dest_y}/d_mem_{dest_x}_{dest_y}.txt", "w") as f:
             for i in range(128):
                     f.write("0000000000000000\n")

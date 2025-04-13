@@ -44,7 +44,7 @@ module router_output_channel (
 
             // If the virtual channel is not empty and the receiver is not ready, we are blocked
       // and we cannot accept new data.
-      blocked = ((virtual_channel_1 != 0 && polarity) || (virtual_channel_2 != 0 && !polarity)) && !ready;
+      blocked = ((virtual_channel_1 != 0 && !vc_1_sent && !polarity) || (virtual_channel_2 != 0 && !vc_2_sent && polarity)) && !ready;
     end
   end
 

@@ -108,9 +108,9 @@ module router (
   // These signals control which request was granted or allowed to pass to the given output channel
   wire cw_granted;
   wire ccw_granted;
-  wire [1:0] pe_granted;
-  wire [1:0] ns_granted;
-  wire [1:0] sn_granted;
+  wire [2:0] pe_granted;
+  wire [2:0] ns_granted;
+  wire [2:0] sn_granted;
 
   wire cw_output_channel_blocked;
   wire ccw_output_channel_blocked;
@@ -199,17 +199,17 @@ module router (
   );
 
   // CW
-  wire cw_output_clk_gate_en;
-  wire CW_OUTPUT_GCLK;
-  assign cw_output_clk_gate_en = (cw_output_channel_blocked == 1'b0) ? 1'b1 : 1'b0;
-  clk_gate_latch cw_output_clk_gate (
-    .CLK(clk), 
-    .EN(cw_output_clk_gate_en), .
-    GCLK(CW_OUTPUT_GCLK));
+  // wire cw_output_clk_gate_en;
+  // wire CW_OUTPUT_GCLK;
+  // assign cw_output_clk_gate_en = (cw_output_channel_blocked == 1'b0) ? 1'b1 : 1'b0;
+  // clk_gate_latch cw_output_clk_gate (
+  //   .CLK(clk), 
+  //   .EN(cw_output_clk_gate_en), .
+  //   GCLK(CW_OUTPUT_GCLK));
 
   router_output_channel cw_output_channel (
-    //.clk(clk),
-    .clk(CW_OUTPUT_GCLK),
+    .clk(clk),
+    //.clk(CW_OUTPUT_GCLK),
     .reset(reset),
     .polarity(polarity),
     .ready(cwro),
@@ -220,16 +220,16 @@ module router (
   );
     
   // CCW
-  wire ccw_output_clk_gate_en;
-  wire CCW_OUTPUT_GCLK;
-  assign ccw_output_clk_gate_en = (ccw_output_channel_blocked == 1'b0) ? 1'b1 : 1'b0;
-  clk_gate_latch ccw_output_clk_gate (
-    .CLK(clk),
-    .EN(ccw_output_clk_gate_en), 
-    .GCLK(CCW_OUTPUT_GCLK));
+  // wire ccw_output_clk_gate_en;
+  // wire CCW_OUTPUT_GCLK;
+  // assign ccw_output_clk_gate_en = (ccw_output_channel_blocked == 1'b0) ? 1'b1 : 1'b0;
+  // clk_gate_latch ccw_output_clk_gate (
+  //   .CLK(clk),
+  //   .EN(ccw_output_clk_gate_en), 
+  //   .GCLK(CCW_OUTPUT_GCLK));
 
   router_output_channel ccw_output_channel (
-    .clk(CCW_OUTPUT_GCLK),
+    .clk(clk),
     .reset(reset),
     .polarity(polarity),
     .ready(ccwro),
@@ -240,17 +240,17 @@ module router (
   );
   
   // PE
-  wire pe_output_clk_gate_en;
-  wire PE_OUTPUT_GCLK;
-  assign pe_output_clk_gate_en = (pe_output_channel_blocked == 1'b0) ? 1'b1 : 1'b0;
-  clk_gate_latch pe_output_clk_gate (
-      .CLK(clk),
-      .EN(pe_output_clk_gate_en),
-      .GCLK(PE_OUTPUT_GCLK)
-  );
+  // wire pe_output_clk_gate_en;
+  // wire PE_OUTPUT_GCLK;
+  // assign pe_output_clk_gate_en = (pe_output_channel_blocked == 1'b0) ? 1'b1 : 1'b0;
+  // clk_gate_latch pe_output_clk_gate (
+  //     .CLK(clk),
+  //     .EN(pe_output_clk_gate_en),
+  //     .GCLK(PE_OUTPUT_GCLK)
+  // );
   
   router_output_channel pe_output_channel (
-    .clk(PE_OUTPUT_GCLK),
+    .clk(clk),
     .reset(reset),
     .polarity(polarity),
     .ready(pero),
@@ -261,17 +261,17 @@ module router (
   );
   
   // NS
-  wire ns_output_clk_gate_en;
-  wire NS_OUTPUT_GCLK;
-  assign ns_output_clk_gate_en = (ns_output_channel_blocked == 1'b0) ? 1'b1 : 1'b0;
-  clk_gate_latch ns_output_clk_gate (
-      .CLK(clk),
-      .EN(ns_output_clk_gate_en),
-      .GCLK(NS_OUTPUT_GCLK)
-  );
+  // wire ns_output_clk_gate_en;
+  // wire NS_OUTPUT_GCLK;
+  // assign ns_output_clk_gate_en = (ns_output_channel_blocked == 1'b0) ? 1'b1 : 1'b0;
+  // clk_gate_latch ns_output_clk_gate (
+  //     .CLK(clk),
+  //     .EN(ns_output_clk_gate_en),
+  //     .GCLK(NS_OUTPUT_GCLK)
+  // );
 
   router_output_channel ns_output_channel (
-    .clk(NS_OUTPUT_GCLK),
+    .clk(clk),
     .reset(reset),
     .polarity(polarity),
     .ready(nsro),
@@ -282,17 +282,17 @@ module router (
   );
   
   // SN
-  wire sn_output_clk_gate_en;
-  wire SN_OUTPUT_GCLK;
-  assign sn_output_clk_gate_en = (sn_output_channel_blocked == 1'b0) ? 1'b1 : 1'b0;
-  clk_gate_latch sn_output_clk_gate (
-      .CLK(clk),
-      .EN(sn_output_clk_gate_en),
-      .GCLK(SN_OUTPUT_GCLK)
-  );
+  // wire sn_output_clk_gate_en;
+  // wire SN_OUTPUT_GCLK;
+  // assign sn_output_clk_gate_en = (sn_output_channel_blocked == 1'b0) ? 1'b1 : 1'b0;
+  // clk_gate_latch sn_output_clk_gate (
+  //     .CLK(clk),
+  //     .EN(sn_output_clk_gate_en),
+  //     .GCLK(SN_OUTPUT_GCLK)
+  // );
   
   router_output_channel sn_output_channel (
-    .clk(SN_OUTPUT_GCLK),
+    .clk(clk),
     .reset(reset),
     .polarity(polarity),
     .ready(snro),
@@ -326,6 +326,7 @@ module router (
                       block_ns_input_channel | ns_output_channel_blocked,
                       block_ccw_input_channel | ccw_output_channel_blocked,
                       block_cw_input_channel | cw_output_channel_blocked}),
+    .output_channel_blocked(pe_output_channel_blocked),
     .granted(pe_granted)
   );
 
@@ -336,6 +337,7 @@ module router (
                       block_pe_input_channel | pe_output_channel_blocked,
                       block_ccw_input_channel | ccw_output_channel_blocked,
                       block_cw_input_channel | cw_output_channel_blocked}),
+    .output_channel_blocked(ns_output_channel_blocked),
     .granted(ns_granted)
   );
 
@@ -346,6 +348,7 @@ module router (
                       block_pe_input_channel | pe_output_channel_blocked,
                       block_ccw_input_channel | ccw_output_channel_blocked,
                       block_cw_input_channel | cw_output_channel_blocked}),
+    .output_channel_blocked(sn_output_channel_blocked),
     .granted(sn_granted)
   );
 
@@ -582,12 +585,6 @@ module router (
 
   task block_channels();
     begin
-      block_cw_input_channel = 1'b0;
-      block_ccw_input_channel = 1'b0;
-      block_pe_input_channel = 1'b0;
-      block_ns_input_channel = 1'b0;
-      block_sn_input_channel = 1'b0;
-
       // more the data from the input channels to the output channels
       if (cw_requests > 0) begin
         if (cw_granted) begin
@@ -608,80 +605,101 @@ module router (
 
       // Index 0 is for cw, index 1 is for ccw, index 2 is for ns, and index 3 is for sn
       if (pe_requests > 0) begin
-        case (pe_granted)
-          2'b00: begin
-            block_ccw_input_channel = pe_requests[1];
-            block_ns_input_channel = pe_requests[2];
-            block_sn_input_channel = pe_requests[3];
-          end
-          2'b01: begin
-            block_cw_input_channel = pe_requests[0];
-            block_ns_input_channel = pe_requests[2];
-            block_sn_input_channel = pe_requests[3];
-          end
-          2'b10: begin 
-            block_cw_input_channel = pe_requests[0];
-            block_ccw_input_channel = pe_requests[1];
-            block_sn_input_channel = pe_requests[3];
-          end
-          2'b11: begin
-            block_cw_input_channel = pe_requests[0];
-            block_ccw_input_channel = pe_requests[1];
-            block_ns_input_channel = pe_requests[2];
-          end
-        endcase
+        if (pe_granted[2]) begin
+          block_cw_input_channel = pe_requests[0];
+          block_ccw_input_channel = pe_requests[1];
+          block_ns_input_channel = pe_requests[2];
+          block_sn_input_channel = pe_requests[3];
+        end else begin
+          case (pe_granted[1:0])
+            2'b00: begin
+              block_ccw_input_channel = pe_requests[1];
+              block_ns_input_channel = pe_requests[2];
+              block_sn_input_channel = pe_requests[3];
+            end
+            2'b01: begin
+              block_cw_input_channel = pe_requests[0];
+              block_ns_input_channel = pe_requests[2];
+              block_sn_input_channel = pe_requests[3];
+            end
+            2'b10: begin 
+              block_cw_input_channel = pe_requests[0];
+              block_ccw_input_channel = pe_requests[1];
+              block_sn_input_channel = pe_requests[3];
+            end
+            2'b11: begin
+              block_cw_input_channel = pe_requests[0];
+              block_ccw_input_channel = pe_requests[1];
+              block_ns_input_channel = pe_requests[2];
+            end
+          endcase
+        end
       end
 
       // Index 0 is for cw, index 1 is for ccw, index 2 is for pe, and index 3 is for ns
       if (ns_requests > 0) begin
-        case (ns_granted)
-          2'b00: begin 
-            block_ccw_input_channel = ns_requests[1];
-            block_pe_input_channel = ns_requests[2];
-            block_ns_input_channel = ns_requests[3];
-          end
-          2'b01: begin 
-            block_cw_input_channel = ns_requests[0];
-            block_pe_input_channel = ns_requests[2];
-            block_ns_input_channel = ns_requests[3];
-          end
-          2'b10: begin 
-            block_cw_input_channel = ns_requests[0];
-            block_ccw_input_channel = ns_requests[1];
-            block_ns_input_channel = ns_requests[3];
-          end
-          2'b11: begin 
-            block_cw_input_channel = ns_requests[0];
-            block_ccw_input_channel = ns_requests[1];
-            block_pe_input_channel = ns_requests[2];
-          end
-        endcase
+        if (ns_granted[2]) begin
+          block_cw_input_channel = ns_requests[0];
+          block_ccw_input_channel = ns_requests[1];
+          block_pe_input_channel = ns_requests[2];
+          block_ns_input_channel = ns_requests[3];
+        end else begin
+          case (ns_granted[1:0])
+            2'b00: begin 
+              block_ccw_input_channel = ns_requests[1];
+              block_pe_input_channel = ns_requests[2];
+              block_ns_input_channel = ns_requests[3];
+            end
+            2'b01: begin 
+              block_cw_input_channel = ns_requests[0];
+              block_pe_input_channel = ns_requests[2];
+              block_ns_input_channel = ns_requests[3];
+            end
+            2'b10: begin 
+              block_cw_input_channel = ns_requests[0];
+              block_ccw_input_channel = ns_requests[1];
+              block_ns_input_channel = ns_requests[3];
+            end
+            2'b11: begin 
+              block_cw_input_channel = ns_requests[0];
+              block_ccw_input_channel = ns_requests[1];
+              block_pe_input_channel = ns_requests[2];
+            end
+          endcase
+        end
       end
 
       // Index 0 is for cw, index 1 is for ccw, index 2 is for pe, and index 3 is for sn
       if (sn_requests > 0) begin
-        case (sn_granted)
-          2'b00: begin 
-            block_ccw_input_channel = sn_requests[1];
-            block_pe_input_channel = sn_requests[2];
-            block_sn_input_channel = sn_requests[3];
-          end
-          2'b01: begin
-            block_cw_input_channel = sn_requests[0];
-            block_pe_input_channel = sn_requests[2];
-            block_sn_input_channel = sn_requests[3];
-          end
-          2'b10: begin
-            block_cw_input_channel = sn_requests[0];
-            block_ccw_input_channel = sn_requests[1];
-            block_sn_input_channel = sn_requests[3];
-          end
-          2'b11: begin
-            block_cw_input_channel = sn_requests[0];
-            block_ccw_input_channel = sn_requests[1];
-            block_pe_input_channel = sn_requests[2];
-          end
-        endcase
+        if (sn_granted[2]) begin
+          block_cw_input_channel = sn_requests[0];
+          block_ccw_input_channel = sn_requests[1];
+          block_pe_input_channel = sn_requests[2];
+          block_sn_input_channel = sn_requests[3];
+        end else begin
+          case (sn_granted[1:0])
+            2'b00: begin 
+              block_ccw_input_channel = sn_requests[1];
+              block_pe_input_channel = sn_requests[2];
+              block_sn_input_channel = sn_requests[3];
+            end
+            2'b01: begin
+              block_cw_input_channel = sn_requests[0];
+              block_pe_input_channel = sn_requests[2];
+              block_sn_input_channel = sn_requests[3];
+            end
+            2'b10: begin
+              block_cw_input_channel = sn_requests[0];
+              block_ccw_input_channel = sn_requests[1];
+              block_sn_input_channel = sn_requests[3];
+            end
+            2'b11: begin
+              block_cw_input_channel = sn_requests[0];
+              block_ccw_input_channel = sn_requests[1];
+              block_pe_input_channel = sn_requests[2];
+            end
+          endcase
+        end
       end
     end
   endtask

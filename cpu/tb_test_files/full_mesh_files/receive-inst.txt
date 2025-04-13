@@ -6,60 +6,60 @@ F0000000 // NOP to start
 8040C000 // Load the Nic input into R5
 84400001 // Store R5 back into dmem[5]
 8020C001 // Read the input channel status register
-88200001 // Loop until we are not 0
-8040C000 // Load the Nic input into R5
-84400002 // Store R5 back into dmem[5]
+88200005 // Loop until we are not 0
+8060C000 // Load the Nic input into R5
+84600002 // Store R5 back into dmem[5]
 8020C001 // Read the input channel status register
-88200001 // Loop until we are not 0
-8040C000 // Load the Nic input into R5
-84400003 // Store R5 back into dmem[5]
+88200009 // Loop until we are not 0
+8080C000 // Load the Nic input into R5
+84800003 // Store R5 back into dmem[5]
 8020C001 // Read the input channel status register
-88200001 // Loop until we are not 0
-8040C000 // Load the Nic input into R5
-84400004 // Store R5 back into dmem[5]
+8820000D // Loop until we are not 0
+80A0C000 // Load the Nic input into R5
+84A00004 // Store R5 back into dmem[5]
 8020C001 // Read the input channel status register
-88200001 // Loop until we are not 0
-8040C000 // Load the Nic input into R5
-84400005 // Store R5 back into dmem[5]
+88200011 // Loop until we are not 0
+80C0C000 // Load the Nic input into R5
+84C00005 // Store R5 back into dmem[5]
 8020C001 // Read the input channel status register
-88200001 // Loop until we are not 0
-8040C000 // Load the Nic input into R5
-84400006 // Store R5 back into dmem[5]
+88200015 // Loop until we are not 0
+80E0C000 // Load the Nic input into R5
+84E00006 // Store R5 back into dmem[5]
 8020C001 // Read the input channel status register
-88200001 // Loop until we are not 0
-8040C000 // Load the Nic input into R5
-84400007 // Store R5 back into dmem[5]
+88200019 // Loop until we are not 0
+8100C000 // Load the Nic input into R5
+85000007 // Store R5 back into dmem[5]
 8020C001 // Read the input channel status register
-88200001 // Loop until we are not 0
-8040C000 // Load the Nic input into R5
-84400008 // Store R5 back into dmem[5]
+8820001D // Loop until we are not 0
+8120C000 // Load the Nic input into R5
+85200008 // Store R5 back into dmem[5]
 8020C001 // Read the input channel status register
-88200001 // Loop until we are not 0
-8040C000 // Load the Nic input into R5
-84400009 // Store R5 back into dmem[5]
+88200021 // Loop until we are not 0
+8140C000 // Load the Nic input into R5
+85400009 // Store R5 back into dmem[5]
 8020C001 // Read the input channel status register
-88200001 // Loop until we are not 0
-8040C000 // Load the Nic input into R5
-8440000A // Store R5 back into dmem[5]
+88200025 // Loop until we are not 0
+8160C000 // Load the Nic input into R5
+8560000A // Store R5 back into dmem[5]
 8020C001 // Read the input channel status register
-88200001 // Loop until we are not 0
-8040C000 // Load the Nic input into R5
-8440000B // Store R5 back into dmem[5]
+88200029 // Loop until we are not 0
+8180C000 // Load the Nic input into R5
+8580000B // Store R5 back into dmem[5]
 8020C001 // Read the input channel status register
-88200001 // Loop until we are not 0
-8040C000 // Load the Nic input into R5
-8440000C // Store R5 back into dmem[5]
+8820002D // Loop until we are not 0
+81A0C000 // Load the Nic input into R5
+85A0000C // Store R5 back into dmem[5]
 8020C001 // Read the input channel status register
-88200001 // Loop until we are not 0
-8040C000 // Load the Nic input into R5
-8440000D // Store R5 back into dmem[5]
+88200031 // Loop until we are not 0
+81C0C000 // Load the Nic input into R5
+85C0000D // Store R5 back into dmem[5]
 8020C001 // Read the input channel status register
-88200001 // Loop until we are not 0
-8040C000 // Load the Nic input into R5
-8440000E // Store R5 back into dmem[5]
+88200035 // Loop until we are not 0
+81E0C000 // Load the Nic input into R5
+85E0000E // Store R5 back into dmem[5]
 8020C001 // Read the input channel status register
-88200001 // Loop until we are not 0
-8040C000 // Load the Nic input into R5
-8440000F // Store R5 back into dmem[5]
+88200039 // Loop until we are not 0
+8200C000 // Load the Nic input into R5
+8600000F // Store R5 back into dmem[5]
 00000000 // End of program
 // End of file

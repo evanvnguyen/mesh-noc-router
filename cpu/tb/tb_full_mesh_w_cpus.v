@@ -670,20 +670,20 @@ module tb_full_mesh_w_cpus;
     
         // Load selected data memories
         $readmemh("d_mem_0_0.txt", d_mem_0_0.MEM);
-        $readmemh("d_mem_0_1.txt", d_mem_1_0.MEM);
-        $readmemh("d_mem_0_2.txt", d_mem_2_0.MEM);
-        $readmemh("d_mem_0_3.txt", d_mem_3_0.MEM);
-        $readmemh("d_mem_1_0.txt", d_mem_0_1.MEM);
+        $readmemh("d_mem_1_0.txt", d_mem_1_0.MEM);
+        $readmemh("d_mem_2_0.txt", d_mem_2_0.MEM);
+        $readmemh("d_mem_3_0.txt", d_mem_3_0.MEM);
+        $readmemh("d_mem_0_1.txt", d_mem_0_1.MEM);
         $readmemh("d_mem_1_1.txt", d_mem_1_1.MEM);
-        $readmemh("d_mem_1_2.txt", d_mem_2_1.MEM);
-        $readmemh("d_mem_1_3.txt", d_mem_3_1.MEM);
-        $readmemh("d_mem_2_0.txt", d_mem_0_2.MEM);
-        $readmemh("d_mem_2_1.txt", d_mem_1_2.MEM);
+        $readmemh("d_mem_2_1.txt", d_mem_2_1.MEM);
+        $readmemh("d_mem_3_1.txt", d_mem_3_1.MEM);
+        $readmemh("d_mem_0_2.txt", d_mem_0_2.MEM);
+        $readmemh("d_mem_1_2.txt", d_mem_1_2.MEM);
         $readmemh("d_mem_2_2.txt", d_mem_2_2.MEM);
-        $readmemh("d_mem_2_3.txt", d_mem_3_2.MEM);
-        $readmemh("d_mem_3_0.txt", d_mem_0_3.MEM);
-        $readmemh("d_mem_3_1.txt", d_mem_1_3.MEM);
-        $readmemh("d_mem_3_2.txt", d_mem_2_3.MEM);
+        $readmemh("d_mem_3_2.txt", d_mem_3_2.MEM);
+        $readmemh("d_mem_0_3.txt", d_mem_0_3.MEM);
+        $readmemh("d_mem_1_3.txt", d_mem_1_3.MEM);
+        $readmemh("d_mem_2_3.txt", d_mem_2_3.MEM);
         $readmemh("d_mem_3_3.txt", d_mem_3_3.MEM);
       end
     endtask

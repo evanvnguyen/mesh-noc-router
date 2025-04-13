@@ -2,5 +2,5 @@ dump.vcd
 sim.out
 mesh-noc-router*
 cpu/cpu.*
-mesh*
+mesh.*/*
 mesh.*

@@ -46,19 +46,19 @@ module router_input_channel (
           end
         end
 
-        if (blocked && vc_1_read && !vc_1_blocked) begin
+        if (blocked && vc_1_read && polarity)
           vc_1_read = 1'b0;
-          vc_1_blocked = 1'b1;
-        end else if (!blocked && vc_1_blocked) begin
-          vc_1_blocked = 1'b0;
-        end
+        // vc_1_blocked = 1'b1;
+        // end else if (!blocked && vc_1_blocked) begin
+        //   vc_1_blocked = 1'b0;
+        // end
         
-        if (blocked && vc_2_read && !vc_2_blocked) begin
+        if (blocked && vc_2_read && !polarity)
           vc_2_read = 1'b0;
-          vc_2_blocked = 1'b1;
-        end else if (!blocked && vc_2_blocked) begin
-          vc_2_blocked = 1'b0;
-        end
+        //   vc_2_blocked = 1'b1;
+        // end else if (!blocked && vc_2_blocked) begin
+        //   vc_2_blocked = 1'b0;
+        // end
 
         // We are ready to receive data if we have space in the virtual channel and we are not blocked.
         // We also check our polarity depending on the virtual channel we are going to be using in the
@@ -77,13 +77,13 @@ module router_input_channel (
 
       if (!polarity) begin
         // Check if we have data in vc1 and we are not blocked
-        if (virtual_channel_1 != 0 && !vc_1_read) begin
+        if (virtual_channel_1 != 0 && !vc_1_read && !blocked) begin
           data_out <= virtual_channel_1;
           vc_1_read <= 1'b1;
         end
       end else begin      
         // Check if we have data in vc2 and we are not blocked
-        if (virtual_channel_2 != 0 && !vc_2_read) begin
+        if (virtual_channel_2 != 0 && !vc_2_read && !blocked) begin
           data_out <= virtual_channel_2;
           vc_2_read <= 1'b1;
         end

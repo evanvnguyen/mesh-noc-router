@@ -51,10 +51,6 @@ module nic #(parameter PACKET_WIDTH = 64)(
     // Send our on clock signal
     // received on not clocked signal
 
-    always @(*) begin
-
-    end
-
     // router handhsake
     always @(posedge clk) begin
     //always @(posedge NIC_OUTPUT_GCLK or posedge reset) begin
@@ -98,7 +94,7 @@ module nic #(parameter PACKET_WIDTH = 64)(
         end
     end
     
-    always @(nicEn or nicEnWR or posedge clk) begin
+    always @(nicEn or nicEnWR) begin
         // Write to Output Buffer (if nicEnWR, nicEn, addr to output buffer, output buffer is empty)
         if (nicEnWR && nicEn && addr == 2'b10 && !channel_output_buffer_status) begin
             channel_output_buffer = d_in;
@@ -122,12 +118,12 @@ module nic #(parameter PACKET_WIDTH = 64)(
         end
     end
 
-    always @(posedge clk) begin
-        if (net_si) begin
-            $display("blah %b", net_si);
-            $display("Phase=%b, Time=%0t, Destination=%b, Source=%b, Packet Value=%h",
-                     net_polarity, $time, channel_input_buffer[55:48], channel_input_buffer[47:32], channel_input_buffer);
-        end
-    end
+//    always @(posedge clk) begin
+//        if (net_si) begin
+//            $display("blah %b", net_si);
+//            $display("Phase=%b, Time=%0t, Destination=%b, Source=%b, Packet Value=%h",
+//                     net_polarity, $time, channel_input_buffer[55:48], channel_input_buffer[47:32], channel_input_buffer);
+//        end
+//    end
 
 endmodule

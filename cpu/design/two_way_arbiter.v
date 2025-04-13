@@ -11,49 +11,55 @@ module two_way_arbiter (
   input reset,
   input [1:0] requests,
   input [1:0] blockedRequests,
-  output reg granted
+  input output_channel_blocked,
+  output reg [1:0] granted
 );
   
-  reg last_granted;  // Tracks last granted request for round-robin fairness
+  reg [1:0] last_granted;  // Tracks last granted request for round-robin fairness
 
   always @(*) begin
     if (reset) begin
-      granted = 0;
-      last_granted = 0;
+      granted = 2'b00;
+      last_granted = 2'b00;
     end else begin
-      case (requests) 
-        2'b10: begin
-          if (blockedRequests[1]) begin
-            granted = 0;
-            last_granted = 0;
-          end else begin
-            granted = 1;
-            last_granted = 1;
+      if (output_channel_blocked) begin
+        granted = {1'b1, last_granted[0]};
+        last_granted = {1'b1, last_granted[0]};
+      end else begin
+        case (requests) 
+          2'b10: begin
+            if (blockedRequests[1]) begin
+              granted = 2'b00;
+              last_granted = 2'b00;
+            end else begin
+              granted = 2'b01;
+              last_granted = 2'b01;
+            end
           end
-        end
-        2'b01: begin
-          if (blockedRequests[0]) begin
-            granted = 1;
-            last_granted = 1;
-          end else begin
-            granted = 0;
-            last_granted = 0;
+          2'b01: begin
+            if (blockedRequests[0]) begin
+              granted = 2'b01;
+              last_granted = 2'b01;
+            end else begin
+              granted = 2'b00;
+              last_granted = 2'b00;
+            end
           end
-        end
-        2'b11: begin  // Both requests active
-          if (last_granted == 0 || blockedRequests[0]) begin
-            granted = 1;
-            last_granted = 1;
-          end else begin
-            granted = 0;
-            last_granted = 0;
+          2'b11: begin  // Both requests active
+            if (last_granted == 2'b00 || blockedRequests[0]) begin
+              granted = 2'b01;
+              last_granted = 2'b01;
+            end else begin
+              granted = 2'b00;
+              last_granted = 2'b00;
+            end
           end
-        end
-        default: begin
-          granted = 0;
-          last_granted = 0;
-        end
-      endcase
+          default: begin
+            granted = 2'b00;
+            last_granted = 2'b00;
+          end
+        endcase
+      end
     end
   end
 
