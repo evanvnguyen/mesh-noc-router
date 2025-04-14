@@ -1,0 +1,20 @@
+#-----------------------------------------------------------
+# Vivado v2018.3 (64-bit)
+# SW Build 2405991 on Thu Dec  6 23:38:27 MST 2018
+# IP Build 2404404 on Fri Dec  7 01:43:56 MST 2018
+# Start of session at: Sat Apr 12 19:02:11 2025
+# Process ID: 45612
+# Current directory: D:/mesh-noc-router/mesh-noc-router
+# Command line: vivado.exe -gui_launcher_event rodinguilauncherevent49700 D:\mesh-noc-router\mesh-noc-router\mesh.xpr
+# Log file: D:/mesh-noc-router/mesh-noc-router/vivado.log
+# Journal file: D:/mesh-noc-router/mesh-noc-router\vivado.jou
+#-----------------------------------------------------------
+start_gui
+open_project D:/mesh-noc-router/mesh-noc-router/mesh.xpr
+update_compile_order -fileset sources_1
+update_compile_order -fileset mesh
+update_compile_order -fileset full_mesh
+save_project_as project_1 {C:/Users/nguye/Documents/OneDrive/USC/EE 577B/project/mesh_row_part_3_all/project_1} -force
+import_files
+update_compile_order -fileset mesh
+update_compile_order -fileset full_mesh

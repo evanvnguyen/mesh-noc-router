@@ -314,11 +314,194 @@ module tb_full_mesh_w_cpus;
     initial clk = 0;
     always #2 clk <= ~clk;
 
-    integer cpu_inject_log, cpu_dmem_log;
+    integer cpu_inject_log, cpu_dmem_log, cpu_receive, node_receive;
     integer cpu_dmem_log_0_0, cpu_dmem_log_0_1, cpu_dmem_log_0_2, cpu_dmem_log_0_3;
     integer cpu_dmem_log_1_0, cpu_dmem_log_1_1, cpu_dmem_log_1_2, cpu_dmem_log_1_3;
     integer cpu_dmem_log_2_0, cpu_dmem_log_2_1, cpu_dmem_log_2_2, cpu_dmem_log_2_3;
     integer cpu_dmem_log_3_0, cpu_dmem_log_3_1, cpu_dmem_log_3_2, cpu_dmem_log_3_3;
+    
+    // Task to open the cpu_inject_log file and set up fmonitor(s)
+    // Check to see what data is getting received to which CPU dmem
+    task setup_cpu_receive_monitor;
+      begin
+        node_receive = $fopen("node_receive.log", "w");
+        if (node_receive == 0) begin
+          $display("Error opening node_receive.log!");
+          $finish;
+       end
+
+    // Write the header to the log file with additional direction signals.
+    $fdisplay(node_receive, "block,component,type,clock_cycle,data,x_source,y_source,cwdi,ccwdi,nsdi,sndi");
+
+    // Row 0 (y = 0): routers from 3_0, 2_0, 1_0, 0_0
+    $fmonitor(node_receive, "Router,3_0,router_direction_channels,%0d,%h,%0d,%0d,%h,%h,%h,%h", 
+      clock_cycle, 
+      uut.row_0.router_3_0.pedo, 
+      uut.row_0.router_3_0.pedo[39:32], 
+      uut.row_0.router_3_0.pedo[47:40],
+      uut.row_0.router_3_0.cwdi,
+      uut.row_0.router_3_0.ccwdi,
+      uut.row_0.router_3_0.nsdi,
+      uut.row_0.router_3_0.sndi);
+      
+    $fmonitor(node_receive, "Router,2_0,router_direction_channels,%0d,%h,%0d,%0d,%h,%h,%h,%h", 
+      clock_cycle, 
+      uut.row_0.router_2_0.pedo, 
+      uut.row_0.router_2_0.pedo[39:32], 
+      uut.row_0.router_2_0.pedo[47:40],
+      uut.row_0.router_2_0.cwdi,
+      uut.row_0.router_2_0.ccwdi,
+      uut.row_0.router_2_0.nsdi,
+      uut.row_0.router_2_0.sndi);
+      
+    $fmonitor(node_receive, "Router,1_0,router_direction_channels,%0d,%h,%0d,%0d,%h,%h,%h,%h", 
+      clock_cycle, 
+      uut.row_0.router_1_0.pedo, 
+      uut.row_0.router_1_0.pedo[39:32], 
+      uut.row_0.router_1_0.pedo[47:40],
+      uut.row_0.router_1_0.cwdi,
+      uut.row_0.router_1_0.ccwdi,
+      uut.row_0.router_1_0.nsdi,
+      uut.row_0.router_1_0.sndi);
+      
+    $fmonitor(node_receive, "Router,0_0,router_direction_channels,%0d,%h,%0d,%0d,%h,%h,%h,%h", 
+      clock_cycle, 
+      uut.row_0.router_0_0.pedo, 
+      uut.row_0.router_0_0.pedo[39:32], 
+      uut.row_0.router_0_0.pedo[47:40],
+      uut.row_0.router_0_0.cwdi,
+      uut.row_0.router_0_0.ccwdi,
+      uut.row_0.router_0_0.nsdi,
+      uut.row_0.router_0_0.sndi);
+
+    // Row 1 (y = 1): routers from 3_1, 2_1, 1_1, 0_1
+    $fmonitor(node_receive, "Router,3_1,router_direction_channels,%0d,%h,%0d,%0d,%h,%h,%h,%h", 
+      clock_cycle, 
+      uut.row_1.router_3_1.pedo, 
+      uut.row_1.router_3_1.pedo[39:32], 
+      uut.row_1.router_3_1.pedo[47:40],
+      uut.row_1.router_3_1.cwdi,
+      uut.row_1.router_3_1.ccwdi,
+      uut.row_1.router_3_1.nsdi,
+      uut.row_1.router_3_1.sndi);
+      
+    $fmonitor(node_receive, "Router,2_1,router_direction_channels,%0d,%h,%0d,%0d,%h,%h,%h,%h", 
+      clock_cycle, 
+      uut.row_1.router_2_1.pedo, 
+      uut.row_1.router_2_1.pedo[39:32], 
+      uut.row_1.router_2_1.pedo[47:40],
+      uut.row_1.router_2_1.cwdi,
+      uut.row_1.router_2_1.ccwdi,
+      uut.row_1.router_2_1.nsdi,
+      uut.row_1.router_2_1.sndi);
+      
+    $fmonitor(node_receive, "Router,1_1,router_direction_channels,%0d,%h,%0d,%0d,%h,%h,%h,%h", 
+      clock_cycle, 
+      uut.row_1.router_1_1.pedo, 
+      uut.row_1.router_1_1.pedo[39:32], 
+      uut.row_1.router_1_1.pedo[47:40],
+      uut.row_1.router_1_1.cwdi,
+      uut.row_1.router_1_1.ccwdi,
+      uut.row_1.router_1_1.nsdi,
+      uut.row_1.router_1_1.sndi);
+      
+    $fmonitor(node_receive, "Router,0_1,router_direction_channels,%0d,%h,%0d,%0d,%h,%h,%h,%h", 
+      clock_cycle, 
+      uut.row_1.router_0_1.pedo, 
+      uut.row_1.router_0_1.pedo[39:32], 
+      uut.row_1.router_0_1.pedo[47:40],
+      uut.row_1.router_0_1.cwdi,
+      uut.row_1.router_0_1.ccwdi,
+      uut.row_1.router_0_1.nsdi,
+      uut.row_1.router_0_1.sndi);
+
+    // Row 2 (y = 2): routers from 3_2, 2_2, 1_2, 0_2
+    $fmonitor(node_receive, "Router,3_2,router_direction_channels,%0d,%h,%0d,%0d,%h,%h,%h,%h", 
+      clock_cycle, 
+      uut.row_2.router_3_2.pedo, 
+      uut.row_2.router_3_2.pedo[39:32], 
+      uut.row_2.router_3_2.pedo[47:40],
+      uut.row_2.router_3_2.cwdi,
+      uut.row_2.router_3_2.ccwdi,
+      uut.row_2.router_3_2.nsdi,
+      uut.row_2.router_3_2.sndi);
+      
+    $fmonitor(node_receive, "Router,2_2,router_direction_channels,%0d,%h,%0d,%0d,%h,%h,%h,%h", 
+      clock_cycle, 
+      uut.row_2.router_2_2.pedo, 
+      uut.row_2.router_2_2.pedo[39:32], 
+      uut.row_2.router_2_2.pedo[47:40],
+      uut.row_2.router_2_2.cwdi,
+      uut.row_2.router_2_2.ccwdi,
+      uut.row_2.router_2_2.nsdi,
+      uut.row_2.router_2_2.sndi);
+      
+    $fmonitor(node_receive, "Router,1_2,router_direction_channels,%0d,%h,%0d,%0d,%h,%h,%h,%h", 
+      clock_cycle, 
+      uut.row_2.router_1_2.pedo, 
+      uut.row_2.router_1_2.pedo[39:32], 
+      uut.row_2.router_1_2.pedo[47:40],
+      uut.row_2.router_1_2.cwdi,
+      uut.row_2.router_1_2.ccwdi,
+      uut.row_2.router_1_2.nsdi,
+      uut.row_2.router_1_2.sndi);
+      
+    $fmonitor(node_receive, "Router,0_2,router_direction_channels,%0d,%h,%0d,%0d,%h,%h,%h,%h", 
+      clock_cycle, 
+      uut.row_2.router_0_2.pedo, 
+      uut.row_2.router_0_2.pedo[39:32], 
+      uut.row_2.router_0_2.pedo[47:40],
+      uut.row_2.router_0_2.cwdi,
+      uut.row_2.router_0_2.ccwdi,
+      uut.row_2.router_0_2.nsdi,
+      uut.row_2.router_0_2.sndi);
+
+    // Row 3 (y = 3): routers from 3_3, 2_3, 1_3, 0_3
+    $fmonitor(node_receive, "Router,3_3,router_direction_channels,%0d,%h,%0d,%0d,%h,%h,%h,%h", 
+      clock_cycle, 
+      uut.row_3.router_3_3.pedo, 
+      uut.row_3.router_3_3.pedo[39:32], 
+      uut.row_3.router_3_3.pedo[47:40],
+      uut.row_3.router_3_3.cwdi,
+      uut.row_3.router_3_3.ccwdi,
+      uut.row_3.router_3_3.nsdi,
+      uut.row_3.router_3_3.sndi);
+      
+    $fmonitor(node_receive, "Router,2_3,router_direction_channels,%0d,%h,%0d,%0d,%h,%h,%h,%h", 
+      clock_cycle, 
+      uut.row_3.router_2_3.pedo, 
+      uut.row_3.router_2_3.pedo[39:32], 
+      uut.row_3.router_2_3.pedo[47:40],
+      uut.row_3.router_2_3.cwdi,
+      uut.row_3.router_2_3.ccwdi,
+      uut.row_3.router_2_3.nsdi,
+      uut.row_3.router_2_3.sndi);
+      
+    $fmonitor(node_receive, "Router,1_3,router_direction_channels,%0d,%h,%0d,%0d,%h,%h,%h,%h", 
+      clock_cycle, 
+      uut.row_3.router_1_3.pedo, 
+      uut.row_3.router_1_3.pedo[39:32], 
+      uut.row_3.router_1_3.pedo[47:40],
+      uut.row_3.router_1_3.cwdi,
+      uut.row_3.router_1_3.ccwdi,
+      uut.row_3.router_1_3.nsdi,
+      uut.row_3.router_1_3.sndi);
+      
+    $fmonitor(node_receive, "Router,0_3,router_direction_channels,%0d,%h,%0d,%0d,%h,%h,%h,%h", 
+      clock_cycle, 
+      uut.row_3.router_0_3.pedo, 
+      uut.row_3.router_0_3.pedo[39:32], 
+      uut.row_3.router_0_3.pedo[47:40],
+      uut.row_3.router_0_3.cwdi,
+      uut.row_3.router_0_3.ccwdi,
+      uut.row_3.router_0_3.nsdi,
+      uut.row_3.router_0_3.sndi);
+  end
+endtask
+
+
+
+
 
     // Task to open the cpu_inject_log file and set up fmonitor(s)
     task setup_cpu_inject_monitor;
@@ -400,6 +583,7 @@ module tb_full_mesh_w_cpus;
     //    );
     //  end
     //endtask
+    
     task setup_destination_dmem_monitor;
       begin
         // ---------------- DMEM Instance: d_mem_0_0 ----------------
@@ -410,11 +594,12 @@ module tb_full_mesh_w_cpus;
         end
         $fdisplay(cpu_dmem_log_0_0, "block,component,type,clock_cycle,data,x_source,y_source");
         $fmonitor(cpu_dmem_log_0_0,
-          "CPU,dmem,data_in,%0d,%h,%0d,%0d",
+          "CPU,dmem,data_in,%0d,%h,%0d,%0d%s",
           clock_cycle,
           d_mem_0_0.dataIn,
           d_mem_0_0.dataIn[24:31],
-          d_mem_0_0.dataIn[16:23]
+          d_mem_0_0.dataIn[16:23],
+          ((d_mem_0_0.dataIn != 32'h0) && (d_mem_0_0.dataIn != 32'bX)) ? "<--inject" : ""
         );
         
         // ---------------- DMEM Instance: d_mem_0_1 ----------------
@@ -644,11 +829,10 @@ module tb_full_mesh_w_cpus;
         
       end
     endtask
-
-
+   
     
     // Task to load the instruction and data memory files
-    task load_memories;
+    task load_memories_gather_0_0;
       begin
         // Load instruction memory (for all instances)
         $readmemh("receive-inst.txt", i_mem_0_0.MEM);
@@ -669,25 +853,628 @@ module tb_full_mesh_w_cpus;
         $readmemh("send-inst.txt", i_mem_3_3.MEM);
     
         // Load selected data memories
-        $readmemh("d_mem_0_0.txt", d_mem_0_0.MEM);
-        $readmemh("d_mem_1_0.txt", d_mem_1_0.MEM);
-        $readmemh("d_mem_2_0.txt", d_mem_2_0.MEM);
-        $readmemh("d_mem_3_0.txt", d_mem_3_0.MEM);
-        $readmemh("d_mem_0_1.txt", d_mem_0_1.MEM);
-        $readmemh("d_mem_1_1.txt", d_mem_1_1.MEM);
-        $readmemh("d_mem_2_1.txt", d_mem_2_1.MEM);
-        $readmemh("d_mem_3_1.txt", d_mem_3_1.MEM);
-        $readmemh("d_mem_0_2.txt", d_mem_0_2.MEM);
-        $readmemh("d_mem_1_2.txt", d_mem_1_2.MEM);
-        $readmemh("d_mem_2_2.txt", d_mem_2_2.MEM);
-        $readmemh("d_mem_3_2.txt", d_mem_3_2.MEM);
-        $readmemh("d_mem_0_3.txt", d_mem_0_3.MEM);
-        $readmemh("d_mem_1_3.txt", d_mem_1_3.MEM);
-        $readmemh("d_mem_2_3.txt", d_mem_2_3.MEM);
-        $readmemh("d_mem_3_3.txt", d_mem_3_3.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/0_0/d_mem_0_0.txt", d_mem_0_0.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/0_0/d_mem_1_0.txt", d_mem_1_0.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/0_0/d_mem_2_0.txt", d_mem_2_0.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/0_0/d_mem_3_0.txt", d_mem_3_0.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/0_0/d_mem_0_1.txt", d_mem_0_1.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/0_0/d_mem_1_1.txt", d_mem_1_1.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/0_0/d_mem_2_1.txt", d_mem_2_1.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/0_0/d_mem_3_1.txt", d_mem_3_1.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/0_0/d_mem_0_2.txt", d_mem_0_2.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/0_0/d_mem_1_2.txt", d_mem_1_2.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/0_0/d_mem_2_2.txt", d_mem_2_2.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/0_0/d_mem_3_2.txt", d_mem_3_2.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/0_0/d_mem_0_3.txt", d_mem_0_3.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/0_0/d_mem_1_3.txt", d_mem_1_3.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/0_0/d_mem_2_3.txt", d_mem_2_3.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/0_0/d_mem_3_3.txt", d_mem_3_3.MEM);
       end
     endtask
     
+    task load_memories_gather_1_0;
+      begin
+        // Load instruction memory (for all instances)
+        $readmemh("send-inst.txt", i_mem_0_0.MEM);
+        $readmemh("send-inst.txt", i_mem_0_1.MEM);
+        $readmemh("send-inst.txt", i_mem_0_2.MEM);
+        $readmemh("send-inst.txt", i_mem_0_3.MEM);
+        $readmemh("receive-inst.txt", i_mem_1_0.MEM);
+        $readmemh("send-inst.txt", i_mem_1_1.MEM);
+        $readmemh("send-inst.txt", i_mem_1_2.MEM);
+        $readmemh("send-inst.txt", i_mem_1_3.MEM);
+        $readmemh("send-inst.txt", i_mem_2_0.MEM);
+        $readmemh("send-inst.txt", i_mem_2_1.MEM);
+        $readmemh("send-inst.txt", i_mem_2_2.MEM);
+        $readmemh("send-inst.txt", i_mem_2_3.MEM);
+        $readmemh("send-inst.txt", i_mem_3_0.MEM);
+        $readmemh("send-inst.txt", i_mem_3_1.MEM);
+        $readmemh("send-inst.txt", i_mem_3_2.MEM);
+        $readmemh("send-inst.txt", i_mem_3_3.MEM);
+    
+        // Load selected data memories
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/1_0/d_mem_0_0.txt", d_mem_0_0.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/1_0/d_mem_1_0.txt", d_mem_1_0.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/1_0/d_mem_2_0.txt", d_mem_2_0.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/1_0/d_mem_3_0.txt", d_mem_3_0.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/1_0/d_mem_0_1.txt", d_mem_0_1.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/1_0/d_mem_1_1.txt", d_mem_1_1.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/1_0/d_mem_2_1.txt", d_mem_2_1.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/1_0/d_mem_3_1.txt", d_mem_3_1.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/1_0/d_mem_0_2.txt", d_mem_0_2.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/1_0/d_mem_1_2.txt", d_mem_1_2.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/1_0/d_mem_2_2.txt", d_mem_2_2.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/1_0/d_mem_3_2.txt", d_mem_3_2.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/1_0/d_mem_0_3.txt", d_mem_0_3.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/1_0/d_mem_1_3.txt", d_mem_1_3.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/1_0/d_mem_2_3.txt", d_mem_2_3.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/1_0/d_mem_3_3.txt", d_mem_3_3.MEM);
+      end
+    endtask
+    
+    task load_memories_gather_2_0;
+      begin
+        // Load instruction memory (for all instances)
+        $readmemh("send-inst.txt", i_mem_0_0.MEM);
+        $readmemh("send-inst.txt", i_mem_0_1.MEM);
+        $readmemh("send-inst.txt", i_mem_0_2.MEM);
+        $readmemh("send-inst.txt", i_mem_0_3.MEM);
+        $readmemh("send-inst.txt", i_mem_1_0.MEM);
+        $readmemh("send-inst.txt", i_mem_1_1.MEM);
+        $readmemh("send-inst.txt", i_mem_1_2.MEM);
+        $readmemh("send-inst.txt", i_mem_1_3.MEM);
+        $readmemh("receive-inst.txt", i_mem_2_0.MEM);
+        $readmemh("send-inst.txt", i_mem_2_1.MEM);
+        $readmemh("send-inst.txt", i_mem_2_2.MEM);
+        $readmemh("send-inst.txt", i_mem_2_3.MEM);
+        $readmemh("send-inst.txt", i_mem_3_0.MEM);
+        $readmemh("send-inst.txt", i_mem_3_1.MEM);
+        $readmemh("send-inst.txt", i_mem_3_2.MEM);
+        $readmemh("send-inst.txt", i_mem_3_3.MEM);
+    
+        // Load selected data memories
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/2_0/d_mem_0_0.txt", d_mem_0_0.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/2_0/d_mem_1_0.txt", d_mem_1_0.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/2_0/d_mem_2_0.txt", d_mem_2_0.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/2_0/d_mem_3_0.txt", d_mem_3_0.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/2_0/d_mem_0_1.txt", d_mem_0_1.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/2_0/d_mem_1_1.txt", d_mem_1_1.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/2_0/d_mem_2_1.txt", d_mem_2_1.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/2_0/d_mem_3_1.txt", d_mem_3_1.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/2_0/d_mem_0_2.txt", d_mem_0_2.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/2_0/d_mem_1_2.txt", d_mem_1_2.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/2_0/d_mem_2_2.txt", d_mem_2_2.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/2_0/d_mem_3_2.txt", d_mem_3_2.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/2_0/d_mem_0_3.txt", d_mem_0_3.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/2_0/d_mem_1_3.txt", d_mem_1_3.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/2_0/d_mem_2_3.txt", d_mem_2_3.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/2_0/d_mem_3_3.txt", d_mem_3_3.MEM);
+      end
+    endtask
+    
+    task load_memories_gather_3_0;
+      begin
+        // Load instruction memory (for all instances)
+        $readmemh("send-inst.txt", i_mem_0_0.MEM);
+        $readmemh("send-inst.txt", i_mem_0_1.MEM);
+        $readmemh("send-inst.txt", i_mem_0_2.MEM);
+        $readmemh("send-inst.txt", i_mem_0_3.MEM);
+        $readmemh("send-inst.txt", i_mem_1_0.MEM);
+        $readmemh("send-inst.txt", i_mem_1_1.MEM);
+        $readmemh("send-inst.txt", i_mem_1_2.MEM);
+        $readmemh("send-inst.txt", i_mem_1_3.MEM);
+        $readmemh("send-inst.txt", i_mem_2_0.MEM);
+        $readmemh("send-inst.txt", i_mem_2_1.MEM);
+        $readmemh("send-inst.txt", i_mem_2_2.MEM);
+        $readmemh("send-inst.txt", i_mem_2_3.MEM);
+        $readmemh("receive-inst.txt", i_mem_3_0.MEM);
+        $readmemh("send-inst.txt", i_mem_3_1.MEM);
+        $readmemh("send-inst.txt", i_mem_3_2.MEM);
+        $readmemh("send-inst.txt", i_mem_3_3.MEM);
+    
+        // Load selected data memories
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/3_0/d_mem_0_0.txt", d_mem_0_0.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/3_0/d_mem_1_0.txt", d_mem_1_0.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/3_0/d_mem_2_0.txt", d_mem_2_0.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/3_0/d_mem_3_0.txt", d_mem_3_0.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/3_0/d_mem_0_1.txt", d_mem_0_1.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/3_0/d_mem_1_1.txt", d_mem_1_1.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/3_0/d_mem_2_1.txt", d_mem_2_1.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/3_0/d_mem_3_1.txt", d_mem_3_1.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/3_0/d_mem_0_2.txt", d_mem_0_2.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/3_0/d_mem_1_2.txt", d_mem_1_2.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/3_0/d_mem_2_2.txt", d_mem_2_2.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/3_0/d_mem_3_2.txt", d_mem_3_2.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/3_0/d_mem_0_3.txt", d_mem_0_3.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/3_0/d_mem_1_3.txt", d_mem_1_3.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/3_0/d_mem_2_3.txt", d_mem_2_3.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/3_0/d_mem_3_3.txt", d_mem_3_3.MEM);
+      end
+    endtask
+    
+    // Task to load the instruction and data memory files
+    task load_memories_gather_0_1;
+      begin
+        // Load instruction memory (for all instances)
+        $readmemh("send-inst.txt", i_mem_0_0.MEM);
+        $readmemh("receive-inst.txt", i_mem_0_1.MEM);
+        $readmemh("send-inst.txt", i_mem_0_2.MEM);
+        $readmemh("send-inst.txt", i_mem_0_3.MEM);
+        $readmemh("send-inst.txt", i_mem_1_0.MEM);
+        $readmemh("send-inst.txt", i_mem_1_1.MEM);
+        $readmemh("send-inst.txt", i_mem_1_2.MEM);
+        $readmemh("send-inst.txt", i_mem_1_3.MEM);
+        $readmemh("send-inst.txt", i_mem_2_0.MEM);
+        $readmemh("send-inst.txt", i_mem_2_1.MEM);
+        $readmemh("send-inst.txt", i_mem_2_2.MEM);
+        $readmemh("send-inst.txt", i_mem_2_3.MEM);
+        $readmemh("send-inst.txt", i_mem_3_0.MEM);
+        $readmemh("send-inst.txt", i_mem_3_1.MEM);
+        $readmemh("send-inst.txt", i_mem_3_2.MEM);
+        $readmemh("send-inst.txt", i_mem_3_3.MEM);
+    
+        // Load selected data memories
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/0_1/d_mem_0_0.txt", d_mem_0_0.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/0_1/d_mem_1_0.txt", d_mem_1_0.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/0_1/d_mem_2_0.txt", d_mem_2_0.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/0_1/d_mem_3_0.txt", d_mem_3_0.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/0_1/d_mem_0_1.txt", d_mem_0_1.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/0_1/d_mem_1_1.txt", d_mem_1_1.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/0_1/d_mem_2_1.txt", d_mem_2_1.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/0_1/d_mem_3_1.txt", d_mem_3_1.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/0_1/d_mem_0_2.txt", d_mem_0_2.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/0_1/d_mem_1_2.txt", d_mem_1_2.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/0_1/d_mem_2_2.txt", d_mem_2_2.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/0_1/d_mem_3_2.txt", d_mem_3_2.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/0_1/d_mem_0_3.txt", d_mem_0_3.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/0_1/d_mem_1_3.txt", d_mem_1_3.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/0_1/d_mem_2_3.txt", d_mem_2_3.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/0_1/d_mem_3_3.txt", d_mem_3_3.MEM);
+      end
+    endtask
+    
+    task load_memories_gather_1_1;
+      begin
+        // Load instruction memory (for all instances)
+        $readmemh("send-inst.txt", i_mem_0_0.MEM);
+        $readmemh("send-inst.txt", i_mem_0_1.MEM);
+        $readmemh("send-inst.txt", i_mem_0_2.MEM);
+        $readmemh("send-inst.txt", i_mem_0_3.MEM);
+        $readmemh("send-inst.txt", i_mem_1_0.MEM);
+        $readmemh("receive-inst.txt", i_mem_1_1.MEM);
+        $readmemh("send-inst.txt", i_mem_1_2.MEM);
+        $readmemh("send-inst.txt", i_mem_1_3.MEM);
+        $readmemh("send-inst.txt", i_mem_2_0.MEM);
+        $readmemh("send-inst.txt", i_mem_2_1.MEM);
+        $readmemh("send-inst.txt", i_mem_2_2.MEM);
+        $readmemh("send-inst.txt", i_mem_2_3.MEM);
+        $readmemh("send-inst.txt", i_mem_3_0.MEM);
+        $readmemh("send-inst.txt", i_mem_3_1.MEM);
+        $readmemh("send-inst.txt", i_mem_3_2.MEM);
+        $readmemh("send-inst.txt", i_mem_3_3.MEM);
+    
+        // Load selected data memories
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/1_1/d_mem_0_0.txt", d_mem_0_0.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/1_1/d_mem_1_0.txt", d_mem_1_0.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/1_1/d_mem_2_0.txt", d_mem_2_0.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/1_1/d_mem_3_0.txt", d_mem_3_0.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/1_1/d_mem_0_1.txt", d_mem_0_1.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/1_1/d_mem_1_1.txt", d_mem_1_1.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/1_1/d_mem_2_1.txt", d_mem_2_1.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/1_1/d_mem_3_1.txt", d_mem_3_1.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/1_1/d_mem_0_2.txt", d_mem_0_2.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/1_1/d_mem_1_2.txt", d_mem_1_2.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/1_1/d_mem_2_2.txt", d_mem_2_2.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/1_1/d_mem_3_2.txt", d_mem_3_2.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/1_1/d_mem_0_3.txt", d_mem_0_3.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/1_1/d_mem_1_3.txt", d_mem_1_3.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/1_1/d_mem_2_3.txt", d_mem_2_3.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/1_1/d_mem_3_3.txt", d_mem_3_3.MEM);
+      end
+    endtask
+    
+    task load_memories_gather_2_1;
+      begin
+        // Load instruction memory (for all instances)
+        $readmemh("send-inst.txt", i_mem_0_0.MEM);
+        $readmemh("send-inst.txt", i_mem_0_1.MEM);
+        $readmemh("send-inst.txt", i_mem_0_2.MEM);
+        $readmemh("send-inst.txt", i_mem_0_3.MEM);
+        $readmemh("send-inst.txt", i_mem_1_0.MEM);
+        $readmemh("send-inst.txt", i_mem_1_1.MEM);
+        $readmemh("send-inst.txt", i_mem_1_2.MEM);
+        $readmemh("send-inst.txt", i_mem_1_3.MEM);
+        $readmemh("send-inst.txt", i_mem_2_0.MEM);
+        $readmemh("receive-inst.txt", i_mem_2_1.MEM);
+        $readmemh("send-inst.txt", i_mem_2_2.MEM);
+        $readmemh("send-inst.txt", i_mem_2_3.MEM);
+        $readmemh("send-inst.txt", i_mem_3_0.MEM);
+        $readmemh("send-inst.txt", i_mem_3_1.MEM);
+        $readmemh("send-inst.txt", i_mem_3_2.MEM);
+        $readmemh("send-inst.txt", i_mem_3_3.MEM);
+    
+        // Load selected data memories
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/2_1/d_mem_0_0.txt", d_mem_0_0.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/2_1/d_mem_1_0.txt", d_mem_1_0.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/2_1/d_mem_2_0.txt", d_mem_2_0.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/2_1/d_mem_3_0.txt", d_mem_3_0.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/2_1/d_mem_0_1.txt", d_mem_0_1.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/2_1/d_mem_1_1.txt", d_mem_1_1.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/2_1/d_mem_2_1.txt", d_mem_2_1.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/2_1/d_mem_3_1.txt", d_mem_3_1.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/2_1/d_mem_0_2.txt", d_mem_0_2.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/2_1/d_mem_1_2.txt", d_mem_1_2.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/2_1/d_mem_2_2.txt", d_mem_2_2.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/2_1/d_mem_3_2.txt", d_mem_3_2.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/2_1/d_mem_0_3.txt", d_mem_0_3.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/2_1/d_mem_1_3.txt", d_mem_1_3.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/2_1/d_mem_2_3.txt", d_mem_2_3.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/2_1/d_mem_3_3.txt", d_mem_3_3.MEM);
+      end
+    endtask
+    
+    task load_memories_gather_3_1;
+      begin
+        // Load instruction memory (for all instances)
+        $readmemh("send-inst.txt", i_mem_0_0.MEM);
+        $readmemh("send-inst.txt", i_mem_0_1.MEM);
+        $readmemh("send-inst.txt", i_mem_0_2.MEM);
+        $readmemh("send-inst.txt", i_mem_0_3.MEM);
+        $readmemh("send-inst.txt", i_mem_1_0.MEM);
+        $readmemh("send-inst.txt", i_mem_1_1.MEM);
+        $readmemh("send-inst.txt", i_mem_1_2.MEM);
+        $readmemh("send-inst.txt", i_mem_1_3.MEM);
+        $readmemh("send-inst.txt", i_mem_2_0.MEM);
+        $readmemh("send-inst.txt", i_mem_2_1.MEM);
+        $readmemh("send-inst.txt", i_mem_2_2.MEM);
+        $readmemh("send-inst.txt", i_mem_2_3.MEM);
+        $readmemh("send-inst.txt", i_mem_3_0.MEM);
+        $readmemh("receive-inst.txt", i_mem_3_1.MEM);
+        $readmemh("send-inst.txt", i_mem_3_2.MEM);
+        $readmemh("send-inst.txt", i_mem_3_3.MEM);
+    
+        // Load selected data memories
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/3_1/d_mem_0_0.txt", d_mem_0_0.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/3_1/d_mem_1_0.txt", d_mem_1_0.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/3_1/d_mem_2_0.txt", d_mem_2_0.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/3_1/d_mem_3_0.txt", d_mem_3_0.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/3_1/d_mem_0_1.txt", d_mem_0_1.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/3_1/d_mem_1_1.txt", d_mem_1_1.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/3_1/d_mem_2_1.txt", d_mem_2_1.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/3_1/d_mem_3_1.txt", d_mem_3_1.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/3_1/d_mem_0_2.txt", d_mem_0_2.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/3_1/d_mem_1_2.txt", d_mem_1_2.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/3_1/d_mem_2_2.txt", d_mem_2_2.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/3_1/d_mem_3_2.txt", d_mem_3_2.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/3_1/d_mem_0_3.txt", d_mem_0_3.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/3_1/d_mem_1_3.txt", d_mem_1_3.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/3_1/d_mem_2_3.txt", d_mem_2_3.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/3_1/d_mem_3_3.txt", d_mem_3_3.MEM);
+      end
+    endtask
+    
+    // Task to load the instruction and data memory files
+    task load_memories_gather_0_2;
+      begin
+        // Load instruction memory (for all instances)
+        $readmemh("send-inst.txt", i_mem_0_0.MEM);
+        $readmemh("send-inst.txt", i_mem_0_1.MEM);
+        $readmemh("receive-inst.txt", i_mem_0_2.MEM);
+        $readmemh("send-inst.txt", i_mem_0_3.MEM);
+        $readmemh("send-inst.txt", i_mem_1_0.MEM);
+        $readmemh("send-inst.txt", i_mem_1_1.MEM);
+        $readmemh("send-inst.txt", i_mem_1_2.MEM);
+        $readmemh("send-inst.txt", i_mem_1_3.MEM);
+        $readmemh("send-inst.txt", i_mem_2_0.MEM);
+        $readmemh("send-inst.txt", i_mem_2_1.MEM);
+        $readmemh("send-inst.txt", i_mem_2_2.MEM);
+        $readmemh("send-inst.txt", i_mem_2_3.MEM);
+        $readmemh("send-inst.txt", i_mem_3_0.MEM);
+        $readmemh("send-inst.txt", i_mem_3_1.MEM);
+        $readmemh("send-inst.txt", i_mem_3_2.MEM);
+        $readmemh("send-inst.txt", i_mem_3_3.MEM);
+    
+        // Load selected data memories
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/0_2/d_mem_0_0.txt", d_mem_0_0.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/0_2/d_mem_1_0.txt", d_mem_1_0.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/0_2/d_mem_2_0.txt", d_mem_2_0.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/0_2/d_mem_3_0.txt", d_mem_3_0.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/0_2/d_mem_0_1.txt", d_mem_0_1.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/0_2/d_mem_1_1.txt", d_mem_1_1.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/0_2/d_mem_2_1.txt", d_mem_2_1.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/0_2/d_mem_3_1.txt", d_mem_3_1.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/0_2/d_mem_0_2.txt", d_mem_0_2.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/0_2/d_mem_1_2.txt", d_mem_1_2.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/0_2/d_mem_2_2.txt", d_mem_2_2.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/0_2/d_mem_3_2.txt", d_mem_3_2.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/0_2/d_mem_0_3.txt", d_mem_0_3.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/0_2/d_mem_1_3.txt", d_mem_1_3.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/0_2/d_mem_2_3.txt", d_mem_2_3.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/0_2/d_mem_3_3.txt", d_mem_3_3.MEM);
+      end
+    endtask
+    
+    task load_memories_gather_1_2;
+      begin
+        // Load instruction memory (for all instances)
+        $readmemh("send-inst.txt", i_mem_0_0.MEM);
+        $readmemh("send-inst.txt", i_mem_0_1.MEM);
+        $readmemh("send-inst.txt", i_mem_0_2.MEM);
+        $readmemh("send-inst.txt", i_mem_0_3.MEM);
+        $readmemh("send-inst.txt", i_mem_1_0.MEM);
+        $readmemh("send-inst.txt", i_mem_1_1.MEM);
+        $readmemh("receive-inst.txt", i_mem_1_2.MEM);
+        $readmemh("send-inst.txt", i_mem_1_3.MEM);
+        $readmemh("send-inst.txt", i_mem_2_0.MEM);
+        $readmemh("send-inst.txt", i_mem_2_1.MEM);
+        $readmemh("send-inst.txt", i_mem_2_2.MEM);
+        $readmemh("send-inst.txt", i_mem_2_3.MEM);
+        $readmemh("send-inst.txt", i_mem_3_0.MEM);
+        $readmemh("send-inst.txt", i_mem_3_1.MEM);
+        $readmemh("send-inst.txt", i_mem_3_2.MEM);
+        $readmemh("send-inst.txt", i_mem_3_3.MEM);
+    
+        // Load selected data memories
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/1_2/d_mem_0_0.txt", d_mem_0_0.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/1_2/d_mem_1_0.txt", d_mem_1_0.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/1_2/d_mem_2_0.txt", d_mem_2_0.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/1_2/d_mem_3_0.txt", d_mem_3_0.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/1_2/d_mem_0_1.txt", d_mem_0_1.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/1_2/d_mem_1_1.txt", d_mem_1_1.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/1_2/d_mem_2_1.txt", d_mem_2_1.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/1_2/d_mem_3_1.txt", d_mem_3_1.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/1_2/d_mem_0_2.txt", d_mem_0_2.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/1_2/d_mem_1_2.txt", d_mem_1_2.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/1_2/d_mem_2_2.txt", d_mem_2_2.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/1_2/d_mem_3_2.txt", d_mem_3_2.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/1_2/d_mem_0_3.txt", d_mem_0_3.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/1_2/d_mem_1_3.txt", d_mem_1_3.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/1_2/d_mem_2_3.txt", d_mem_2_3.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/1_2/d_mem_3_3.txt", d_mem_3_3.MEM);
+      end
+    endtask
+    
+    task load_memories_gather_2_2;
+      begin
+        // Load instruction memory (for all instances)
+        $readmemh("send-inst.txt", i_mem_0_0.MEM);
+        $readmemh("send-inst.txt", i_mem_0_1.MEM);
+        $readmemh("send-inst.txt", i_mem_0_2.MEM);
+        $readmemh("send-inst.txt", i_mem_0_3.MEM);
+        $readmemh("send-inst.txt", i_mem_1_0.MEM);
+        $readmemh("send-inst.txt", i_mem_1_1.MEM);
+        $readmemh("send-inst.txt", i_mem_1_2.MEM);
+        $readmemh("send-inst.txt", i_mem_1_3.MEM);
+        $readmemh("send-inst.txt", i_mem_2_0.MEM);
+        $readmemh("send-inst.txt", i_mem_2_1.MEM);
+        $readmemh("receive-inst.txt", i_mem_2_2.MEM);
+        $readmemh("send-inst.txt", i_mem_2_3.MEM);
+        $readmemh("send-inst.txt", i_mem_3_0.MEM);
+        $readmemh("send-inst.txt", i_mem_3_1.MEM);
+        $readmemh("send-inst.txt", i_mem_3_2.MEM);
+        $readmemh("send-inst.txt", i_mem_3_3.MEM);
+    
+        // Load selected data memories
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/2_2/d_mem_0_0.txt", d_mem_0_0.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/2_2/d_mem_1_0.txt", d_mem_1_0.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/2_2/d_mem_2_0.txt", d_mem_2_0.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/2_2/d_mem_3_0.txt", d_mem_3_0.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/2_2/d_mem_0_1.txt", d_mem_0_1.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/2_2/d_mem_1_1.txt", d_mem_1_1.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/2_2/d_mem_2_1.txt", d_mem_2_1.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/2_2/d_mem_3_1.txt", d_mem_3_1.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/2_2/d_mem_0_2.txt", d_mem_0_2.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/2_2/d_mem_1_2.txt", d_mem_1_2.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/2_2/d_mem_2_2.txt", d_mem_2_2.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/2_2/d_mem_3_2.txt", d_mem_3_2.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/2_2/d_mem_0_3.txt", d_mem_0_3.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/2_2/d_mem_1_3.txt", d_mem_1_3.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/2_2/d_mem_2_3.txt", d_mem_2_3.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/2_2/d_mem_3_3.txt", d_mem_3_3.MEM);
+      end
+    endtask
+    
+    task load_memories_gather_3_2;
+      begin
+        // Load instruction memory (for all instances)
+        $readmemh("send-inst.txt", i_mem_0_0.MEM);
+        $readmemh("send-inst.txt", i_mem_0_1.MEM);
+        $readmemh("send-inst.txt", i_mem_0_2.MEM);
+        $readmemh("send-inst.txt", i_mem_0_3.MEM);
+        $readmemh("send-inst.txt", i_mem_1_0.MEM);
+        $readmemh("send-inst.txt", i_mem_1_1.MEM);
+        $readmemh("send-inst.txt", i_mem_1_2.MEM);
+        $readmemh("send-inst.txt", i_mem_1_3.MEM);
+        $readmemh("send-inst.txt", i_mem_2_0.MEM);
+        $readmemh("send-inst.txt", i_mem_2_1.MEM);
+        $readmemh("send-inst.txt", i_mem_2_2.MEM);
+        $readmemh("send-inst.txt", i_mem_2_3.MEM);
+        $readmemh("send-inst.txt", i_mem_3_0.MEM);
+        $readmemh("send-inst.txt", i_mem_3_1.MEM);
+        $readmemh("receive-inst.txt", i_mem_3_2.MEM);
+        $readmemh("send-inst.txt", i_mem_3_3.MEM);
+    
+        // Load selected data memories
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/3_2/d_mem_0_0.txt", d_mem_0_0.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/3_2/d_mem_1_0.txt", d_mem_1_0.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/3_2/d_mem_2_0.txt", d_mem_2_0.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/3_2/d_mem_3_0.txt", d_mem_3_0.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/3_2/d_mem_0_1.txt", d_mem_0_1.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/3_2/d_mem_1_1.txt", d_mem_1_1.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/3_2/d_mem_2_1.txt", d_mem_2_1.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/3_2/d_mem_3_1.txt", d_mem_3_1.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/3_2/d_mem_0_2.txt", d_mem_0_2.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/3_2/d_mem_1_2.txt", d_mem_1_2.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/3_2/d_mem_2_2.txt", d_mem_2_2.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/3_2/d_mem_3_2.txt", d_mem_3_2.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/3_2/d_mem_0_3.txt", d_mem_0_3.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/3_2/d_mem_1_3.txt", d_mem_1_3.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/3_2/d_mem_2_3.txt", d_mem_2_3.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/3_2/d_mem_3_3.txt", d_mem_3_3.MEM);
+      end
+    endtask
+    
+    
+    // Task to load the instruction and data memory files
+    task load_memories_gather_0_3;
+      begin
+        // Load instruction memory (for all instances)
+        $readmemh("send-inst.txt", i_mem_0_0.MEM);
+        $readmemh("send-inst.txt", i_mem_0_1.MEM);
+        $readmemh("send-inst.txt", i_mem_0_2.MEM);
+        $readmemh("receive-inst.txt", i_mem_0_3.MEM);
+        $readmemh("send-inst.txt", i_mem_1_0.MEM);
+        $readmemh("send-inst.txt", i_mem_1_1.MEM);
+        $readmemh("send-inst.txt", i_mem_1_2.MEM);
+        $readmemh("send-inst.txt", i_mem_1_3.MEM);
+        $readmemh("send-inst.txt", i_mem_2_0.MEM);
+        $readmemh("send-inst.txt", i_mem_2_1.MEM);
+        $readmemh("send-inst.txt", i_mem_2_2.MEM);
+        $readmemh("send-inst.txt", i_mem_2_3.MEM);
+        $readmemh("send-inst.txt", i_mem_3_0.MEM);
+        $readmemh("send-inst.txt", i_mem_3_1.MEM);
+        $readmemh("send-inst.txt", i_mem_3_2.MEM);
+        $readmemh("send-inst.txt", i_mem_3_3.MEM);
+    
+        // Load selected data memories
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/0_3/d_mem_0_0.txt", d_mem_0_0.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/0_3/d_mem_1_0.txt", d_mem_1_0.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/0_3/d_mem_2_0.txt", d_mem_2_0.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/0_3/d_mem_3_0.txt", d_mem_3_0.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/0_3/d_mem_0_1.txt", d_mem_0_1.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/0_3/d_mem_1_1.txt", d_mem_1_1.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/0_3/d_mem_2_1.txt", d_mem_2_1.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/0_3/d_mem_3_1.txt", d_mem_3_1.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/0_3/d_mem_0_2.txt", d_mem_0_2.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/0_3/d_mem_1_2.txt", d_mem_1_2.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/0_3/d_mem_2_2.txt", d_mem_2_2.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/0_3/d_mem_3_2.txt", d_mem_3_2.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/0_3/d_mem_0_3.txt", d_mem_0_3.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/0_3/d_mem_1_3.txt", d_mem_1_3.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/0_3/d_mem_2_3.txt", d_mem_2_3.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/0_3/d_mem_3_3.txt", d_mem_3_3.MEM);
+      end
+    endtask
+    
+    task load_memories_gather_1_3;
+      begin
+        // Load instruction memory (for all instances)
+        $readmemh("send-inst.txt", i_mem_0_0.MEM);
+        $readmemh("send-inst.txt", i_mem_0_1.MEM);
+        $readmemh("send-inst.txt", i_mem_0_2.MEM);
+        $readmemh("send-inst.txt", i_mem_0_3.MEM);
+        $readmemh("send-inst.txt", i_mem_1_0.MEM);
+        $readmemh("send-inst.txt", i_mem_1_1.MEM);
+        $readmemh("send-inst.txt", i_mem_1_2.MEM);
+        $readmemh("receive-inst.txt", i_mem_1_3.MEM);
+        $readmemh("send-inst.txt", i_mem_2_0.MEM);
+        $readmemh("send-inst.txt", i_mem_2_1.MEM);
+        $readmemh("send-inst.txt", i_mem_2_2.MEM);
+        $readmemh("send-inst.txt", i_mem_2_3.MEM);
+        $readmemh("send-inst.txt", i_mem_3_0.MEM);
+        $readmemh("send-inst.txt", i_mem_3_1.MEM);
+        $readmemh("send-inst.txt", i_mem_3_2.MEM);
+        $readmemh("send-inst.txt", i_mem_3_3.MEM);
+    
+        // Load selected data memories
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/1_3/d_mem_0_0.txt", d_mem_0_0.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/1_3/d_mem_1_0.txt", d_mem_1_0.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/1_3/d_mem_2_0.txt", d_mem_2_0.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/1_3/d_mem_3_0.txt", d_mem_3_0.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/1_3/d_mem_0_1.txt", d_mem_0_1.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/1_3/d_mem_1_1.txt", d_mem_1_1.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/1_3/d_mem_2_1.txt", d_mem_2_1.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/1_3/d_mem_3_1.txt", d_mem_3_1.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/1_3/d_mem_0_2.txt", d_mem_0_2.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/1_3/d_mem_1_2.txt", d_mem_1_2.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/1_3/d_mem_2_2.txt", d_mem_2_2.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/1_3/d_mem_3_2.txt", d_mem_3_2.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/1_3/d_mem_0_3.txt", d_mem_0_3.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/1_3/d_mem_1_3.txt", d_mem_1_3.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/1_3/d_mem_2_3.txt", d_mem_2_3.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/1_3/d_mem_3_3.txt", d_mem_3_3.MEM);
+      end
+    endtask
+    
+    task load_memories_gather_2_3;
+      begin
+        // Load instruction memory (for all instances)
+        $readmemh("send-inst.txt", i_mem_0_0.MEM);
+        $readmemh("send-inst.txt", i_mem_0_1.MEM);
+        $readmemh("send-inst.txt", i_mem_0_2.MEM);
+        $readmemh("send-inst.txt", i_mem_0_3.MEM);
+        $readmemh("send-inst.txt", i_mem_1_0.MEM);
+        $readmemh("send-inst.txt", i_mem_1_1.MEM);
+        $readmemh("send-inst.txt", i_mem_1_2.MEM);
+        $readmemh("send-inst.txt", i_mem_1_3.MEM);
+        $readmemh("send-inst.txt", i_mem_2_0.MEM);
+        $readmemh("send-inst.txt", i_mem_2_1.MEM);
+        $readmemh("send-inst.txt", i_mem_2_2.MEM);
+        $readmemh("receive-inst.txt", i_mem_2_3.MEM);
+        $readmemh("send-inst.txt", i_mem_3_0.MEM);
+        $readmemh("send-inst.txt", i_mem_3_1.MEM);
+        $readmemh("send-inst.txt", i_mem_3_2.MEM);
+        $readmemh("send-inst.txt", i_mem_3_3.MEM);
+    
+        // Load selected data memories
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/2_3/d_mem_0_0.txt", d_mem_0_0.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/2_3/d_mem_1_0.txt", d_mem_1_0.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/2_3/d_mem_2_0.txt", d_mem_2_0.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/2_3/d_mem_3_0.txt", d_mem_3_0.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/2_3/d_mem_0_1.txt", d_mem_0_1.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/2_3/d_mem_1_1.txt", d_mem_1_1.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/2_3/d_mem_2_1.txt", d_mem_2_1.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/2_3/d_mem_3_1.txt", d_mem_3_1.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/2_3/d_mem_0_2.txt", d_mem_0_2.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/2_3/d_mem_1_2.txt", d_mem_1_2.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/2_3/d_mem_2_2.txt", d_mem_2_2.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/2_3/d_mem_3_2.txt", d_mem_3_2.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/2_3/d_mem_0_3.txt", d_mem_0_3.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/2_3/d_mem_1_3.txt", d_mem_1_3.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/2_3/d_mem_2_3.txt", d_mem_2_3.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/2_3/d_mem_3_3.txt", d_mem_3_3.MEM);
+      end
+    endtask
+    
+    task load_memories_gather_3_3;
+      begin
+        // Load instruction memory (for all instances)
+        $readmemh("send-inst.txt", i_mem_0_0.MEM);
+        $readmemh("send-inst.txt", i_mem_0_1.MEM);
+        $readmemh("send-inst.txt", i_mem_0_2.MEM);
+        $readmemh("send-inst.txt", i_mem_0_3.MEM);
+        $readmemh("send-inst.txt", i_mem_1_0.MEM);
+        $readmemh("send-inst.txt", i_mem_1_1.MEM);
+        $readmemh("send-inst.txt", i_mem_1_2.MEM);
+        $readmemh("send-inst.txt", i_mem_1_3.MEM);
+        $readmemh("send-inst.txt", i_mem_2_0.MEM);
+        $readmemh("send-inst.txt", i_mem_2_1.MEM);
+        $readmemh("send-inst.txt", i_mem_2_2.MEM);
+        $readmemh("send-inst.txt", i_mem_2_3.MEM);
+        $readmemh("send-inst.txt", i_mem_3_0.MEM);
+        $readmemh("send-inst.txt", i_mem_3_1.MEM);
+        $readmemh("send-inst.txt", i_mem_3_2.MEM);
+        $readmemh("receive-inst.txt", i_mem_3_3.MEM);
+    
+        // Load selected data memories
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/3_3/d_mem_0_0.txt", d_mem_0_0.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/3_3/d_mem_1_0.txt", d_mem_1_0.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/3_3/d_mem_2_0.txt", d_mem_2_0.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/3_3/d_mem_3_0.txt", d_mem_3_0.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/3_3/d_mem_0_1.txt", d_mem_0_1.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/3_3/d_mem_1_1.txt", d_mem_1_1.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/3_3/d_mem_2_1.txt", d_mem_2_1.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/3_3/d_mem_3_1.txt", d_mem_3_1.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/3_3/d_mem_0_2.txt", d_mem_0_2.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/3_3/d_mem_1_2.txt", d_mem_1_2.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/3_3/d_mem_2_2.txt", d_mem_2_2.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/3_3/d_mem_3_2.txt", d_mem_3_2.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/3_3/d_mem_0_3.txt", d_mem_0_3.MEM);
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/3_3/d_mem_1_3.txt", d_mem_1_3.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/3_3/d_mem_2_3.txt", d_mem_2_3.MEM);  
+        $readmemh("D:/mesh-noc-router/mesh-noc-router/cpu/tb_test_files/full_mesh_files/dmem/3_3/d_mem_3_3.txt", d_mem_3_3.MEM);
+      end
+    endtask
     // Task to dump the memory contents to a file
     task dump_data_memory(input integer row);
       integer i, dmem0_dump_file;
@@ -719,14 +1506,29 @@ module tb_full_mesh_w_cpus;
         
     setup_destination_dmem_monitor();
     setup_cpu_inject_monitor();
+    setup_cpu_receive_monitor();
     
     // Assert reset and deassert after a few cycles
     reset = 1'b1;
     repeat(5) @(negedge clk);
     reset = 1'b0;
     
-    load_memories();
-    
+      load_memories_gather_0_0();
+      //load_memories_gather_0_1();
+      //load_memories_gather_0_2();
+      //load_memories_gather_0_3();
+      //load_memories_gather_1_0();
+      //load_memories_gather_1_1();
+      //load_memories_gather_1_2();
+      //load_memories_gather_1_3();
+      //load_memories_gather_2_0();
+      //load_memories_gather_2_1();
+      //load_memories_gather_2_2();
+      //load_memories_gather_2_3();
+      //load_memories_gather_3_0();
+      //load_memories_gather_3_1();
+      //load_memories_gather_3_2();
+      //load_memories_gather_3_3();    
     // Wait for termination condition (for example, when instruction 0_0 becomes zero)
     wait (cpu_inst_in_0_0 == 32'h00000000);
     $display("The program completed in %d cycles", clock_cycle);
@@ -736,6 +1538,7 @@ module tb_full_mesh_w_cpus;
     
     // Dump logs
     $fclose(cpu_dmem_log);
+    $fclose(cpu_receive);
     $fclose(cpu_inject_log);
     
     $finish;
