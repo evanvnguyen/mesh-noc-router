@@ -106,8 +106,8 @@ module router (
   reg [3:0] sn_requests;  // Index 0 is for cw, index 1 is for ccw, index 2 is for pe, and index 3 is for sn
 
   // These signals control which request was granted or allowed to pass to the given output channel
-  wire cw_granted;
-  wire ccw_granted;
+  wire [1:0] cw_granted;
+  wire [1:0] ccw_granted;
   wire [2:0] pe_granted;
   wire [2:0] ns_granted;
   wire [2:0] sn_granted;
@@ -308,6 +308,7 @@ module router (
     .requests(cw_requests),
     .blockedRequests({block_pe_input_channel | pe_output_channel_blocked,
                       block_cw_input_channel | cw_output_channel_blocked}),
+    .output_channel_blocked(cw_output_channel_blocked),
     .granted(cw_granted)
   );
 
@@ -316,6 +317,7 @@ module router (
     .requests(ccw_requests),
     .blockedRequests({block_pe_input_channel | pe_output_channel_blocked,
                       block_ccw_input_channel | ccw_output_channel_blocked}),
+    .output_channel_blocked(ccw_output_channel_blocked),
     .granted(ccw_granted)
   );
 
@@ -357,10 +359,18 @@ module router (
       reset_clocked_values;
       polarity <= 1'b0;
     end else begin
-      reset_clocked_values;
-      block_channels;
+      
 
       polarity <= ~polarity;
+    end
+  end
+
+  always @(negedge clk) begin
+    if (!reset) begin
+      // If the output channel is blocked, we need to block the input channels
+      // that are trying to send data to the output channel.
+      reset_clocked_values;
+      block_channels;
     end
   end
 
@@ -457,11 +467,11 @@ module router (
 
   task reset_clocked_values();
     begin
-        block_cw_input_channel <= 1'b0;
-        block_ccw_input_channel <= 1'b0;
-        block_pe_input_channel <= 1'b0;
-        block_ns_input_channel <= 1'b0;
-        block_sn_input_channel <= 1'b0;
+        block_cw_input_channel = 1'b0;
+        block_ccw_input_channel = 1'b0;
+        block_pe_input_channel = 1'b0;
+        block_ns_input_channel = 1'b0;
+        block_sn_input_channel = 1'b0;
     end
   endtask
 
@@ -587,19 +597,30 @@ module router (
     begin
       // more the data from the input channels to the output channels
       if (cw_requests > 0) begin
-        if (cw_granted) begin
-          // If cw also requested to send data to cw out, we need to block it.
+        if (cw_granted[1]) begin
           block_cw_input_channel = cw_requests[0];
+          block_ccw_input_channel = cw_requests[1];
         end else begin
-          block_pe_input_channel = cw_requests[1];
+          if (cw_granted) begin
+            // If cw also requested to send data to cw out, we need to block it.
+            block_cw_input_channel = cw_requests[0];
+          end else begin
+            block_pe_input_channel = cw_requests[1];
+          end
         end
       end
 
       if (ccw_requests > 0) begin
-        if (ccw_granted) begin
+        if (ccw_granted[1]) begin
           block_ccw_input_channel = ccw_requests[0];
-        end else begin
           block_pe_input_channel = ccw_requests[1];
+        end else begin
+          if (ccw_granted) begin
+            // If ccw also requested to send data to ccw out, we need to block it.
+            block_ccw_input_channel = ccw_requests[0];
+          end else begin
+            block_pe_input_channel = ccw_requests[1];
+          end
         end
       end
 
