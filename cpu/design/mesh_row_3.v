@@ -230,9 +230,43 @@ module mesh_row_3 #(
       .net_do(net_do_pedi_03),
       .net_polarity(net_polarity_03)
   );
-  
+      reg [3:0] cpu_0_3_gclk_count;
+    wire cpu_0_3_gclk_start;
+    reg cpu_0_3_gclk_count_done;
+    
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            cpu_0_3_gclk_count <= 3'd0;
+            cpu_0_3_gclk_count_done <= 1'b0;
+        end else if (cpu_0_3_gclk_start) begin
+            if (cpu_0_3_gclk_count < 3'd5) begin
+                cpu_0_3_gclk_count <= cpu_0_3_gclk_count + 1;
+                cpu_0_3_gclk_count_done <= 1'b0;
+            end else begin
+                cpu_0_3_gclk_count_done <= 1'b1;
+            end
+        end else begin
+            cpu_0_3_gclk_count <= 3'd0;
+            cpu_0_3_gclk_count_done <= 1'b0;
+        end
+    end
+
+    wire cpu_0_3_clk_gate_en;
+    wire cpu_0_3_gclk;
+    assign cpu_0_3_clk_gate_en = !(node_0_3_inst_in == 64'b0);
+
+    clk_gate_latch cpu_0_3_clkgate (
+        .CLK(clk), 
+        .EN(cpu_0_3_clk_gate_en), 
+        .GCLK(cpu_0_3_gclk)
+    );
+
+    assign cpu_0_3_gclk_start = ~cpu_0_3_clk_gate_en;
+
 four_stage_processor cpu_0_3 (
-    .clk(clk),
+    //.clk(clk),
+    .clk(cpu_0_3_gclk),
+
     .reset(reset),
     .inst_in(node_0_3_inst_in),
     .d_in(node_0_3_d_in),
@@ -302,9 +336,43 @@ four_stage_processor cpu_0_3 (
       .net_do(net_do_pedi_13),
       .net_polarity(net_polarity_13)
   );
-  
+      reg [3:0] cpu_1_3_gclk_count;
+    wire cpu_1_3_gclk_start;
+    reg cpu_1_3_gclk_count_done;
+    
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            cpu_1_3_gclk_count <= 3'd0;
+            cpu_1_3_gclk_count_done <= 1'b0;
+        end else if (cpu_1_3_gclk_start) begin
+            if (cpu_1_3_gclk_count < 3'd5) begin
+                cpu_1_3_gclk_count <= cpu_1_3_gclk_count + 1;
+                cpu_1_3_gclk_count_done <= 1'b0;
+            end else begin
+                cpu_1_3_gclk_count_done <= 1'b1;
+            end
+        end else begin
+            cpu_1_3_gclk_count <= 3'd0;
+            cpu_1_3_gclk_count_done <= 1'b0;
+        end
+    end
+
+    wire cpu_1_3_clk_gate_en;
+    wire cpu_1_3_gclk;
+    assign cpu_1_3_clk_gate_en = !(node_1_3_inst_in == 64'b0);
+
+    clk_gate_latch cpu_1_3_clkgate (
+        .CLK(clk), 
+        .EN(cpu_1_3_clk_gate_en), 
+        .GCLK(cpu_1_3_gclk)
+    );
+
+    assign cpu_1_3_gclk_start = ~cpu_1_3_clk_gate_en;
+
 four_stage_processor cpu_1_3 (
-    .clk(clk),
+    //.clk(clk),
+    .clk(cpu_1_3_gclk),
+
     .reset(reset),
     .inst_in(node_1_3_inst_in),
     .d_in(node_1_3_d_in),
@@ -375,8 +443,44 @@ four_stage_processor cpu_1_3 (
       .net_polarity(net_polarity_23)
   );
   
+      reg [3:0] cpu_2_3_gclk_count;
+    wire cpu_2_3_gclk_start;
+    reg cpu_2_3_gclk_count_done;
+    
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            cpu_2_3_gclk_count <= 3'd0;
+            cpu_2_3_gclk_count_done <= 1'b0;
+        end else if (cpu_2_3_gclk_start) begin
+            if (cpu_2_3_gclk_count < 3'd5) begin
+                cpu_2_3_gclk_count <= cpu_2_3_gclk_count + 1;
+                cpu_2_3_gclk_count_done <= 1'b0;
+            end else begin
+                cpu_2_3_gclk_count_done <= 1'b1;
+            end
+        end else begin
+            cpu_2_3_gclk_count <= 3'd0;
+            cpu_2_3_gclk_count_done <= 1'b0;
+        end
+    end
+
+    wire cpu_2_3_clk_gate_en;
+    wire cpu_2_3_gclk;
+    assign cpu_2_3_clk_gate_en = !(node_2_3_inst_in == 64'b0);
+
+    clk_gate_latch cpu_2_3_clkgate (
+        .CLK(clk), 
+        .EN(cpu_2_3_clk_gate_en), 
+        .GCLK(cpu_2_3_gclk)
+    );
+
+    assign cpu_2_3_gclk_start = ~cpu_2_3_clk_gate_en;
+
+  
 four_stage_processor cpu_2_3 (
-    .clk(clk),
+    //.clk(clk),
+    .clk(cpu_2_3_gclk),
+
     .reset(reset),
     .inst_in(node_2_3_inst_in),
     .d_in(node_2_3_d_in),
@@ -446,8 +550,44 @@ four_stage_processor cpu_2_3 (
       .net_polarity(net_polarity_33)
   );
   
+      reg [3:0] cpu_3_3_gclk_count;
+    wire cpu_3_3_gclk_start;
+    reg cpu_3_3_gclk_count_done;
+    
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            cpu_3_3_gclk_count <= 3'd0;
+            cpu_3_3_gclk_count_done <= 1'b0;
+        end else if (cpu_3_3_gclk_start) begin
+            if (cpu_3_3_gclk_count < 3'd5) begin
+                cpu_3_3_gclk_count <= cpu_3_3_gclk_count + 1;
+                cpu_3_3_gclk_count_done <= 1'b0;
+            end else begin
+                cpu_3_3_gclk_count_done <= 1'b1;
+            end
+        end else begin
+            cpu_3_3_gclk_count <= 3'd0;
+            cpu_3_3_gclk_count_done <= 1'b0;
+        end
+    end
+
+    wire cpu_3_3_clk_gate_en;
+    wire cpu_3_3_gclk;
+    assign cpu_3_3_clk_gate_en = !(node_3_3_inst_in == 64'b0);
+
+    clk_gate_latch cpu_3_3_clkgate (
+        .CLK(clk), 
+        .EN(cpu_3_3_clk_gate_en), 
+        .GCLK(cpu_3_3_gclk)
+    );
+
+    assign cpu_3_3_gclk_start = ~cpu_3_3_clk_gate_en;
+
+  
 four_stage_processor cpu_3_3 (
-    .clk(clk),
+    //.clk(clk),
+    .clk(cpu_3_3_gclk),
+
     .reset(reset),
     .inst_in(node_3_3_inst_in),
     .d_in(node_3_3_d_in),

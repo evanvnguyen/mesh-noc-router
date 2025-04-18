@@ -179,14 +179,14 @@ module mesh_row_0 #(
     .router_position(0), 
     .polarity_out(net_polarity_00),
     // Left side, no connections
-    .cwsi(), .cwri(), .cwdi(), .ccwso(), .ccwro(), .ccwdo(),
+    .cwsi(), .cwri(), .cwdi(), .ccwso(), .ccwro(1'b1), .ccwdo(),
 
     // Right side CW out and CCW in
     .ccwsi(ccw_si_00_so_10), .ccwri(ccw_ri_00_ro_10), .ccwdi(ccw_di_00_do_10),
     .cwso(cw_so_00_si_10), .cwro(cw_ro_00_ri_10), .cwdo(cw_do_00_di_10),
 
     // Bottom, no connections
-    .snsi(), .snri(), .sndi(), .nsso(), .nsro(), .nsdo(),
+    .snsi(), .snri(), .sndi(), .nsso(), .nsro(1'b1), .nsdo(),
 
     // Top side
     .snso(snso_0_0), .snro(snro_0_0), .sndo(sndo_0_0), .nssi(nssi_0_0), .nsri(nsri_0_0), .nsdi(nsdi_0_0),
@@ -226,8 +226,41 @@ module mesh_row_0 #(
       .net_polarity(net_polarity_00)
   );
 
+    reg [3:0] cpu_0_0_gclk_count;
+    wire cpu_0_0_gclk_start;
+    reg cpu_0_0_gclk_count_done;
+    
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            cpu_0_0_gclk_count <= 3'd0;
+            cpu_0_0_gclk_count_done <= 1'b0;
+        end else if (cpu_0_0_gclk_start) begin
+            if (cpu_0_0_gclk_count < 3'd5) begin
+                cpu_0_0_gclk_count <= cpu_0_0_gclk_count + 1;
+                cpu_0_0_gclk_count_done <= 1'b0;
+            end else begin
+                cpu_0_0_gclk_count_done <= 1'b1;
+            end
+        end else begin
+            cpu_0_0_gclk_count <= 3'd0;
+            cpu_0_0_gclk_count_done <= 1'b0;
+        end
+    end
+
+    wire cpu_0_0_clk_gate_en;
+    wire cpu_0_0_gclk;
+    assign cpu_0_0_clk_gate_en = !(node_0_0_inst_in == 64'b0);
+    clk_gate_latch cpu_0_0_clkgate (
+     .CLK(clk), 
+     .EN(cpu_0_0_clk_gate_en), 
+     .GCLK(cpu_0_0_gclk));
+     
+    assign cpu_0_0_gclk_start = ~cpu_0_0_clk_gate_en;
+
   four_stage_processor cpu_0_0 (
-    .clk(clk),
+    //.clk(clk),
+    .clk(cpu_0_0_gclk),
+
     .reset(reset),
     .inst_in(node_0_0_inst_in),
     .d_in(node_0_0_d_in),
@@ -257,7 +290,7 @@ module mesh_row_0 #(
     .cwso(cw_so_10_si_20), .cwro(cw_ro_10_ri_20), .cwdo(cw_do_10_di_20),
 
     // Bottom, no connections
-    .snsi(), .snri(), .sndi(), .nsso(), .nsro(), .nsdo(),
+    .snsi(), .snri(), .sndi(), .nsso(), .nsro(1'b1), .nsdo(),
 
     // Top side
     .snso(snso_1_0), .snro(snro_1_0), .sndo(sndo_1_0), .nssi(nssi_1_0), .nsri(nsri_1_0), .nsdi(nsdi_1_0),
@@ -296,9 +329,43 @@ module mesh_row_0 #(
       .net_do(net_do_pedi_10),
       .net_polarity(net_polarity_10)
   );
+    reg [3:0] cpu_1_0_gclk_count;
+    wire cpu_1_0_gclk_start;
+    reg cpu_1_0_gclk_count_done;
+    
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            cpu_1_0_gclk_count <= 3'd0;
+            cpu_1_0_gclk_count_done <= 1'b0;
+        end else if (cpu_1_0_gclk_start) begin
+            if (cpu_1_0_gclk_count < 3'd5) begin
+                cpu_1_0_gclk_count <= cpu_1_0_gclk_count + 1;
+                cpu_1_0_gclk_count_done <= 1'b0;
+            end else begin
+                cpu_1_0_gclk_count_done <= 1'b1;
+            end
+        end else begin
+            cpu_1_0_gclk_count <= 3'd0;
+            cpu_1_0_gclk_count_done <= 1'b0;
+        end
+    end
+
+    wire cpu_1_0_clk_gate_en;
+    wire cpu_1_0_gclk;
+    assign cpu_1_0_clk_gate_en = !(node_1_0_inst_in == 64'b0);
+
+    clk_gate_latch cpu_1_0_clkgate (
+        .CLK(clk), 
+        .EN(cpu_1_0_clk_gate_en), 
+        .GCLK(cpu_1_0_gclk)
+    );
+
+    assign cpu_1_0_gclk_start = ~cpu_1_0_clk_gate_en;
 
     four_stage_processor cpu_1_0 (
-    .clk(clk),
+    //.clk(clk),
+    .clk(cpu_1_0_gclk),
+
     .reset(reset),
     .inst_in(node_1_0_inst_in),
     .d_in(node_1_0_d_in),
@@ -328,7 +395,7 @@ module mesh_row_0 #(
     .cwso(cw_so_20_si_30), .cwro(cw_ro_20_ri_30), .cwdo(cw_do_20_di_30),
 
     // Bottom, no connections
-    .snsi(), .snri(), .sndi(), .nsso(), .nsro(), .nsdo(),
+    .snsi(), .snri(), .sndi(), .nsso(), .nsro(1'b1), .nsdo(),
 
     // Top side
     .snso(snso_2_0), .snro(snro_2_0), .sndo(sndo_2_0), .nssi(nssi_2_0), .nsri(nsri_2_0), .nsdi(nsdi_2_0),
@@ -367,9 +434,43 @@ module mesh_row_0 #(
       .net_do(net_do_pedi_20),
       .net_polarity(net_polarity_20)
   );
+    reg [3:0] cpu_2_0_gclk_count;
+    wire cpu_2_0_gclk_start;
+    reg cpu_2_0_gclk_count_done;
+    
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            cpu_2_0_gclk_count <= 3'd0;
+            cpu_2_0_gclk_count_done <= 1'b0;
+        end else if (cpu_2_0_gclk_start) begin
+            if (cpu_2_0_gclk_count < 3'd5) begin
+                cpu_2_0_gclk_count <= cpu_2_0_gclk_count + 1;
+                cpu_2_0_gclk_count_done <= 1'b0;
+            end else begin
+                cpu_2_0_gclk_count_done <= 1'b1;
+            end
+        end else begin
+            cpu_2_0_gclk_count <= 3'd0;
+            cpu_2_0_gclk_count_done <= 1'b0;
+        end
+    end
+
+    wire cpu_2_0_clk_gate_en;
+    wire cpu_2_0_gclk;
+    assign cpu_2_0_clk_gate_en = !(node_2_0_inst_in == 64'b0);
+
+    clk_gate_latch cpu_2_0_clkgate (
+        .CLK(clk), 
+        .EN(cpu_2_0_clk_gate_en), 
+        .GCLK(cpu_2_0_gclk)
+    );
+
+    assign cpu_2_0_gclk_start = ~cpu_2_0_clk_gate_en;
 
     four_stage_processor cpu_2_0 (
-    .clk(clk),
+    //.clk(clk),
+    .clk(cpu_2_0_gclk),
+
     .reset(reset),
     .inst_in(node_2_0_inst_in),
     .d_in(node_2_0_d_in),
@@ -395,10 +496,10 @@ module mesh_row_0 #(
     .ccwso(ccw_si_20_so_30), .ccwro(ccw_ri_20_ro_30), .ccwdo(ccw_di_20_do_30),
 
     // Right side, no connections
-    .ccwsi(), .ccwri(), .ccwdi(), .cwso(), .cwro(), .cwdo(),
+    .ccwsi(), .ccwri(), .ccwdi(), .cwso(), .cwro(1'b1), .cwdo(),
 
     // Bottom, no connections
-    .snsi(), .snri(), .sndi(), .nsso(), .nsro(), .nsdo(),
+    .snsi(), .snri(), .sndi(), .nsso(), .nsro(1'b1), .nsdo(),
 
     // Top side
     .snso(snso_3_0), .snro(snro_3_0), .sndo(sndo_3_0), .nssi(nssi_3_0), .nsri(nsri_3_0), .nsdi(nsdi_3_0),
@@ -437,9 +538,43 @@ module mesh_row_0 #(
       .net_do(net_do_pedi_30),
       .net_polarity(net_polarity_30)
   );
+    reg [3:0] cpu_3_0_gclk_count;
+    wire cpu_3_0_gclk_start;
+    reg cpu_3_0_gclk_count_done;
+    
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            cpu_3_0_gclk_count <= 3'd0;
+            cpu_3_0_gclk_count_done <= 1'b0;
+        end else if (cpu_3_0_gclk_start) begin
+            if (cpu_3_0_gclk_count < 3'd5) begin
+                cpu_3_0_gclk_count <= cpu_3_0_gclk_count + 1;
+                cpu_3_0_gclk_count_done <= 1'b0;
+            end else begin
+                cpu_3_0_gclk_count_done <= 1'b1;
+            end
+        end else begin
+            cpu_3_0_gclk_count <= 3'd0;
+            cpu_3_0_gclk_count_done <= 1'b0;
+        end
+    end
+
+    wire cpu_3_0_clk_gate_en;
+    wire cpu_3_0_gclk;
+    assign cpu_3_0_clk_gate_en = !(node_3_0_inst_in == 64'b0);
+
+    clk_gate_latch cpu_3_0_clkgate (
+        .CLK(clk), 
+        .EN(cpu_3_0_clk_gate_en), 
+        .GCLK(cpu_3_0_gclk)
+    );
+
+    assign cpu_3_0_gclk_start = ~cpu_3_0_clk_gate_en;
 
     four_stage_processor cpu_3_0 (
-    .clk(clk),
+    //.clk(clk),
+    .clk(cpu_3_0_gclk),
+
     .reset(reset),
     .inst_in(node_3_0_inst_in),
     .d_in(node_3_0_d_in),
