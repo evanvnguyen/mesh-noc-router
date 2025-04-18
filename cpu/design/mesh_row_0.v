@@ -12,7 +12,7 @@
               GND           GND         GND          GND
         (x,y) = (0,0) (x,y) = (1,0) (x,y) = (2,0) (x,y) = (3,0)
 */
-
+`define DEBUG_ROUTER
 
 module mesh_row_0 #(
     parameter PACKET_WIDTH = 64
@@ -73,6 +73,14 @@ module mesh_row_0 #(
 	output [0:31] node_3_0_addr_out,
 	output        node_3_0_memWrEn,
 	output        node_3_0_memEn
+
+  `ifdef DEBUG_ROUTER
+    ,
+    input wire integer file_name_0,
+    input wire integer file_name_1,
+    input wire integer file_name_2,
+    input wire integer file_name_3
+  `endif
 ); 
 
   // Row 0
@@ -186,6 +194,11 @@ module mesh_row_0 #(
     // PE input/output to NIC
     .pesi(net_so_pesi_00), .pedi(net_do_pedi_00), .peri(net_ro_peri_00),
     .peso(net_si_peso_00), .pedo(net_di_pedo_00), .pero(net_ri_pero_00)
+
+    `ifdef DEBUG_ROUTER
+      , .router_name(4'b0000)
+      , .file_name(file_name_0)
+    `endif
   );
 
   // NIC module instantiation for 0_0
@@ -252,6 +265,11 @@ module mesh_row_0 #(
     // PE input/output to NIC
     .pesi(net_so_pesi_10), .pedi(net_do_pedi_10), .peri(net_ro_peri_10),
     .peso(net_si_peso_10), .pedo(net_di_pedo_10), .pero(net_ri_pero_10)
+
+    `ifdef DEBUG_ROUTER
+      , .router_name(4'b0100)
+      , .file_name(file_name_1)
+    `endif
   );
 
   // NIC module instantiation for 0_0
@@ -318,6 +336,11 @@ module mesh_row_0 #(
     // PE input/output to NIC
     .pesi(net_so_pesi_20), .pedi(net_do_pedi_20), .peri(net_ro_peri_20),
     .peso(net_si_peso_20), .pedo(net_di_pedo_20), .pero(net_ri_pero_20)
+
+    `ifdef DEBUG_ROUTER
+      , .router_name(4'b1000)
+      , .file_name(file_name_2)
+    `endif
   );
 
   // NIC module instantiation for 0_0
@@ -362,7 +385,7 @@ module mesh_row_0 #(
     .d_out_nic(nic_d_out_2_0)
   );
 
-      router router_3_0 (
+    router router_3_0 (
     .clk (clk),
     .reset(reset),
     .router_position(0), 
@@ -383,6 +406,11 @@ module mesh_row_0 #(
     // PE input/output to NIC
     .pesi(net_so_pesi_30), .pedi(net_do_pedi_30), .peri(net_ro_peri_30),
     .peso(net_si_peso_30), .pedo(net_di_pedo_30), .pero(net_ri_pero_30)
+    
+    `ifdef DEBUG_ROUTER
+      , .router_name(4'b1100)
+      , .file_name(file_name_3)
+    `endif
   );
 
   // NIC module instantiation for 0_0

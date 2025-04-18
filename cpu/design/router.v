@@ -9,6 +9,8 @@
 *  - sn: south-north
 */
 
+`define DEBUG_ROUTER
+
 module router (
   input clk,
   input reset,
@@ -64,7 +66,18 @@ module router (
   input snro,
   output snso,
   output [63:0] sndo
+
+  `ifdef DEBUG_ROUTER
+    ,
+    input [3:0] router_name, // xx,yy eg. for router (1,2) router_name = 4'b01_10 
+    input wire integer file_name
+  `endif
 );
+
+  `ifdef DEBUG_ROUTER
+    wire [1:0] pos_x = router_name[3:2]; // x position of the router
+    wire [1:0] pos_y = router_name[1:0]; // y position of the router
+  `endif
 
   parameter TOP_LEFT      = 4'b1001;
   parameter TOP           = 4'b1000;
@@ -356,17 +369,16 @@ module router (
 
   always @(posedge clk) begin
     if (reset) begin
-      reset_clocked_values;
       polarity <= 1'b0;
     end else begin
-      
-
       polarity <= ~polarity;
     end
   end
 
   always @(negedge clk) begin
-    if (!reset) begin
+    if (reset)
+      reset_clocked_values;
+    else begin
       // If the output channel is blocked, we need to block the input channels
       // that are trying to send data to the output channel.
       reset_clocked_values;
@@ -375,8 +387,10 @@ module router (
   end
 
   always @(*) begin
-    reset_values;
-    if (!reset) begin
+    if (reset)
+      reset_values;
+    else begin
+      reset_values;
       // We need to look at the direction of the data and figure out where to 
       // send it. We will use an arbiter to determine who has priority if
       // multiple channels are trying to send data to the same output channel.
@@ -392,7 +406,7 @@ module router (
 
       // more the data from the input channels to the output channels
       if (cw_requests > 0) begin
-        if (cw_granted) begin
+        if (cw_granted[0]) begin
           cw_output_channel_data_in <= {pe_input_channel_data_out[63:52], pe_input_channel_data_out[51:48] >> 1, pe_input_channel_data_out[47:0]};
         end else begin
           cw_output_channel_data_in <= {cw_input_channel_data_out[63:52], cw_input_channel_data_out[51:48] >> 1, cw_input_channel_data_out[47:0]};
@@ -400,7 +414,7 @@ module router (
       end
 
       if (ccw_requests > 0) begin
-        if (ccw_granted) begin
+        if (ccw_granted[0]) begin
           ccw_output_channel_data_in <= {pe_input_channel_data_out[63:52], pe_input_channel_data_out[51:48] >> 1, pe_input_channel_data_out[47:0]};
         end else begin
           ccw_output_channel_data_in <= {ccw_input_channel_data_out[63:52], ccw_input_channel_data_out[51:48] >> 1, ccw_input_channel_data_out[47:0]};
@@ -409,7 +423,7 @@ module router (
 
       // Index 0 is for cw, index 1 is for ccw, index 2 is for ns, and index 3 is for sn
       if (pe_requests > 0) begin
-        case (pe_granted)
+        case (pe_granted[1:0])
           2'b00: begin
             pe_output_channel_data_in <= {cw_input_channel_data_out[63:52], cw_input_channel_data_out[51:48] >> 1, cw_input_channel_data_out[47:0]};
           end
@@ -427,7 +441,7 @@ module router (
 
       // Index 0 is for cw, index 1 is for ccw, index 2 is for pe, and index 3 is for ns
       if (ns_requests > 0) begin
-        case (ns_granted)
+        case (ns_granted[1:0])
           2'b00: begin 
             ns_output_channel_data_in <= {cw_input_channel_data_out[63:56], cw_input_channel_data_out[55:52] >> 1, cw_input_channel_data_out[51:0]};
           end
@@ -445,7 +459,7 @@ module router (
 
       // Index 0 is for cw, index 1 is for ccw, index 2 is for pe, and index 3 is for sn
       if (sn_requests > 0) begin
-        case (sn_granted)
+        case (sn_granted[1:0])
           2'b00: begin 
             sn_output_channel_data_in <= {cw_input_channel_data_out[63:56], cw_input_channel_data_out[55:52] >> 1, cw_input_channel_data_out[51:0]};
           end
@@ -724,5 +738,42 @@ module router (
       end
     end
   endtask
+
+`ifdef DEBUG_ROUTER
+  always @(posedge clk) begin
+    if (reset) begin
+      //$fdisplay(file_name, "%0t,router %0d_%0d,**RESET**,,,,,", $time, pos_x, pos_y);
+    end else begin
+      $fdisplay(file_name, "%0t,router_%0d_%0d,IN,%h,%h,%h,%h,%h",
+        $time, pos_x, pos_y,
+        cwdi, ccwdi, pedi, nsdi, sndi
+      );
+      $fdisplay(file_name, "%0t,router_%0d_%0d,INPUT_OUT,%h,%h,%h,%h,%h",
+        $time, pos_x, pos_y,
+        cw_input_channel_data_out, ccw_input_channel_data_out, pe_input_channel_data_out, ns_input_channel_data_out, sn_input_channel_data_out
+      );
+      $fdisplay(file_name, "%0t,router_%0d_%0d,REQS,%b,%b,%b,%b,%b",
+        $time, pos_x, pos_y,
+        cw_requests, ccw_requests, pe_requests, ns_requests, sn_requests
+      );
+      $fdisplay(file_name, "%0t,router_%0d_%0d,GRANTS,%b,%b,%b,%b,%b",
+        $time, pos_x, pos_y,
+        cw_granted, ccw_granted, pe_granted, ns_granted, sn_granted
+      );
+      $fdisplay(file_name, "%0t,router_%0d_%0d,BLOCKED,%b,%b,%b,%b,%b",
+        $time, pos_x, pos_y,
+        block_cw_input_channel, block_ccw_input_channel, block_pe_input_channel, block_ns_input_channel, block_sn_input_channel
+      );
+      $fdisplay(file_name, "%0t,router_%0d_%0d,OUTPUT_IN,%h,%h,%h,%h,%h",
+        $time, pos_x, pos_y,
+        cw_output_channel_data_in, ccw_output_channel_data_in, pe_output_channel_data_in, ns_output_channel_data_in, sn_output_channel_data_in
+      );
+      $fdisplay(file_name, "%0t,router_%0d_%0d,OUT,%h,%h,%h,%h,%h",
+        $time, pos_x, pos_y,
+        cwdo, ccwdo, pedo, nsdo, sndo
+      );
+    end
+  end
+`endif
 
 endmodule

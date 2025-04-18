@@ -12,7 +12,7 @@
               GND           GND         GND          GND
         (x,y) = (0,0) (x,y) = (1,0) (x,y) = (2,0) (x,y) = (3,0)
 */
-
+`define DEBUG_ROUTER
 
 module mesh_row_1 #(
     parameter PACKET_WIDTH = 64
@@ -99,7 +99,13 @@ module mesh_row_1 #(
     output        node_3_1_memWrEn,
     output        node_3_1_memEn
 
-
+  `ifdef DEBUG_ROUTER
+    ,
+    input wire integer file_name_0,
+    input wire integer file_name_1,
+    input wire integer file_name_2,
+    input wire integer file_name_3
+  `endif
 ); 
 
   // Row 0
@@ -218,6 +224,11 @@ module mesh_row_1 #(
     // PE input/output to NIC
     .pesi(net_so_pesi_01), .pedi(net_do_pedi_01), .peri(net_ro_peri_01),
     .peso(net_si_peso_01), .pedo(net_di_pedo_01), .pero(net_ri_pero_01)
+
+    `ifdef DEBUG_ROUTER
+      , .router_name(4'b0001)
+      , .file_name(file_name_0)
+    `endif
   );
 
   // NIC module instantiation for 0_1
@@ -285,6 +296,11 @@ module mesh_row_1 #(
     // PE input/output to NIC
     .pesi(net_so_pesi_11), .pedi(net_do_pedi_11), .peri(net_ro_peri_11),
     .peso(net_si_peso_11), .pedo(net_di_pedo_11), .pero(net_ri_pero_11)
+
+    `ifdef DEBUG_ROUTER
+      , .router_name(4'b0101)
+      , .file_name(file_name_1)
+    `endif
   );
 
   // NIC module instantiation for 0_1
@@ -352,6 +368,11 @@ module mesh_row_1 #(
     // PE input/output to NIC
     .pesi(net_so_pesi_21), .pedi(net_do_pedi_21), .peri(net_ro_peri_21),
     .peso(net_si_peso_21), .pedo(net_di_pedo_21), .pero(net_ri_pero_21)
+
+    `ifdef DEBUG_ROUTER
+      , .router_name(4'b1001)
+      , .file_name(file_name_2)
+    `endif
   );
 
   // NIC module instantiation for 0_1
@@ -418,6 +439,11 @@ module mesh_row_1 #(
     // PE input/output to NIC
     .pesi(net_so_pesi_31), .pedi(net_do_pedi_31), .peri(net_ro_peri_31),
     .peso(net_si_peso_31), .pedo(net_di_pedo_31), .pero(net_ri_pero_31)
+
+    `ifdef DEBUG_ROUTER
+      , .router_name(4'b1101)
+      , .file_name(file_name_3)
+    `endif
   );
   
   

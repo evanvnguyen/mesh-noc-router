@@ -14,6 +14,7 @@
                   ===================================================
                       GND           GND         GND          GND
 */
+`define DEBUG_ROUTER
 
 module mesh_top_flat (
 
@@ -55,7 +56,13 @@ module mesh_top_flat (
     output cpu_memWrEn_0_0, cpu_memWrEn_1_0, cpu_memWrEn_2_0, cpu_memWrEn_3_0,              // data memory write enable
     output cpu_memEn_0_0, cpu_memEn_1_0, cpu_memEn_2_0, cpu_memEn_3_0                      // data memory enable
 
-
+    `ifdef DEBUG_ROUTER
+    ,
+        input wire integer file_name_0_0, file_name_0_1, file_name_0_2, file_name_0_3,
+        input wire integer file_name_1_0, file_name_1_1, file_name_1_2, file_name_1_3,
+        input wire integer file_name_2_0, file_name_2_1, file_name_2_2, file_name_2_3,
+        input wire integer file_name_3_0, file_name_3_1, file_name_3_2, file_name_3_3
+    `endif
     );
 
     localparam PACKET_WIDTH = 64;
@@ -133,6 +140,11 @@ module mesh_top_flat (
         .node_0_3_addr_out(cpu_addr_out_0_3), .node_1_3_addr_out(cpu_addr_out_1_3), .node_2_3_addr_out(cpu_addr_out_2_3), .node_3_3_addr_out(cpu_addr_out_3_3),        // data memory address
         .node_0_3_memWrEn(cpu_memWrEn_0_3),   .node_1_3_memWrEn(cpu_memWrEn_1_3),   .node_2_3_memWrEn(cpu_memWrEn_2_3),   .node_3_3_memWrEn(cpu_memWrEn_3_3),              // data memory write enable
         .node_0_3_memEn(cpu_memEn_0_3),       .node_1_3_memEn(cpu_memEn_1_3),       .node_2_3_memEn(cpu_memEn_2_3),       .node_3_3_memEn(cpu_memEn_3_3)                       // data memory enable
+
+        `ifdef DEBUG_ROUTER
+        ,
+        .file_name_0(file_name_0_3), .file_name_1(file_name_1_3), .file_name_2(file_name_2_3), .file_name_3(file_name_3_3)
+        `endif
     );
 
     wire [63:0] sndo_from_01_to_sndi_02;
@@ -203,9 +215,10 @@ module mesh_top_flat (
         .node_0_2_memWrEn(cpu_memWrEn_0_2),   .node_1_2_memWrEn(cpu_memWrEn_1_2),   .node_2_2_memWrEn(cpu_memWrEn_2_2),   .node_3_2_memWrEn(cpu_memWrEn_3_2),              // data memory write enable
         .node_0_2_memEn(cpu_memEn_0_2),       .node_1_2_memEn(cpu_memEn_1_2),       .node_2_2_memEn(cpu_memEn_2_2),       .node_3_2_memEn(cpu_memEn_3_2)                       // data memory enable
 
-
-    
-
+        `ifdef DEBUG_ROUTER
+        ,
+        .file_name_0(file_name_0_2), .file_name_1(file_name_1_2), .file_name_2(file_name_2_2), .file_name_3(file_name_3_2)
+        `endif
     );
 
     wire [63:0] sndo_from_00_to_sndi_01;
@@ -276,9 +289,10 @@ module mesh_top_flat (
         .node_0_1_memWrEn(cpu_memWrEn_0_1),   .node_1_1_memWrEn(cpu_memWrEn_1_1),   .node_2_1_memWrEn(cpu_memWrEn_2_1),   .node_3_1_memWrEn(cpu_memWrEn_3_1),              // data memory write enable
         .node_0_1_memEn(cpu_memEn_0_1),       .node_1_1_memEn(cpu_memEn_1_1),       .node_2_1_memEn(cpu_memEn_2_1),       .node_3_1_memEn(cpu_memEn_3_1)                       // data memory enable
 
-
-
-
+        `ifdef DEBUG_ROUTER
+        ,
+        .file_name_0(file_name_0_1), .file_name_1(file_name_1_1), .file_name_2(file_name_2_1), .file_name_3(file_name_3_1)
+        `endif
     );
 
 
@@ -308,8 +322,10 @@ module mesh_top_flat (
         .node_0_0_memWrEn(cpu_memWrEn_0_0),   .node_1_0_memWrEn(cpu_memWrEn_1_0),   .node_2_0_memWrEn(cpu_memWrEn_2_0),   .node_3_0_memWrEn(cpu_memWrEn_3_0),              // data memory write enable
         .node_0_0_memEn(cpu_memEn_0_0),       .node_1_0_memEn(cpu_memEn_1_0),       .node_2_0_memEn(cpu_memEn_2_0),       .node_3_0_memEn(cpu_memEn_3_0)                       // data memory enable
 
-
-
+        `ifdef DEBUG_ROUTER
+        ,
+        .file_name_0(file_name_0_0), .file_name_1(file_name_1_0), .file_name_2(file_name_2_0), .file_name_3(file_name_3_0)
+        `endif
 
     );
 

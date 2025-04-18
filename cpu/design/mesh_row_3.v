@@ -12,7 +12,7 @@
               GND           GND         GND          GND
         (x,y) = (0,0) (x,y) = (1,0) (x,y) = (2,0) (x,y) = (3,0)
 */
-
+`define DEBUG_ROUTER
 
 module mesh_row_3 #(
     parameter PACKET_WIDTH = 64
@@ -78,6 +78,13 @@ module mesh_row_3 #(
     output        node_3_3_memWrEn,
     output        node_3_3_memEn
 
+  `ifdef DEBUG_ROUTER
+    ,
+    input wire integer file_name_0,
+    input wire integer file_name_1,
+    input wire integer file_name_2,
+    input wire integer file_name_3
+  `endif
 ); 
 
   // Row 0
@@ -191,6 +198,11 @@ module mesh_row_3 #(
     // PE input/output to NIC
     .pesi(net_so_pesi_03), .pedi(net_do_pedi_03), .peri(net_ro_peri_03),
     .peso(net_si_peso_03), .pedo(net_di_pedo_03), .pero(net_ri_pero_03)
+
+    `ifdef DEBUG_ROUTER
+      , .router_name(4'b0011)
+      , .file_name(file_name_0)
+    `endif
   );
 
   // NIC module instantiation for 0_2
@@ -258,6 +270,11 @@ four_stage_processor cpu_0_3 (
     // PE input/output to NIC
     .pesi(net_so_pesi_13), .pedi(net_do_pedi_13), .peri(net_ro_peri_13),
     .peso(net_si_peso_13), .pedo(net_di_pedo_13), .pero(net_ri_pero_13)
+
+    `ifdef DEBUG_ROUTER
+      , .router_name(4'b0111)
+      , .file_name(file_name_1)
+    `endif
   );
 
   // NIC module instantiation for 0_2
@@ -325,6 +342,11 @@ four_stage_processor cpu_1_3 (
     // PE input/output to NIC
     .pesi(net_so_pesi_23), .pedi(net_do_pedi_23), .peri(net_ro_peri_23),
     .peso(net_si_peso_23), .pedo(net_di_pedo_23), .pero(net_ri_pero_23)
+
+    `ifdef DEBUG_ROUTER
+      , .router_name(4'b1011)
+      , .file_name(file_name_2)
+    `endif
   );
 
   // NIC module instantiation for 0_2
@@ -391,6 +413,11 @@ four_stage_processor cpu_2_3 (
     // PE input/output to NIC
     .pesi(net_so_pesi_33), .pedi(net_do_pedi_33), .peri(net_ro_peri_33),
     .peso(net_si_peso_33), .pedo(net_di_pedo_33), .pero(net_ri_pero_33)
+
+    `ifdef DEBUG_ROUTER
+      , .router_name(4'b1111)
+      , .file_name(file_name_3)
+    `endif
   );
 
   // NIC module instantiation for 0_2
