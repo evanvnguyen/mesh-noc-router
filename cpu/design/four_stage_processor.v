@@ -219,7 +219,16 @@ always @(id_out_bez or id_out_bnez or rf_out_rB_data or ex_rB_mux_out or nicEn) 
 end
 
 always @(id_stage_ld or ex_stage_ld or id_stage_sd or id_stage_immediate_address or ex_rB_mux_out) begin
-  if (!reset) begin
+  if (reset) begin
+    memEn = 1'b0;
+    memWrEn = 1'b0;
+    d_out = 64'b0;
+    addr_out = 5'b0;
+    addr_nic = 2'b0;
+    nicEn = 1'b0;
+    nicWrEn = 1'b0;
+    d_in_nic = 64'b0;
+  end begin
     memEn = 1'b0;
     memWrEn = 1'b0;
     d_out = 64'b0;
@@ -338,13 +347,6 @@ end
 // This resets all clocked values
 task reset_clocked_values();
   begin
-    addr_out = 31'b0;
-    d_out = 64'b0;
-    memEn = 1'b0;
-    memWrEn = 1'b0;
-    d_in_nic = 64'b0;
-    addr_nic = 2'b0;
-
     id_stage_rA_address <= 5'b0;
     id_stage_rB_address <= 5'b0;
     id_stage_rD_address <= 5'b0;

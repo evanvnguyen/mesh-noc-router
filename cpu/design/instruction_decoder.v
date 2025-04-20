@@ -144,23 +144,4 @@ always @(instruction) begin
   end
 end
 
-always @(posedge clk) begin
-  if (reset) begin
-    rA_address <= 5'b0;
-    rB_address <= 5'b0;
-    rD_address <= 5'b0;
-    alu_operation <= 6'b0;
-    immediate_address <= 16'b0;
-    ppp <= 3'b0;
-    ww <= 2'b0;
-    alu <= 1'b0;
-    sfu <= 1'b0;
-    ld <= 1'b0;
-    sd <= 1'b0;
-    bez <= 1'b0;
-    bnez <= 1'b0;
-    nop <= 1'b0;
-  end
-end
-
 endmodule

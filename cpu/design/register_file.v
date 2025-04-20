@@ -18,7 +18,6 @@ always @(*) begin
   if (reset) begin
     rA_data = 64'b0;
     rB_data = 64'b0;
-    registerFile[0] = 64'b0;
   end else begin  
     if (!writeEn) begin
       rA_data = registerFile[rA_address];
@@ -28,7 +27,9 @@ always @(*) begin
 end
 
 always @(posedge clk) begin
-  if (!reset) begin
+  if (reset) begin
+    registerFile[0] = 64'b0;
+  end else begin
     writeEn = writeEnable;
     if (writeEn) begin
       if (rD_address != 5'b0) begin
