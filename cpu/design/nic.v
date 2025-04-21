@@ -1,129 +1,107 @@
-module nic #(parameter PACKET_WIDTH = 64)(
-    input clk,
-    input reset,
+module nic #(
+    parameter PACKET_WIDTH = 64
+)(
+    input                        clk,
+    input                        reset,
 
     // **** Between CPU and NIC ****
-    input  [1:0] addr,                // Addressing for status reg and channel buffer reg
-    input  [PACKET_WIDTH-1:0] d_in,   // Packet from CPU to NIC (network OUTPUT buffer)
-    output reg [PACKET_WIDTH-1:0] d_out, // Packet from Router to CPU (stored in network INPUT buffer)
-    input nicEn,                      // Enable signal to NIC (if !nicEn, d_out = 0)
-    input nicEnWR,                    // Write enable signal to NIC (if nicEnWR + nicEn, d_in -> network OUTPUT buffer)
+    input      [1:0]             addr,                // Address for status & buffers
+    input      [PACKET_WIDTH-1:0] d_in,                // From CPU ? network OUTPUT buffer
+    output reg [PACKET_WIDTH-1:0] d_out,               // From network INPUT buffer ? CPU
+    input                        nicEn,               // NIC enable
+    input                        nicEnWR,             // NIC write enable
 
     // **** Between Router and NIC ****
-    input  net_si,                     // Handshake signal from Router for network input channel
-    output reg net_ri,                 // Ready handshake signal from NIC to Router for input channel
-    input  [PACKET_WIDTH-1:0] net_di,   // Packet data from Router to NIC (stored in network INPUT buffer)
-    output reg net_so,                 // Handshake signal from NIC to Router for output channel
-    input  net_ro,                     // Ready handshake signal from Router for network output channel
-    output reg [PACKET_WIDTH-1:0] net_do, // Packet data for network output channel
-    input net_polarity                 // Polarity input from Router connected to NIC
+    input                        net_si,              // Router ? NIC, data valid
+    output wire                  net_ri,              // NIC ? Router, ready to accept
+    input      [PACKET_WIDTH-1:0] net_di,              // Router ? NIC, data
+    output reg                   net_so,              // NIC ? Router, data valid
+    input                        net_ro,              // Router ? NIC, ready to accept
+    output reg [PACKET_WIDTH-1:0] net_do,              // NIC ? Router, data
+    input                        net_polarity         // Used to match high-bit polarity
 );
 
-    // Internal Buffers and Status Registers
+    // Internal data buffers
     reg [PACKET_WIDTH-1:0] channel_input_buffer;
     reg [PACKET_WIDTH-1:0] channel_output_buffer;
-    reg channel_input_buffer_status;   
-    reg channel_output_buffer_status;
 
-    // Update Status Registers (0-empty, 1-full)
-    // reduced by 1 cycle
-    always @(*) begin
-        channel_input_buffer_status = (channel_input_buffer == 0) ? 1'b0 : 1'b1;
-        channel_output_buffer_status = (channel_output_buffer == 0) ? 1'b0 : 1'b1;
-        net_ri = (channel_input_buffer_status == 0) ? 1'b1 : 1'b0;
-    end
-    
-    wire output_channel_blocked;
-    // if our output buffer is full and the router channel is full, we are blocked
-    assign output_channel_blocked = net_ro && (channel_output_buffer_status == 1'b1);
-    
-    
-    wire nic_output_clk_gate;
-    assign nic_output_clk_gate = (output_channel_blocked == 1'b0) ? 1'b1 : 1'b0;
-    
-   //` wire NIC_OUTPUT_GCLK;
-   // clk_gate_latch ccw_output_clk_gate (
-   //     .CLK(clk),
-   //     .EN(nic_output_clk_gate), 
-   //     .GCLK(NIC_OUTPUT_GCLK));
+    // Status signals (single source of truth)
+    wire channel_input_buffer_status  = |channel_input_buffer;   // 1 if non-zero/full
+    wire channel_output_buffer_status = |channel_output_buffer;  // 1 if non-zero/full
 
+    // Ready handshake: ready when input buffer is empty
+    assign net_ri = ~channel_input_buffer_status;
 
-    // Send our on clock signal
-    // received on not clocked signal
+    // Clock-gating
+    wire nic_clk_gate_en      = (nicEn || nicEnWR) && (channel_input_buffer_status || channel_output_buffer_status);
+    wire nic_gclk;
+    clk_gate_latch nic_clk_gate (
+        .CLK(clk),
+        .EN (nic_clk_gate_en),
+        .GCLK(nic_gclk)
+    );
+    wire internal_clk = nic_gclk;
 
-    // router handhsake
-    always @(posedge clk) begin
-    //always @(posedge NIC_OUTPUT_GCLK or posedge reset) begin
+    // Detect if output channel is blocked
+    wire output_channel_blocked = net_ro && channel_output_buffer_status;
+    wire nic_output_clk_gate    = ~output_channel_blocked;
+
+    // -------------------------------------------------------------------------
+    // Main sequential logic: reset, NIC RX/TX, CPU push into output buffer
+    // -------------------------------------------------------------------------
+    always @(posedge clk or posedge reset) begin
         if (reset) begin
-            channel_input_buffer <= 0;
-            channel_output_buffer <= 0;
-            channel_input_buffer_status <= 0;
-            channel_output_buffer_status <= 0;
-            d_out <= 0;
-            net_ri <= 1;    // Ready to accept data after reset
-            net_so <= 0;
-            net_do <= 0;
+            channel_input_buffer  <= {PACKET_WIDTH{1'b0}};
+            channel_output_buffer <= {PACKET_WIDTH{1'b0}};
+            //d_out                 <= {PACKET_WIDTH{1'b0}};
+            net_so                <= 1'b0;
+            net_do                <= {PACKET_WIDTH{1'b0}};
         end else begin
-            //else if (net_ro && net_si) begin // next data logic
-                //channel_output_buffer <= d_in;
-            //end
-    
-            // Receive Data from Router into Input Buffer (only if ready and input buffer is empty)\
-            // * add an explicit condition that even though its full, d_out to CPU can get the next piece of data immediately
+            // --- Receive path: Router ? Input Buffer ---
             if (net_ri && net_si) begin
                 channel_input_buffer <= net_di;
             end
 
-
-            // Update net_ri based on input buffer status
-            //net_ri <= (channel_input_buffer_status == 0) ? 1'b1 : 1'b0;
-    
-            // Send data to router (if router ready, polarity ok, buffer is full)
-            if (channel_output_buffer_status && net_ro && (net_polarity == channel_output_buffer[63])) begin
-                net_do <= channel_output_buffer;
-                if (nicEnWR && nicEn && addr == 2'b10) begin // get next data if it was blocked
+            // --- Send path: Output Buffer ? Router ---
+            if (channel_output_buffer_status &&
+                net_ro &&
+                (net_polarity == channel_output_buffer[PACKET_WIDTH-1]))
+            begin
+                net_do  <= channel_output_buffer;
+                net_so  <= 1'b1;
+                // If previously blocked and CPU writes, grab next
+                if (nicEnWR && nicEn && addr == 2'b10) begin
                     channel_output_buffer <= d_in;
-                end else 
-                    channel_output_buffer <= 0;
-                channel_output_buffer <= 0;
-                net_so <= 1;
+                end else begin
+                    channel_output_buffer <= {PACKET_WIDTH{1'b0}};
+                end
             end else begin
-                net_so <= 0;
-                net_do <= 0;
+                net_so <= 1'b0;
+                net_do <= {PACKET_WIDTH{1'b0}};
+            end
+
+            // --- CPU write into output buffer (if empty) ---
+            if (nicEnWR && nicEn && addr == 2'b10 && !channel_output_buffer_status) begin
+                channel_output_buffer <= d_in;
             end
         end
     end
-    
-    always @(nicEn or nicEnWR) begin
-        // Write to Output Buffer (if nicEnWR, nicEn, addr to output buffer, output buffer is empty)
-        if (nicEnWR && nicEn && addr == 2'b10 && !channel_output_buffer_status) begin
-            channel_output_buffer = d_in;
-        end 
-        
-        // Processor Read Logic
+
+    // -------------------------------------------------------------------------
+    // CPU read logic (combinational): drives d_out
+    // -------------------------------------------------------------------------
+    always @(*) begin
         if (nicEn && !nicEnWR) begin
             case (addr)
-                2'b00: begin
-                    d_out = channel_input_buffer;  // Read input buffer
-                    if (net_si)
-                        channel_input_buffer = net_di;  // Immediately load new data if available
-                    else
-                        channel_input_buffer = 64'b0;    // Otherwise clear the buffer
-                end
-                2'b01: d_out = {63'b0, channel_input_buffer_status};               // Read input status
-                2'b10: d_out = 64'b0;                                              // Invalid read from output buffer
-                2'b11: d_out = {63'b0, channel_output_buffer_status};              // Read output status
-                default: d_out = 64'b0;
+                2'b00: d_out = channel_input_buffer;                                 // Read data
+                2'b01: d_out = {{(PACKET_WIDTH-1){1'b0}}, channel_input_buffer_status}; // Input status
+                2'b10: d_out = {PACKET_WIDTH{1'b0}};                                  // Invalid
+                2'b11: d_out = {{(PACKET_WIDTH-1){1'b0}}, channel_output_buffer_status}; // Output status
+                default: d_out = {PACKET_WIDTH{1'b0}};
             endcase
+        end else begin
+            d_out = {PACKET_WIDTH{1'b0}};
         end
     end
-
-//    always @(posedge clk) begin
-//        if (net_si) begin
-//            $display("blah %b", net_si);
-//            $display("Phase=%b, Time=%0t, Destination=%b, Source=%b, Packet Value=%h",
-//                     net_polarity, $time, channel_input_buffer[55:48], channel_input_buffer[47:32], channel_input_buffer);
-//        end
-//    end
 
 endmodule
