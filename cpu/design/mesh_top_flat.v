@@ -130,7 +130,7 @@ module mesh_top_flat (
         .snsi_2_3(snso_from_22_to_snsi_23), .snri_2_3(snro_from_22_to_snri_23), .sndi_2_3(sndo_from_22_to_sndi_23), .nsso_2_3(nssi_from_22_to_nsso_23), .nsro_2_3(nsri_from_22_to_nsro_23), .nsdo_2_3(nsdi_from_22_to_nsdo_23), 
         
         // bottom signal router 3,3 
-        .snsi_3_3(snso_from_32_to_snsi_33), .snri_3_3(snso_from_32_to_snsi_33), .sndi_3_3(sndo_from_32_to_sndi_33), .nsso_3_3(nssi_from_32_to_nsso_33), .nsro_3_3(nsri_from_32_to_nsro_33), .nsdo_3_3(nsdi_from_32_to_nsdo_33),
+        .snsi_3_3(snso_from_32_to_snsi_33), .snri_3_3(snro_from_32_to_snri_33), .sndi_3_3(sndo_from_32_to_sndi_33), .nsso_3_3(nssi_from_32_to_nsso_33), .nsro_3_3(nsri_from_32_to_nsro_33), .nsdo_3_3(nsdi_from_32_to_nsdo_33),
 
 
         .node_0_3_inst_in(cpu_inst_in_0_3), .node_1_3_inst_in(cpu_inst_in_1_3), .node_2_3_inst_in(cpu_inst_in_2_3), .node_3_3_inst_in(cpu_inst_in_3_3),                // from imem
@@ -202,7 +202,7 @@ module mesh_top_flat (
         .snsi_2_2(snso_from_21_to_snsi_22), .snri_2_2(snro_from_21_to_snri_22), .sndi_2_2(sndo_from_21_to_sndi_22), .nsso_2_2(nssi_from_21_to_nsso_22), .nsro_2_2(nsri_from_21_to_nsro_22), .nsdo_2_2(nsdi_from_21_to_nsdo_22), 
 
         // top signal router 3,2 
-        .snso_3_2(snso_from_32_to_snsi_33), .snro_3_2(snso_from_32_to_snsi_33), .sndo_3_2(sndo_from_32_to_sndi_33), .nssi_3_2(nssi_from_32_to_nsso_33), .nsri_3_2(nsri_from_32_to_nsro_33), .nsdi_3_2(nsdi_from_32_to_nsdo_33),
+        .snso_3_2(snso_from_32_to_snsi_33), .snro_3_2(snro_from_32_to_snri_33), .sndo_3_2(sndo_from_32_to_sndi_33), .nssi_3_2(nssi_from_32_to_nsso_33), .nsri_3_2(nsri_from_32_to_nsro_33), .nsdi_3_2(nsdi_from_32_to_nsdo_33),
 
         // bottom signal router 3,2
         .snsi_3_2(snso_from_31_to_snsi_32), .snri_3_2(snro_from_31_to_snri_32), .sndi_3_2(sndo_from_31_to_sndi_32), .nsso_3_2(nssi_from_31_to_nsso_32), .nsro_3_2(nsri_from_31_to_nsro_32), .nsdo_3_2(nsdi_from_31_to_nsdo_32),

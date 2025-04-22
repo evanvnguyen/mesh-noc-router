@@ -45,23 +45,38 @@ localparam NOP          = 6'b111100;
 reg [0:5] opcode;
 
 // Update when the instruction value changes
-always @(instruction) begin
-  rA_address = 5'b0;
-  rB_address = 5'b0;
-  rD_address = 5'b0;
-  alu_operation = 6'b0;
-  immediate_address = 16'b0;
-  ppp = 3'b0;
-  ww = 2'b0;
-  alu = 1'b0;
-  sfu = 1'b0;
-  ld = 1'b0;
-  sd = 1'b0;
-  bez = 1'b0;
-  bnez = 1'b0;
-  nop = 1'b0;
+always @(instruction or reset) begin
+  if (reset) begin
+    rA_address = 5'b0;
+    rB_address = 5'b0;
+    rD_address = 5'b0;
+    alu_operation = 6'b0;
+    immediate_address = 16'b0;
+    ppp = 3'b0;
+    ww = 2'b0;
+    alu = 1'b0;
+    sfu = 1'b0;
+    ld = 1'b0;
+    sd = 1'b0;
+    bez = 1'b0;
+    bnez = 1'b0;
+    nop = 1'b0;
+  end else begin
+    rA_address = 5'b0;
+    rB_address = 5'b0;
+    rD_address = 5'b0;
+    alu_operation = 6'b0;
+    immediate_address = 16'b0;
+    ppp = 3'b0;
+    ww = 2'b0;
+    alu = 1'b0;
+    sfu = 1'b0;
+    ld = 1'b0;
+    sd = 1'b0;
+    bez = 1'b0;
+    bnez = 1'b0;
+    nop = 1'b0;
 
-  if (!reset) begin
     opcode = instruction[OPCODE_MSB:OPCODE_LSB];
     case (opcode)
       ALU_OPCODE: begin

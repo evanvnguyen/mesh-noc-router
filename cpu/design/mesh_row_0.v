@@ -258,8 +258,8 @@ module mesh_row_0 #(
     assign cpu_0_0_gclk_start = ~cpu_0_0_clk_gate_en;
 
   four_stage_processor cpu_0_0 (
-    //.clk(clk),
-    .clk(cpu_0_0_gclk),
+    .clk(clk),
+    //.clk(cpu_0_0_gclk),
 
     .reset(reset),
     .inst_in(node_0_0_inst_in),
@@ -363,8 +363,8 @@ module mesh_row_0 #(
     assign cpu_1_0_gclk_start = ~cpu_1_0_clk_gate_en;
 
     four_stage_processor cpu_1_0 (
-    //.clk(clk),
-    .clk(cpu_1_0_gclk),
+    .clk(clk),
+    //.clk(cpu_1_0_gclk),
 
     .reset(reset),
     .inst_in(node_1_0_inst_in),
@@ -468,8 +468,8 @@ module mesh_row_0 #(
     assign cpu_2_0_gclk_start = ~cpu_2_0_clk_gate_en;
 
     four_stage_processor cpu_2_0 (
-    //.clk(clk),
-    .clk(cpu_2_0_gclk),
+    .clk(clk),
+    //.clk(cpu_2_0_gclk),
 
     .reset(reset),
     .inst_in(node_2_0_inst_in),
@@ -572,8 +572,8 @@ module mesh_row_0 #(
     assign cpu_3_0_gclk_start = ~cpu_3_0_clk_gate_en;
 
     four_stage_processor cpu_3_0 (
-    //.clk(clk),
-    .clk(cpu_3_0_gclk),
+    .clk(clk),
+    //.clk(cpu_3_0_gclk),
 
     .reset(reset),
     .inst_in(node_3_0_inst_in),
